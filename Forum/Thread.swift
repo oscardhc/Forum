@@ -1,0 +1,62 @@
+//
+//  Thread.swift
+//  Forum
+//
+//  Created by Oscar on 2020/9/20.
+//
+
+import Foundation
+
+enum PostType {
+    case uncategorized
+    case sport
+    case study
+}
+
+class Post {
+    
+    var id = "", title = "", summary = ""
+    var type: PostType = .uncategorized
+    var liked = 0, read = 0, commented = 0
+    var visible = true, hasLiked = false, hasDisliked = false, hasFavoured = false
+    var postTime = Date(), lastUpdateTime = Date()
+    
+    static var cnt = 1
+    
+    init() {}
+    init(json: Any) {
+        let thread = json as! [String: Any]
+        commented  = thread["Comment"] as! Int
+        id         = thread["ThreadID"] as! String
+        read       = thread["Read"] as! Int
+        summary    = thread["Summary"] as! String
+        liked      = thread["Praise"] as! Int
+        title      = thread["Title"] as! String
+    }
+    
+    static func samplePost() -> Post {
+        let p = Post()
+        p.id = "00001"
+        p.title = "This is a title"
+        p.summary = "From the first floor"
+        p.liked = cnt * 333
+        p.commented = cnt * 2
+        p.read = cnt * 114514
+        cnt += 1
+        return p
+    }
+    
+}
+
+class Floor {
+    
+    var id = 0
+    var name = "", content = ""
+    var liked = 233
+    var hasLiked = false
+    var time = Date()
+    
+    var replyToName: String?
+    var replyToFloor: Int?
+    
+}

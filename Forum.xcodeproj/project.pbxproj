@@ -3,19 +3,25 @@
 	archiveVersion = 1;
 	classes = {
 	};
-	objectVersion = 50;
+	objectVersion = 52;
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5522CD53251CDAD800ED1657 /* DetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */; };
+		55557CDD25232912002F17AC /* MainCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55557CDC25232912002F17AC /* MainCell.swift */; };
+		55557CE225232966002F17AC /* MainCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55557CE125232966002F17AC /* MainCell.xib */; };
+		55557CEB25237C1A002F17AC /* Socket in Frameworks */ = {isa = PBXBuildFile; productRef = 55557CEA25237C1A002F17AC /* Socket */; };
+		55557CF025237F12002F17AC /* Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55557CEF25237F12002F17AC /* Network.swift */; };
 		55AA465B2516739A00AAF708 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA465A2516739A00AAF708 /* AppDelegate.swift */; };
 		55AA465D2516739A00AAF708 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA465C2516739A00AAF708 /* SceneDelegate.swift */; };
-		55AA465F2516739A00AAF708 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA465E2516739A00AAF708 /* ViewController.swift */; };
 		55AA46622516739A00AAF708 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 55AA46602516739A00AAF708 /* Main.storyboard */; };
 		55AA46652516739A00AAF708 /* Forum.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46632516739A00AAF708 /* Forum.xcdatamodeld */; };
 		55AA46672516739B00AAF708 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 55AA46662516739B00AAF708 /* Assets.xcassets */; };
 		55AA466A2516739B00AAF708 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 55AA46682516739B00AAF708 /* LaunchScreen.storyboard */; };
 		55AA46752516739B00AAF708 /* ForumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46742516739B00AAF708 /* ForumTests.swift */; };
 		55AA46802516739B00AAF708 /* ForumUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA467F2516739B00AAF708 /* ForumUITests.swift */; };
+		55AA469C2516750100AAF708 /* MainTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA469B2516750100AAF708 /* MainTableViewController.swift */; };
+		55AA46A6251799B000AAF708 /* Thread.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46A5251799B000AAF708 /* Thread.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -36,10 +42,13 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailTableViewController.swift; sourceTree = "<group>"; };
+		55557CDC25232912002F17AC /* MainCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCell.swift; sourceTree = "<group>"; };
+		55557CE125232966002F17AC /* MainCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainCell.xib; sourceTree = "<group>"; };
+		55557CEF25237F12002F17AC /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
 		55AA46572516739A00AAF708 /* Forum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Forum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		55AA465A2516739A00AAF708 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		55AA465C2516739A00AAF708 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
-		55AA465E2516739A00AAF708 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
 		55AA46612516739A00AAF708 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		55AA46642516739A00AAF708 /* Forum.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Forum.xcdatamodel; sourceTree = "<group>"; };
 		55AA46662516739B00AAF708 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -51,6 +60,8 @@
 		55AA467B2516739B00AAF708 /* ForumUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ForumUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		55AA467F2516739B00AAF708 /* ForumUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumUITests.swift; sourceTree = "<group>"; };
 		55AA46812516739B00AAF708 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		55AA469B2516750100AAF708 /* MainTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableViewController.swift; sourceTree = "<group>"; };
+		55AA46A5251799B000AAF708 /* Thread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thread.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -58,6 +69,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				55557CEB25237C1A002F17AC /* Socket in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -103,8 +115,13 @@
 			children = (
 				55AA465A2516739A00AAF708 /* AppDelegate.swift */,
 				55AA465C2516739A00AAF708 /* SceneDelegate.swift */,
-				55AA465E2516739A00AAF708 /* ViewController.swift */,
 				55AA46602516739A00AAF708 /* Main.storyboard */,
+				5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */,
+				55AA469B2516750100AAF708 /* MainTableViewController.swift */,
+				55557CDC25232912002F17AC /* MainCell.swift */,
+				55557CE125232966002F17AC /* MainCell.xib */,
+				55AA46A5251799B000AAF708 /* Thread.swift */,
+				55557CEF25237F12002F17AC /* Network.swift */,
 				55AA46662516739B00AAF708 /* Assets.xcassets */,
 				55AA46682516739B00AAF708 /* LaunchScreen.storyboard */,
 				55AA466B2516739B00AAF708 /* Info.plist */,
@@ -147,6 +164,9 @@
 			dependencies = (
 			);
 			name = Forum;
+			packageProductDependencies = (
+				55557CEA25237C1A002F17AC /* Socket */,
+			);
 			productName = Forum;
 			productReference = 55AA46572516739A00AAF708 /* Forum.app */;
 			productType = "com.apple.product-type.application";
@@ -218,6 +238,9 @@
 				Base,
 			);
 			mainGroup = 55AA464E2516739A00AAF708;
+			packageReferences = (
+				55557CE925237C1A002F17AC /* XCRemoteSwiftPackageReference "BlueSocket" */,
+			);
 			productRefGroup = 55AA46582516739A00AAF708 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -236,6 +259,7 @@
 			files = (
 				55AA466A2516739B00AAF708 /* LaunchScreen.storyboard in Resources */,
 				55AA46672516739B00AAF708 /* Assets.xcassets in Resources */,
+				55557CE225232966002F17AC /* MainCell.xib in Resources */,
 				55AA46622516739A00AAF708 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -261,10 +285,14 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				55AA465F2516739A00AAF708 /* ViewController.swift in Sources */,
+				5522CD53251CDAD800ED1657 /* DetailTableViewController.swift in Sources */,
+				55AA469C2516750100AAF708 /* MainTableViewController.swift in Sources */,
+				55557CF025237F12002F17AC /* Network.swift in Sources */,
+				55AA46A6251799B000AAF708 /* Thread.swift in Sources */,
 				55AA465B2516739A00AAF708 /* AppDelegate.swift in Sources */,
 				55AA465D2516739A00AAF708 /* SceneDelegate.swift in Sources */,
 				55AA46652516739A00AAF708 /* Forum.xcdatamodeld in Sources */,
+				55557CDD25232912002F17AC /* MainCell.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -597,6 +625,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		55557CE925237C1A002F17AC /* XCRemoteSwiftPackageReference "BlueSocket" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Kitura/BlueSocket";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 1.0.52;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		55557CEA25237C1A002F17AC /* Socket */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55557CE925237C1A002F17AC /* XCRemoteSwiftPackageReference "BlueSocket" */;
+			productName = Socket;
+		};
+/* End XCSwiftPackageProductDependency section */
 
 /* Begin XCVersionGroup section */
 		55AA46632516739A00AAF708 /* Forum.xcdatamodeld */ = {
