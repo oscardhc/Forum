@@ -20,16 +20,16 @@ class MainTableViewController: UITableViewController {
         
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
         
-        self.posts = NetworkManager.getAllThreads()
+        posts = NetworkManager.getAllThreads()
         
         for i in 1...10 {
             posts.append(Post.samplePost())
         }
     }
-    
-    var posts: [Post] = []
 
     // MARK: - Table view data source
+    
+    var posts: [Post] = []
 
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
@@ -73,6 +73,8 @@ class MainTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        (tableView.cellForRow(at: indexPath) as! ContentTableViewCell).mainView.backgroundColor = .white
+        
+        Globals.detailThread = (tableView.cellForRow(at: indexPath) as! MainCell).idLabel.text!
         
         self.navigationController?.pushViewController(
             UIStoryboard(name: "Main", bundle: nil)

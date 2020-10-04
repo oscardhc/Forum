@@ -16,6 +16,7 @@ class MainCell: UITableViewCell {
     @IBOutlet weak var likedBtn: UIButton!
     @IBOutlet weak var commentBtn: UIButton!
     @IBOutlet weak var readLabel: UILabel!
+    @IBOutlet weak var realCommentBtn: UIButton!
     
     override func awakeFromNib() {
         super.awakeFromNib()
@@ -35,6 +36,15 @@ class MainCell: UITableViewCell {
         likedBtn.setTitle("\(p.liked) liked", for: .normal)
         readLabel.text = "\(p.read) read"
         commentBtn.setTitle("\(p.commented) comments", for: .normal)
+    }
+    
+    func setAsFloorHead(floor f: Floor) {
+        idLabel.text = f.name + " -> " + (f.replyToName ?? "NIL")
+        
+        contentLabel.text = f.content
+        contentLabel.frame = titleLabel.frame
+        titleLabel.text = ""
+        likedBtn.setTitle("\(f.liked) liked", for: .normal)
     }
     
     override func layoutSubviews() {

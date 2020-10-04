@@ -22,9 +22,9 @@ class NetworkManager {
             try s.write(from: data)
             
             let rec = try JSONSerialization.jsonObject(
-                    with: try s.readString()!.data(using: .utf8)!,
-                    options: .allowFragments
-                )
+                with: try s.readString()!.data(using: .utf8)!,
+                options: .allowFragments
+            )
             
             s.close()
             return rec as? [String: Any]
@@ -33,27 +33,35 @@ class NetworkManager {
         }
     }
     
-    static func getData(op_code: String, pa_1: String, pa_2: String, pa_3: String, pa_4: String, pa_5: String) -> [String: Any]? {
-        connect(["op_code": op_code,
-                 "pa_1": pa_1,
-                 "pa_2": pa_2,
-                 "pa_3": pa_3,
-                 "pa_4": pa_4,
-                 "pa_5": pa_5,
-                 "Token": token
-        ])
+    static func getData<T>(
+        op_code: String,
+        pa_1: String, pa_2: String, pa_3: String, pa_4: String, pa_5: String,
+        done: (([String: Any]) -> T)
+    ) -> T? {
+        if let result = connect([
+            "op_code": op_code, "pa_1": pa_1, "pa_2": pa_2, "pa_3": pa_3, "pa_4": pa_4, "pa_5": pa_5, "Token": token
+        ]) {
+            return done(result)
+        } else {
+            print("FAIL!")
+            return nil
+        }
     }
-
     
     static func getAllThreads() -> [Post] {
-        if let rec = getData(op_code: "d", pa_1: "NULL", pa_2: "0", pa_3: "0", pa_4: "0", pa_5: "0") {
-            return (rec["thread_list"]! as! [Any]).map() {
+        getData(op_code: "d", pa_1: "NULL", pa_2: "0", pa_3: "0", pa_4: "0", pa_5: "0") {
+            ($0["thread_list"]! as! [Any]).map() {
                 Post(json: $0)
             }
-        } else {
-            print("FFFAILED!")
-            return []
-        }
+        } ?? []
+    }
+    
+    static func getAllFloors(for threadID: String) -> [Floor] {
+        getData(op_code: "2", pa_1: threadID, pa_2: "0", pa_3: "0", pa_4: "0", pa_5: "0") {
+            ($0["floor_list"]! as! [Any]).map() {
+                Floor(json: $0)
+            }
+        } ?? []
     }
     
 }

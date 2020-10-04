@@ -25,13 +25,13 @@ class Post {
     
     init() {}
     init(json: Any) {
-        let thread = json as! [String: Any]
-        commented  = thread["Comment"] as! Int
-        id         = thread["ThreadID"] as! String
-        read       = thread["Read"] as! Int
-        summary    = thread["Summary"] as! String
-        liked      = thread["Praise"] as! Int
-        title      = thread["Title"] as! String
+        let thread  = json as! [String: Any]
+        commented   = thread["Comment"] as! Int
+        id          = thread["ThreadID"] as! String
+        read        = thread["Read"] as! Int
+        summary     = thread["Summary"] as! String
+        liked       = thread["Praise"] as! Int
+        title       = thread["Title"] as! String
     }
     
     static func samplePost() -> Post {
@@ -50,7 +50,7 @@ class Post {
 
 class Floor {
     
-    var id = 0
+    var id = ""
     var name = "", content = ""
     var liked = 233
     var hasLiked = false
@@ -58,5 +58,18 @@ class Floor {
     
     var replyToName: String?
     var replyToFloor: Int?
+    
+    init() {}
+    init(json: Any) {
+//        print(json)
+        let floor = json as! [String: Any]
+        print(floor)
+        id = floor["FloorID"] as! String
+        content = floor["Context"] as! String
+        name = floor["Speakername"] as! String
+        replyToName = floor["Replytoname"] as? String
+        replyToFloor = floor["Replytofloor"] as? Int
+//        time = Date(from: <#T##Decoder#>)
+    }
     
 }

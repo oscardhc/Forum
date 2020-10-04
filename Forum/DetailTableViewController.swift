@@ -19,18 +19,23 @@ class DetailTableViewController: UITableViewController {
         // self.navigationItem.rightBarButtonItem = self.editButtonItem
         
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
+        
+        floors = NetworkManager.getAllFloors(for: Globals.detailThread)
+        
     }
 
     // MARK: - Table view data source
     
+    var floors: [Floor] = []
+    
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 2
+        return 1
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return section == 0 ? 1 : 3
+        return floors.count
     }
 
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -42,7 +47,7 @@ class DetailTableViewController: UITableViewController {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell
 
             // Configure the cell...
-//        cell.setAsPost(post: posts[0])
+        cell.setAsFloorHead(floor: floors[indexPath.row])
             
         return cell
     }
