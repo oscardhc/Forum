@@ -8,21 +8,85 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Item 2-->
-        <scene sceneID="ZUT-Mc-MKd">
+        <!--Item-->
+        <scene sceneID="7zZ-Ay-gIs">
             <objects>
-                <viewController id="Z8G-gm-r4L" sceneMemberID="viewController">
-                    <view key="view" contentMode="scaleToFill" id="nJh-ax-6s3">
+                <navigationController id="XGd-1B-C8g" sceneMemberID="viewController">
+                    <tabBarItem key="tabBarItem" title="Item" id="5KN-ut-khJ"/>
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="t5f-3I-Wj0">
+                        <rect key="frame" x="0.0" y="44" width="414" height="96"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="ls2-8T-Wkw" kind="relationship" relationship="rootViewController" id="QAl-0H-90A"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="CJE-fW-Fkw" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="858" y="424"/>
+        </scene>
+        <!--About-->
+        <scene sceneID="7Nt-Xb-OAT">
+            <objects>
+                <viewController id="ls2-8T-Wkw" customClass="AboutViewController" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="nww-jU-EuS">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
-                        <viewLayoutGuide key="safeArea" id="KRZ-Qv-rjL"/>
+                        <subviews>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="d41-pF-hSz">
+                                <rect key="frame" x="184" y="433" width="46" height="30"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <connections>
+                                    <action selector="accountBtnClicked:" destination="ls2-8T-Wkw" eventType="touchUpInside" id="2wn-Zb-3Px"/>
+                                </connections>
+                            </button>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="bkf-h9-Vo6"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                     </view>
-                    <tabBarItem key="tabBarItem" title="Item 2" id="bxg-ww-lf1"/>
+                    <navigationItem key="navigationItem" title="About" id="bVB-Mp-IBh"/>
                 </viewController>
-                <placeholder placeholderIdentifier="IBFirstResponder" id="DZW-LM-iqT" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="ryg-Bq-OzI" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="858" y="338"/>
+            <point key="canvasLocation" x="1616" y="424"/>
+        </scene>
+        <!--Login View Controller-->
+        <scene sceneID="W2y-4G-Ir1">
+            <objects>
+                <viewController storyboardIdentifier="LoginVC" id="5Ai-eD-v2Z" customClass="LoginViewController" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="sBa-qh-uMI">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="Login Page" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PUr-te-3Tw">
+                                <rect key="frame" x="165" y="438" width="85" height="21"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                            <navigationBar contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="DH8-6J-T4P">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                                <items>
+                                    <navigationItem title="Login" id="uFr-K4-Bjr">
+                                        <barButtonItem key="rightBarButtonItem" title="Dismiss" id="zTy-hI-l33">
+                                            <connections>
+                                                <action selector="dismissBtnClicked:" destination="5Ai-eD-v2Z" id="l16-0w-vCz"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="4mu-oi-LVw"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="9Ih-Hx-cVw" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2503" y="424"/>
         </scene>
         <!--Root View Controller-->
         <scene sceneID="8fd-8r-FC7">
@@ -47,7 +111,7 @@
                             <outlet property="delegate" destination="bPB-Il-1ZY" id="2O4-BJ-j5W"/>
                         </connections>
                     </tableView>
-                    <navigationItem key="navigationItem" title="Root View Controller" id="Eqj-xK-TbX"/>
+                    <navigationItem key="navigationItem" title="Root View Controller" id="lNK-Zg-my6"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="nvK-ax-sj0" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -56,7 +120,7 @@
         <!--Detail Table View Controller-->
         <scene sceneID="KTf-Qj-dYV">
             <objects>
-                <tableViewController storyboardIdentifier="DetailTableViewController" id="eaM-pm-WDg" customClass="DetailTableViewController" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController storyboardIdentifier="DetailTableVC" id="eaM-pm-WDg" customClass="DetailTableViewController" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="5cW-SI-0fh">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -99,7 +163,7 @@
                     </tabBar>
                     <connections>
                         <segue destination="Qr8-gF-T6n" kind="relationship" relationship="viewControllers" id="DAd-bi-Of7"/>
-                        <segue destination="Z8G-gm-r4L" kind="relationship" relationship="viewControllers" id="Rh3-Me-jvO"/>
+                        <segue destination="XGd-1B-C8g" kind="relationship" relationship="viewControllers" id="zKE-Vp-u8M"/>
                     </connections>
                 </tabBarController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="bva-fe-YCC" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>

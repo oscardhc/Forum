@@ -76,9 +76,11 @@ class MainTableViewController: UITableViewController {
         
         Globals.detailThread = (tableView.cellForRow(at: indexPath) as! MainCell).idLabel.text!
         
+//        present(UIStoryboard(name: "Main", bundle: nil).instantiateViewController(identifier: "DetailTableViewController"), animated: true, completion: nil)
+            
         self.navigationController?.pushViewController(
             UIStoryboard(name: "Main", bundle: nil)
-                .instantiateViewController(identifier: "DetailTableViewController"),
+                .instantiateViewController(identifier: "DetailTableVC"),
             animated: true
         )
     }
