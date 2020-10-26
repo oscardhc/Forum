@@ -13,7 +13,7 @@ enum PostType {
     case study
 }
 
-class Post {
+struct Post {
     
     var id = "", title = "", summary = ""
     var type: PostType = .uncategorized
@@ -35,7 +35,7 @@ class Post {
     }
     
     static func samplePost() -> Post {
-        let p = Post()
+        var p = Post()
         p.id = "00001"
         p.title = "This is a title"
         p.summary = "From the first floor"
@@ -46,9 +46,17 @@ class Post {
         return p
     }
     
+    func generateFirstFloor() -> Floor {
+        var f = Floor()
+        f.content = summary
+        f.name = "1"
+        f.liked = liked
+        return f
+    }
+    
 }
 
-class Floor {
+struct Floor {
     
     var id = ""
     var name = "", content = ""
@@ -69,7 +77,8 @@ class Floor {
         name = floor["Speakername"] as! String
         replyToName = floor["Replytoname"] as? String
         replyToFloor = floor["Replytofloor"] as? Int
-//        time = Date(from: <#T##Decoder#>)
+        time = Util.stringToDate(floor["RTime"] as! String)
+        liked = floor["Praise"] as! Int
     }
     
 }

@@ -40,32 +40,39 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fyk-PJ-aSy">
-                                <rect key="frame" x="78" y="124" width="64" height="28"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fyk-PJ-aSy">
+                                <rect key="frame" x="12" y="126" width="30" height="24"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <state key="normal" title="+赞数"/>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MAi-70-Asr">
-                                <rect key="frame" x="202" y="124" width="61" height="28"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" misplaced="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MAi-70-Asr">
+                                <rect key="frame" x="229" y="126" width="62" height="24"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <state key="normal" title="+评论数"/>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" fixedFrame="YES" text="+阅读量" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lsx-F7-MSG">
-                                <rect key="frame" x="281" y="124" width="116" height="28"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hYU-Wo-K4k">
+                                <rect key="frame" x="359" y="120" width="38" height="30"/>
+                                <state key="normal" title="-评论"/>
+                            </button>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+阅读量" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lsx-F7-MSG">
+                                <rect key="frame" x="309.5" y="132" width="37.5" height="12"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="10"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hYU-Wo-K4k">
-                                <rect key="frame" x="357" y="121" width="38" height="30"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="-评论"/>
-                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemGray5Color"/>
+                        <constraints>
+                            <constraint firstAttribute="bottom" secondItem="fyk-PJ-aSy" secondAttribute="bottom" constant="2" id="4jQ-uQ-dbZ"/>
+                            <constraint firstAttribute="trailing" secondItem="hYU-Wo-K4k" secondAttribute="trailing" constant="11" id="9Vt-tS-Wzn"/>
+                            <constraint firstAttribute="bottom" secondItem="fyk-PJ-aSy" secondAttribute="bottom" constant="2" id="Odb-89-KfP"/>
+                            <constraint firstAttribute="bottom" secondItem="hYU-Wo-K4k" secondAttribute="bottom" constant="2" id="cYd-Mm-0Cc"/>
+                            <constraint firstItem="fyk-PJ-aSy" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="12" id="coc-nv-lOw"/>
+                            <constraint firstAttribute="bottom" secondItem="lsx-F7-MSG" secondAttribute="bottom" constant="8" id="dI0-ys-M9e"/>
+                            <constraint firstAttribute="bottom" secondItem="MAi-70-Asr" secondAttribute="bottom" constant="2" id="fn1-pt-Emk"/>
+                            <constraint firstItem="lsx-F7-MSG" firstAttribute="leading" secondItem="MAi-70-Asr" secondAttribute="trailing" constant="18" id="gjj-yR-z5s"/>
+                            <constraint firstItem="hYU-Wo-K4k" firstAttribute="leading" secondItem="lsx-F7-MSG" secondAttribute="trailing" constant="12" id="vdB-dl-n4V"/>
+                        </constraints>
                     </view>
                 </subviews>
                 <constraints>

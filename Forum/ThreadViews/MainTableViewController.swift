@@ -1,14 +1,14 @@
 //
-//  DetailTableViewController.swift
+//  MainTableViewController.swift
 //  Forum
 //
-//  Created by Oscar on 2020/9/24.
+//  Created by Oscar on 2020/9/20.
 //
 
 import UIKit
 
-class DetailTableViewController: UITableViewController {
-
+class MainTableViewController: UITableViewController {
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -20,36 +20,78 @@ class DetailTableViewController: UITableViewController {
         
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
         
-        floors = NetworkManager.getAllFloors(for: Globals.detailThread)
+        G.posts = Network.getAllThreads()
         
+        for i in 1...10 {
+            G.posts.append(Post.samplePost())
+        }
     }
-
+    
+    @IBAction func newPost(_ sender: Any) {
+        present(
+            UIStoryboard(name: "Main", bundle: nil)
+                .instantiateViewController(identifier: "NewPostVC"),
+            animated: true, completion: nil
+        )
+    }
+    
     // MARK: - Table view data source
-    
-    var floors: [Floor] = []
-    
+
     override func numberOfSections(in tableView: UITableView) -> Int {
         // #warning Incomplete implementation, return the number of sections
-        return 1
+        return 2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return floors.count
+        return section == 0 ? 1 : G.posts.count
     }
 
+    
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        if indexPath.section == 0 {
+            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "HeadCell", for: indexPath)
+
+            // Configure the cell...
+
+            return cell
+        } else {
+            
+            let cell = tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell
+
+            // Configure the cell...
+            cell.setAsPost(post: G.posts[indexPath.row])
+            
+            return cell
+        }
+    }
+    
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 200
     }
     
-    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+    override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
+//        (tableView.cellForRow(at: indexPath) as! ContentTableViewCell).mainView.backgroundColor = .red
+        return indexPath
+    }
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+//        (tableView.cellForRow(at: indexPath) as! ContentTableViewCell).mainView.backgroundColor = .white
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell
-
-            // Configure the cell...
-        cell.setAsFloorHead(floor: floors[indexPath.row])
+        if let cell = tableView.cellForRow(at: indexPath) as? MainCell {
             
-        return cell
+            G.detailThread = cell.idLabel.text!
+            G.detailThreadIndex = indexPath.row
+            
+            self.navigationController?.pushViewController(
+                UIStoryboard(name: "Main", bundle: nil)
+                    .instantiateViewController(identifier: "DetailTableVC"),
+                animated: true
+            )
+            
+        }
     }
     
 

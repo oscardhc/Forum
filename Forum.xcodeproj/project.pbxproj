@@ -8,6 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		5522CD53251CDAD800ED1657 /* DetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */; };
+		55370A2D253DF213008FB742 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55370A2C253DF213008FB742 /* Utilities.swift */; };
 		55557CDD25232912002F17AC /* MainCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55557CDC25232912002F17AC /* MainCell.swift */; };
 		55557CE225232966002F17AC /* MainCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55557CE125232966002F17AC /* MainCell.xib */; };
 		55557CEB25237C1A002F17AC /* Socket in Frameworks */ = {isa = PBXBuildFile; productRef = 55557CEA25237C1A002F17AC /* Socket */; };
@@ -24,7 +25,9 @@
 		55AA46752516739B00AAF708 /* ForumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46742516739B00AAF708 /* ForumTests.swift */; };
 		55AA46802516739B00AAF708 /* ForumUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA467F2516739B00AAF708 /* ForumUITests.swift */; };
 		55AA469C2516750100AAF708 /* MainTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA469B2516750100AAF708 /* MainTableViewController.swift */; };
-		55AA46A6251799B000AAF708 /* Thread.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46A5251799B000AAF708 /* Thread.swift */; };
+		55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46A5251799B000AAF708 /* DataTypes.swift */; };
+		55D748F7253EC35E00F44EF8 /* NewPostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D748F6253EC35E00F44EF8 /* NewPostViewController.swift */; };
+		55F81359253F1EF2009FFA21 /* Material in Frameworks */ = {isa = PBXBuildFile; productRef = 55F81358253F1EF2009FFA21 /* Material */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -46,6 +49,7 @@
 
 /* Begin PBXFileReference section */
 		5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailTableViewController.swift; sourceTree = "<group>"; };
+		55370A2C253DF213008FB742 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		55557CDC25232912002F17AC /* MainCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCell.swift; sourceTree = "<group>"; };
 		55557CE125232966002F17AC /* MainCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainCell.xib; sourceTree = "<group>"; };
 		55557CEF25237F12002F17AC /* Network.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Network.swift; sourceTree = "<group>"; };
@@ -67,7 +71,8 @@
 		55AA467F2516739B00AAF708 /* ForumUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumUITests.swift; sourceTree = "<group>"; };
 		55AA46812516739B00AAF708 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		55AA469B2516750100AAF708 /* MainTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableViewController.swift; sourceTree = "<group>"; };
-		55AA46A5251799B000AAF708 /* Thread.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Thread.swift; sourceTree = "<group>"; };
+		55AA46A5251799B000AAF708 /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
+		55D748F6253EC35E00F44EF8 /* NewPostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -76,6 +81,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				55557CEB25237C1A002F17AC /* Socket in Frameworks */,
+				55F81359253F1EF2009FFA21 /* Material in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -96,6 +102,38 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		55370A1F253DF111008FB742 /* ThreadViews */ = {
+			isa = PBXGroup;
+			children = (
+				55AA469B2516750100AAF708 /* MainTableViewController.swift */,
+				5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */,
+				55557CDC25232912002F17AC /* MainCell.swift */,
+				55557CE125232966002F17AC /* MainCell.xib */,
+			);
+			path = ThreadViews;
+			sourceTree = "<group>";
+		};
+		55370A20253DF132008FB742 /* OtherViews */ = {
+			isa = PBXGroup;
+			children = (
+				556CA30B252A4A5C00246DA0 /* LoginViewController.swift */,
+				556CA306252A46B500246DA0 /* AboutViewController.swift */,
+				55D748F6253EC35E00F44EF8 /* NewPostViewController.swift */,
+			);
+			path = OtherViews;
+			sourceTree = "<group>";
+		};
+		55370A21253DF14A008FB742 /* Misc */ = {
+			isa = PBXGroup;
+			children = (
+				556CA2F9252A36C000246DA0 /* Globals.swift */,
+				55370A2C253DF213008FB742 /* Utilities.swift */,
+				55AA46A5251799B000AAF708 /* DataTypes.swift */,
+				55557CEF25237F12002F17AC /* Network.swift */,
+			);
+			path = Misc;
+			sourceTree = "<group>";
+		};
 		55AA464E2516739A00AAF708 = {
 			isa = PBXGroup;
 			children = (
@@ -122,15 +160,9 @@
 				55AA465A2516739A00AAF708 /* AppDelegate.swift */,
 				55AA465C2516739A00AAF708 /* SceneDelegate.swift */,
 				55AA46602516739A00AAF708 /* Main.storyboard */,
-				556CA30B252A4A5C00246DA0 /* LoginViewController.swift */,
-				556CA306252A46B500246DA0 /* AboutViewController.swift */,
-				5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */,
-				55AA469B2516750100AAF708 /* MainTableViewController.swift */,
-				55557CDC25232912002F17AC /* MainCell.swift */,
-				556CA2F9252A36C000246DA0 /* Globals.swift */,
-				55557CE125232966002F17AC /* MainCell.xib */,
-				55AA46A5251799B000AAF708 /* Thread.swift */,
-				55557CEF25237F12002F17AC /* Network.swift */,
+				55370A1F253DF111008FB742 /* ThreadViews */,
+				55370A20253DF132008FB742 /* OtherViews */,
+				55370A21253DF14A008FB742 /* Misc */,
 				55AA46662516739B00AAF708 /* Assets.xcassets */,
 				55AA46682516739B00AAF708 /* LaunchScreen.storyboard */,
 				55AA466B2516739B00AAF708 /* Info.plist */,
@@ -175,6 +207,7 @@
 			name = Forum;
 			packageProductDependencies = (
 				55557CEA25237C1A002F17AC /* Socket */,
+				55F81358253F1EF2009FFA21 /* Material */,
 			);
 			productName = Forum;
 			productReference = 55AA46572516739A00AAF708 /* Forum.app */;
@@ -249,6 +282,7 @@
 			mainGroup = 55AA464E2516739A00AAF708;
 			packageReferences = (
 				55557CE925237C1A002F17AC /* XCRemoteSwiftPackageReference "BlueSocket" */,
+				55F81357253F1EF2009FFA21 /* XCRemoteSwiftPackageReference "Material" */,
 			);
 			productRefGroup = 55AA46582516739A00AAF708 /* Products */;
 			projectDirPath = "";
@@ -295,11 +329,13 @@
 			buildActionMask = 2147483647;
 			files = (
 				5522CD53251CDAD800ED1657 /* DetailTableViewController.swift in Sources */,
+				55D748F7253EC35E00F44EF8 /* NewPostViewController.swift in Sources */,
 				55AA469C2516750100AAF708 /* MainTableViewController.swift in Sources */,
 				55557CF025237F12002F17AC /* Network.swift in Sources */,
-				55AA46A6251799B000AAF708 /* Thread.swift in Sources */,
+				55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */,
 				55AA465B2516739A00AAF708 /* AppDelegate.swift in Sources */,
 				55AA465D2516739A00AAF708 /* SceneDelegate.swift in Sources */,
+				55370A2D253DF213008FB742 /* Utilities.swift in Sources */,
 				55AA46652516739A00AAF708 /* Forum.xcdatamodeld in Sources */,
 				55557CDD25232912002F17AC /* MainCell.swift in Sources */,
 				556CA307252A46B500246DA0 /* AboutViewController.swift in Sources */,
@@ -647,6 +683,14 @@
 				minimumVersion = 1.0.52;
 			};
 		};
+		55F81357253F1EF2009FFA21 /* XCRemoteSwiftPackageReference "Material" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/CosmicMind/Material";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 3.1.8;
+			};
+		};
 /* End XCRemoteSwiftPackageReference section */
 
 /* Begin XCSwiftPackageProductDependency section */
@@ -654,6 +698,11 @@
 			isa = XCSwiftPackageProductDependency;
 			package = 55557CE925237C1A002F17AC /* XCRemoteSwiftPackageReference "BlueSocket" */;
 			productName = Socket;
+		};
+		55F81358253F1EF2009FFA21 /* Material */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 55F81357253F1EF2009FFA21 /* XCRemoteSwiftPackageReference "Material" */;
+			productName = Material;
 		};
 /* End XCSwiftPackageProductDependency section */
 

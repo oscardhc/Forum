@@ -7,8 +7,11 @@
 
 import Foundation
 
-class Globals {
+class G {
     
     static var detailThread = "unset"
+    static var detailThreadIndex = 0
+    static var posts: [Post] = []
+    static var floors: [Floor] = []
     
 }
