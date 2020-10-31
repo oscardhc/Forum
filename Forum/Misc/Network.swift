@@ -49,15 +49,21 @@ class Network {
         }
     }
     
-    static func getAllThreads() -> [Post] {
-        getData(op_code: "d", pa_1: "NULL") {
-            ($0["thread_list"]! as! [Any]).map() {
-                Post(json: $0)
-            }
-        } ?? []
+    static let parseResultThreads: ([String: Any]) -> [Thread] = {
+        ($0["thread_list"]! as! [Any]).map() {
+            Thread(json: $0)
+        }
     }
     
-    static func getAllFloors(for threadID: String) -> [Floor] {
+    enum GetThreadType: String {
+        case Default = "1", Favoured = "6", My = "7"
+    }
+    
+    static func getThreads(type: GetThreadType, lastSeenID: String = "NULL") -> [Thread] {
+        getData(op_code: type.rawValue, pa_1: lastSeenID, done: parseResultThreads) ?? []
+    }
+    
+    static func getFloors(for threadID: String) -> [Floor] {
         getData(op_code: "2", pa_1: threadID) {
             ($0["floor_list"]! as! [Any]).map() {
                 Floor(json: $0)
@@ -77,12 +83,45 @@ class Network {
         } ?? (false, "")
     }
     
-    static func likeFloor(for threadID: String, floor: String) -> Bool {
-        getData(op_code: "8", pa_1: threadID, pa_2: "0", pa_3: "1", pa_4: floor, done: {_ in true}) ?? false
+    static func favourThread(for threadID: String) -> Bool {
+        getData(op_code: "5", pa_1: threadID, pa_3: "1", done: {_ in true}) ?? false
     }
     
-    static func newPost(title: String, block: String, content: String) -> Bool {
+    static func cancelFavourThread(for threadID: String) -> Bool {
+        getData(op_code: "5", pa_1: threadID, pa_3: "2", done: {_ in true}) ?? false
+    }
+    
+    static func likeFloor(for threadID: String, floor: String) -> Bool {
+        getData(op_code: "8", pa_1: threadID, pa_3: "1", pa_4: floor, done: {_ in true}) ?? false
+    }
+    
+    static func cancelLikeFloor(for threadID: String, floor: String) -> Bool {
+        getData(op_code: "8_2", pa_1: threadID, pa_3: "2", pa_4: floor, done: {_ in true}) ?? false
+    }
+    
+    static func likeThread(for threadID: String) -> Bool {
+        getData(op_code: "8_3", pa_1: threadID, pa_3: "1", pa_4: "1", done: {_ in true}) ?? false
+    }
+    
+    static func cancelLikeThread(for threadID: String) -> Bool {
+        getData(op_code: "8_3", pa_1: threadID, pa_3: "2", pa_4: "1", done: {_ in true}) ?? false
+    }
+    
+    static func dislikeThread(for threadID: String) -> Bool {
+        getData(op_code: "9", pa_1: threadID, pa_3: "1", pa_4: "1", done: {_ in true}) ?? false
+    }
+    
+    static func cancelDislikeThread(for threadID: String) -> Bool {
+        getData(op_code: "9_2", pa_1: threadID, pa_3: "1", pa_4: "1", done: {_ in true}) ?? false
+    }
+//    static func getMessage(lastSeenID: )
+    
+    static func newThread(title: String, block: String, content: String) -> Bool {
         getData(op_code: "3", pa_1: title, pa_2: block, pa_3: content, done: {_ in true}) ?? false
+    }
+    
+    static func newReply(for threadID: String, floor: String?, content: String) -> Bool {
+        getData(op_code: floor == nil ? "4" : "4_2", pa_1: threadID, pa_3: content, pa_4: floor ?? "0", done: {_ in true}) ?? false
     }
     
 }

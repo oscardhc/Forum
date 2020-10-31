@@ -9,10 +9,9 @@ import UIKit
 
 class DetailTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     
-    let replyView = UIView(frame: CGRect(x: 0, y: 0, width: UIScreen.main.bounds.width, height: UIScreen.main.bounds.height / 3))
-    
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var textField: UITextField!
+    @IBOutlet weak var bottomSpace: NSLayoutConstraint!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -30,6 +29,8 @@ class DetailTableViewController: UIViewController, UITableViewDelegate, UITableV
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         textField.delegate = self
         
+        bottomSpace.constant = G.bottomDelta
+        
         let gesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(_:)))
         gesture.numberOfTouchesRequired = 1
         gesture.cancelsTouchesInView = false
@@ -37,8 +38,7 @@ class DetailTableViewController: UIViewController, UITableViewDelegate, UITableV
         
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
         
-        G.floors = [G.posts[G.detailThreadIndex].generateFirstFloor()] + Network.getAllFloors(for: G.detailThread)
-        replyView.backgroundColor = .red
+        G.floors = [G.threads[G.detailThreadIndex].generateFirstFloor()] + [G.threads[G.detailThreadIndex].generateFirstFloor()] + [G.threads[G.detailThreadIndex].generateFirstFloor()] + Network.getFloors(for: G.detailThread)
         
     }
     
@@ -52,12 +52,26 @@ class DetailTableViewController: UIViewController, UITableViewDelegate, UITableV
         self.tabBarController?.tabBar.isHidden = false
     }
     
-    @objc func keyboardWillShow(_ sender: Any) {
+    @objc func keyboardWillShow(_ sender: Notification) {
         print("WILL SHOW!!!")
+        let height = (sender.userInfo![UIResponder.keyboardFrameEndUserInfoKey]! as! NSValue).cgRectValue.height
+        var time: TimeInterval = 0
+        (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
+        print(height, time)
+        bottomSpace.constant = height + G.bottomDelta
+        UIView.animate(withDuration: time) {
+            self.view.layoutIfNeeded()
+        }
     }
     
-    @objc func keyboardWillHide(_ sender: Any) {
+    @objc func keyboardWillHide(_ sender: Notification) {
         print("WILL HIDE!!!")
+        var time: TimeInterval = 0
+        (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
+        bottomSpace.constant = G.bottomDelta
+        UIView.animate(withDuration: time) {
+            self.view.layoutIfNeeded()
+        }
     }
     
     @objc func viewTapped(_ sender: Any) {

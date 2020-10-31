@@ -6,12 +6,14 @@
 //
 
 import Foundation
+import UIKit
 
 class G {
     
     static var detailThread = "unset"
     static var detailThreadIndex = 0
-    static var posts: [Post] = []
+    static var threads: [Thread] = []
     static var floors: [Floor] = []
+    static let bottomDelta: CGFloat = 0
     
 }

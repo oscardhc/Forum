@@ -20,17 +20,17 @@ class MainTableViewController: UITableViewController {
         
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
         
-        G.posts = Network.getAllThreads()
+        G.threads = Network.getThreads(type: .Default)
         
         for i in 1...10 {
-            G.posts.append(Post.samplePost())
+            G.threads.append(Thread.samplePost())
         }
     }
     
-    @IBAction func newPost(_ sender: Any) {
+    @IBAction func newThread(_ sender: Any) {
         present(
             UIStoryboard(name: "Main", bundle: nil)
-                .instantiateViewController(identifier: "NewPostVC"),
+                .instantiateViewController(identifier: "NewThreadVC"),
             animated: true, completion: nil
         )
     }
@@ -44,7 +44,7 @@ class MainTableViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return section == 0 ? 1 : G.posts.count
+        return section == 0 ? 1 : G.threads.count
     }
 
     
@@ -62,7 +62,7 @@ class MainTableViewController: UITableViewController {
             let cell = tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell
 
             // Configure the cell...
-            cell.setAsPost(post: G.posts[indexPath.row])
+            cell.setAsThread(thread: G.threads[indexPath.row])
             
             return cell
         }

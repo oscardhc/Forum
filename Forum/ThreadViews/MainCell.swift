@@ -21,6 +21,7 @@ class MainCell: UITableViewCell {
     override func awakeFromNib() {
         super.awakeFromNib()
         // Initialization code
+        
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -29,13 +30,13 @@ class MainCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func setAsPost(post p: Post) {
-        titleLabel.text = p.title
-        idLabel.text = p.id
-        contentLabel.text = p.summary
-        likedBtn.setTitle("\(p.liked) liked", for: .normal)
-        readLabel.text = "\(p.read) read"
-        commentBtn.setTitle("\(p.commented) comments", for: .normal)
+    func setAsThread(thread t: Thread) {
+        titleLabel.text = t.title
+        idLabel.text = t.id
+        contentLabel.text = t.summary
+        likedBtn.setTitle("\(t.liked) liked", for: .normal)
+        readLabel.text = "\(t.read) read"
+        commentBtn.setTitle("\(t.commented) comments", for: .normal)
     }
     
     func setAsFloorHead(floor f: Floor) {

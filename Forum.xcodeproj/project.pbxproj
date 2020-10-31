@@ -26,7 +26,7 @@
 		55AA46802516739B00AAF708 /* ForumUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA467F2516739B00AAF708 /* ForumUITests.swift */; };
 		55AA469C2516750100AAF708 /* MainTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA469B2516750100AAF708 /* MainTableViewController.swift */; };
 		55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46A5251799B000AAF708 /* DataTypes.swift */; };
-		55D748F7253EC35E00F44EF8 /* NewPostViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D748F6253EC35E00F44EF8 /* NewPostViewController.swift */; };
+		55D748F7253EC35E00F44EF8 /* NewThreadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D748F6253EC35E00F44EF8 /* NewThreadViewController.swift */; };
 		55F81359253F1EF2009FFA21 /* Material in Frameworks */ = {isa = PBXBuildFile; productRef = 55F81358253F1EF2009FFA21 /* Material */; };
 /* End PBXBuildFile section */
 
@@ -72,7 +72,7 @@
 		55AA46812516739B00AAF708 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		55AA469B2516750100AAF708 /* MainTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableViewController.swift; sourceTree = "<group>"; };
 		55AA46A5251799B000AAF708 /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
-		55D748F6253EC35E00F44EF8 /* NewPostViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewPostViewController.swift; sourceTree = "<group>"; };
+		55D748F6253EC35E00F44EF8 /* NewThreadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewThreadViewController.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -118,7 +118,7 @@
 			children = (
 				556CA30B252A4A5C00246DA0 /* LoginViewController.swift */,
 				556CA306252A46B500246DA0 /* AboutViewController.swift */,
-				55D748F6253EC35E00F44EF8 /* NewPostViewController.swift */,
+				55D748F6253EC35E00F44EF8 /* NewThreadViewController.swift */,
 			);
 			path = OtherViews;
 			sourceTree = "<group>";
@@ -329,7 +329,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				5522CD53251CDAD800ED1657 /* DetailTableViewController.swift in Sources */,
-				55D748F7253EC35E00F44EF8 /* NewPostViewController.swift in Sources */,
+				55D748F7253EC35E00F44EF8 /* NewThreadViewController.swift in Sources */,
 				55AA469C2516750100AAF708 /* MainTableViewController.swift in Sources */,
 				55557CF025237F12002F17AC /* Network.swift in Sources */,
 				55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */,

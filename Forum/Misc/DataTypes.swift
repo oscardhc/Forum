@@ -7,16 +7,16 @@
 
 import Foundation
 
-enum PostType {
+enum ThreadType {
     case uncategorized
     case sport
     case study
 }
 
-struct Post {
+struct Thread {
     
     var id = "", title = "", summary = ""
-    var type: PostType = .uncategorized
+    var type: ThreadType = .uncategorized
     var liked = 0, read = 0, commented = 0
     var visible = true, hasLiked = false, hasDisliked = false, hasFavoured = false
     var postTime = Date(), lastUpdateTime = Date()
@@ -34,8 +34,8 @@ struct Post {
         title       = thread["Title"] as! String
     }
     
-    static func samplePost() -> Post {
-        var p = Post()
+    static func samplePost() -> Thread {
+        var p = Thread()
         p.id = "00001"
         p.title = "This is a title"
         p.summary = "From the first floor"
