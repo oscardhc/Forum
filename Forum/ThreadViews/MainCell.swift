@@ -30,22 +30,23 @@ class MainCell: UITableViewCell {
         // Configure the view for the selected state
     }
     
-    func setAsThread(thread t: Thread) {
+    func setAsThread(thread t: Thread) -> Self {
         titleLabel.text = t.title
         idLabel.text = t.id
         contentLabel.text = t.summary
         likedBtn.setTitle("\(t.liked) liked", for: .normal)
         readLabel.text = "\(t.read) read"
         commentBtn.setTitle("\(t.commented) comments", for: .normal)
+        return self
     }
     
-    func setAsFloorHead(floor f: Floor) {
+    func setAsFloorHead(floor f: Floor) -> Self {
         idLabel.text = f.name + " -> " + (f.replyToName ?? "NIL")
-        
         contentLabel.text = f.content
         contentLabel.frame = titleLabel.frame
         titleLabel.text = ""
         likedBtn.setTitle("\(f.liked) liked", for: .normal)
+        return self
     }
     
     override func layoutSubviews() {

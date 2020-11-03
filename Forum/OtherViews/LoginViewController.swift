@@ -39,7 +39,7 @@ class LoginViewController: UIViewController {
         if let code = codeTextField.text, sentEmail != "" {
             let (success, token) = Network.performLogin(with: sentEmail, verificationCode: code)
             if success {
-                Network.token = token
+                G.token = token
                 print("Success! token = \(token)")
                 dismiss(animated: true, completion: nil)
             }

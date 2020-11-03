@@ -12,7 +12,6 @@ import UIKit
 class Network {
     
     static let e = JSONEncoder(), ip = "172.81.215.104", port: Int32 = 8080
-    static var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyaWQiOiIyM2EzMDhiNjgxYTIwYjQ5YjlmYzFiNzA0MjdlNWNmNjQyMTAyMDdmMDQwZWZiZTEyZGViZDYxM2VmZDJlMGI5IiwiZGV2aWNlaWQiOiJDRDAwNTMwMS02RDlDLTQ2MEMtOUZBNS03RjZGRTRBQzkwMzUiLCJpYXQiOjE2MDMxNzU3NDIsImV4cCI6MTYwNTc2Nzc0Mn0.BqAbK7QDOOhR-IYl-PJI3lYDY8Lyd1fXbx4ERrA9jmQ"
     
     static private func connect<T: Encodable>(_ data: T) -> [String: Any]? {
         do {
@@ -40,7 +39,7 @@ class Network {
         done: (([String: Any]) -> T)
     ) -> T? {
         if let result = connect([
-            "op_code": op_code, "pa_1": pa_1, "pa_2": pa_2, "pa_3": pa_3, "pa_4": pa_4, "pa_5": pa_5, "Token": token
+            "op_code": op_code, "pa_1": pa_1, "pa_2": pa_2, "pa_3": pa_3, "pa_4": pa_4, "pa_5": pa_5, "Token": G.token
         ]) {
             return done(result)
         } else {

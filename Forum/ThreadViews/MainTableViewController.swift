@@ -6,70 +6,84 @@
 //
 
 import UIKit
+import GTMRefresh
 
 class MainTableViewController: UITableViewController {
+    
+    enum Scene {
+        case main, myThreads
+    }
+    private var scene = Scene.main
+    
+    var threads = [Thread]()
+    
+    func setScene(_ s: Scene) -> Self {
+        scene = s
+        return self
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        // Uncomment the following line to preserve selection between presentations
-        // self.clearsSelectionOnViewWillAppear = false
-
-        // Uncomment the following line to display an Edit button in the navigation bar for this view controller.
-        // self.navigationItem.rightBarButtonItem = self.editButtonItem
+        navigationItem.title = scene == .main ? "Threads" : "My Threads"
         
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
+        tableView.gtm_addRefreshHeaderView {
+            print("Refresh!", self.scene)
+            sleep(2)
+            self.tableView.endRefreshing()
+        }
+        tableView.gtm_addLoadMoreFooterView {
+            print("Load More!", self.scene)
+            self.loadMore()
+            self.tableView.endRefreshing()
+        }
+        tableView.headerIdleImage(UIImage())
+        tableView
+            .pullUpToRefreshText("")
+            .pullDownToRefreshText("")
+            .releaseToRefreshText("")
+            .releaseLoadMoreText("")
+            .refreshSuccessText("")
+            .refreshFailureText("")
+            .refreshingText("")
         
-        G.threads = Network.getThreads(type: .Default)
-        
+        threads = Network.getThreads(type: .Default)
         for i in 1...10 {
-            G.threads.append(Thread.samplePost())
+            threads.append(Thread.samplePost())
         }
     }
     
+    func loadMore() {
+//        let last = threads
+    }
+    
     @IBAction func newThread(_ sender: Any) {
-        present(
-            UIStoryboard(name: "Main", bundle: nil)
-                .instantiateViewController(identifier: "NewThreadVC"),
-            animated: true, completion: nil
-        )
+        present(*"NewThreadVC", animated: true, completion: nil)
     }
     
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
-        return 2
+        2
     }
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        // #warning Incomplete implementation, return the number of rows
-        return section == 0 ? 1 : G.threads.count
+        section == 0
+            ? 1
+            : threads.count
     }
-
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        if indexPath.section == 0 {
-            
-            let cell = tableView.dequeueReusableCell(withIdentifier: "HeadCell", for: indexPath)
-
-            // Configure the cell...
-
-            return cell
-        } else {
-            
-            let cell = tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell
-
-            // Configure the cell...
-            cell.setAsThread(thread: G.threads[indexPath.row])
-            
-            return cell
-        }
+        indexPath.section == 0
+            ?  tableView.dequeueReusableCell(withIdentifier: "HeadCell", for: indexPath)
+            : (tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell).setAsThread(thread: threads[indexPath.row])
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        return 200
+        indexPath.section == 0
+            ? (scene == .main ? 150 : 0)
+            : 200
     }
     
     override func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
@@ -80,14 +94,11 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 //        (tableView.cellForRow(at: indexPath) as! ContentTableViewCell).mainView.backgroundColor = .white
         
-        if let cell = tableView.cellForRow(at: indexPath) as? MainCell {
-            
-            G.detailThread = cell.idLabel.text!
-            G.detailThreadIndex = indexPath.row
+        if tableView.cellForRow(at: indexPath) is MainCell {
             
             self.navigationController?.pushViewController(
-                UIStoryboard(name: "Main", bundle: nil)
-                    .instantiateViewController(identifier: "DetailTableVC"),
+                (*"DetailTableVC" as! DetailTableViewController)
+                    .forThread(threads[indexPath.row]),
                 animated: true
             )
             

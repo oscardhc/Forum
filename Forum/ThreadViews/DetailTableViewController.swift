@@ -13,6 +13,9 @@ class DetailTableViewController: UIViewController, UITableViewDelegate, UITableV
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var bottomSpace: NSLayoutConstraint!
     
+    var floors = [Floor]()
+    var detailThread = ""
+    
     override func viewDidLoad() {
         super.viewDidLoad()
 
@@ -38,8 +41,14 @@ class DetailTableViewController: UIViewController, UITableViewDelegate, UITableV
         
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
         
-        G.floors = [G.threads[G.detailThreadIndex].generateFirstFloor()] + [G.threads[G.detailThreadIndex].generateFirstFloor()] + [G.threads[G.detailThreadIndex].generateFirstFloor()] + Network.getFloors(for: G.detailThread)
+        floors += Network.getFloors(for: detailThread)
         
+    }
+    
+    func forThread(_ t: Thread) -> Self {
+        detailThread = t.id
+        floors = [t.generateFirstFloor()]
+        return self
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -88,7 +97,7 @@ class DetailTableViewController: UIViewController, UITableViewDelegate, UITableV
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         // #warning Incomplete implementation, return the number of rows
-        return G.floors.count
+        return floors.count
     }
 
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -96,13 +105,8 @@ class DetailTableViewController: UIViewController, UITableViewDelegate, UITableV
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell
-
-            // Configure the cell...
-        cell.setAsFloorHead(floor: G.floors[indexPath.row])
-            
-        return cell
+        (tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell)
+            .setAsFloorHead(floor: floors[indexPath.row])
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
