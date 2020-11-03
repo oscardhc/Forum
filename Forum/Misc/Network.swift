@@ -54,11 +54,11 @@ class Network {
         }
     }
     
-    enum GetThreadType: String {
+    enum NetworkGetThreadType: String {
         case Default = "1", Favoured = "6", My = "7"
     }
     
-    static func getThreads(type: GetThreadType, lastSeenID: String = "NULL") -> [Thread] {
+    static func getThreads(type: NetworkGetThreadType, lastSeenID: String = "NULL") -> [Thread] {
         getData(op_code: type.rawValue, pa_1: lastSeenID, done: parseResultThreads) ?? []
     }
     
@@ -113,7 +113,6 @@ class Network {
     static func cancelDislikeThread(for threadID: String) -> Bool {
         getData(op_code: "9_2", pa_1: threadID, pa_3: "1", pa_4: "1", done: {_ in true}) ?? false
     }
-//    static func getMessage(lastSeenID: )
     
     static func newThread(title: String, block: String, content: String) -> Bool {
         getData(op_code: "3", pa_1: title, pa_2: block, pa_3: content, done: {_ in true}) ?? false

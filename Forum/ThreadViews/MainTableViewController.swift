@@ -6,60 +6,76 @@
 //
 
 import UIKit
-import GTMRefresh
+import MJRefresh
 
 class MainTableViewController: UITableViewController {
     
-    enum Scene {
-        case main, myThreads
+    enum Scene: String {
+        case main = "Threads", myThreads = "My Threads", trends = "Trends"
     }
     private var scene = Scene.main
     
     var threads = [Thread]()
+    var sortType = Network.NetworkGetThreadType.Default
     
-    func setScene(_ s: Scene) -> Self {
-        scene = s
+    func my() -> Self {
+        scene = .myThreads
         return self
     }
+    func tr() -> Self {
+        scene = .trends
+        return self
+    }
+    
+    let footer = MJRefreshAutoNormalFooter()
     
     override func viewDidLoad() {
         super.viewDidLoad()
 
-        navigationItem.title = scene == .main ? "Threads" : "My Threads"
+        if tabBarController?.viewControllers?.count == 2 {
+            let nav = UINavigationController(rootViewController: (*"MainVC" as! MainTableViewController).tr())
+            nav.navigationBar.prefersLargeTitles = true
+            tabBarController?.viewControllers?.insert(nav, at: 1)
+            tabBarController?.tabBar.items?[1].title = "Thrends"
+        }
+        navigationItem.title = scene.rawValue
         
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
-        tableView.gtm_addRefreshHeaderView {
-            print("Refresh!", self.scene)
-            sleep(2)
-            self.tableView.endRefreshing()
-        }
-        tableView.gtm_addLoadMoreFooterView {
-            print("Load More!", self.scene)
-            self.loadMore()
-            self.tableView.endRefreshing()
-        }
-        tableView.headerIdleImage(UIImage())
-        tableView
-            .pullUpToRefreshText("")
-            .pullDownToRefreshText("")
-            .releaseToRefreshText("")
-            .releaseLoadMoreText("")
-            .refreshSuccessText("")
-            .refreshFailureText("")
-            .refreshingText("")
         
-        threads = Network.getThreads(type: .Default)
-        for i in 1...10 {
-            threads.append(Thread.samplePost())
-        }
+        footer.setRefreshingTarget(self, refreshingAction: #selector(loadMore))
+        self.tableView.mj_footer = footer
+
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
+        tableView.refreshControl = refreshControl
+        
+        
+        refresh()
     }
     
-    func loadMore() {
-//        let last = threads
+    
+    @objc func refresh() {
+        threads = Network.getThreads(type: sortType)
+        tableView.reloadData()
+        refreshControl?.endRefreshing()
+        tableView.mj_footer?.resetNoMoreData()
+    }
+    
+    @objc func loadMore() {
+        var data = [Thread]()
+        if let last = threads.last?.id {
+            data = Network.getThreads(type: sortType, lastSeenID: last)
+            threads += data
+            tableView.reloadData()
+        }
+        tableView.mj_footer?.endRefreshing()
+        if data.isEmpty {
+            tableView.mj_footer?.endRefreshingWithNoMoreData()
+        }
     }
     
     @IBAction func newThread(_ sender: Any) {
-        present(*"NewThreadVC", animated: true, completion: nil)
+        present((*"NewThreadVC" as! NewThreadViewController).withFather(self), animated: true, completion: nil)
     }
     
     // MARK: - Table view data source

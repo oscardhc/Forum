@@ -12,8 +12,14 @@ class NewThreadViewController: UIViewController {
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var contentTextField: UITextView!
     
+    private var fatherVC: MainTableViewController!
+    func withFather(_ vc: MainTableViewController) -> Self {
+        fatherVC = vc
+        return self
+    }
+    
     @IBAction func dismissBtnClicked(_ sender: Any) {
-        dismiss(animated: true, completion: nil)
+        dismiss(animated: true)
     }
     
     
@@ -25,7 +31,13 @@ class NewThreadViewController: UIViewController {
     
     @IBAction func postBtnClicked(_ sender: Any) {
         if let postTitle = titleTextField.text, let postContent = contentTextField.text {
-            
+            if Network.newThread(title: postTitle, block: "1", content: postContent) {
+                print("post thread success!")
+                fatherVC.refresh()
+                dismiss(animated: true)
+            } else {
+                print("...new thread post failed")
+            }
         }
     }
     

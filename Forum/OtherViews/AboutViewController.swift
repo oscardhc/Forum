@@ -22,7 +22,7 @@ class AboutViewController: UIViewController, UITableViewDataSource, UITableViewD
             [
                 ("我的帖子", {
                     self.navigationController?.pushViewController(
-                        (*"MainVC" as! MainTableViewController).setScene(.myThreads),
+                        (*"MainVC" as! MainTableViewController).my(),
                         animated: true
                     )
                 })

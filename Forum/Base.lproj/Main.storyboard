@@ -8,11 +8,11 @@
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <scenes>
-        <!--Item-->
+        <!--Me-->
         <scene sceneID="7zZ-Ay-gIs">
             <objects>
                 <navigationController id="XGd-1B-C8g" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Item" id="5KN-ut-khJ"/>
+                    <tabBarItem key="tabBarItem" title="Me" id="5KN-ut-khJ"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="t5f-3I-Wj0">
                         <rect key="frame" x="0.0" y="44" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -370,11 +370,11 @@
             </objects>
             <point key="canvasLocation" x="2502.898550724638" y="-333.48214285714283"/>
         </scene>
-        <!--Main-->
+        <!--Threads-->
         <scene sceneID="Nvd-Wc-E1l">
             <objects>
                 <navigationController id="Qr8-gF-T6n" sceneMemberID="viewController">
-                    <tabBarItem key="tabBarItem" title="Main" id="Uxf-UU-5YR"/>
+                    <tabBarItem key="tabBarItem" title="Threads" id="Uxf-UU-5YR"/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" largeTitles="YES" id="CR5-cd-pDF">
                         <rect key="frame" x="0.0" y="44" width="414" height="96"/>
                         <autoresizingMask key="autoresizingMask"/>
@@ -397,7 +397,7 @@
                         <color key="backgroundColor" white="0.0" alpha="0.0" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                     </tabBar>
                     <connections>
-                        <segue destination="Qr8-gF-T6n" kind="relationship" relationship="viewControllers" id="DAd-bi-Of7"/>
+                        <segue destination="Qr8-gF-T6n" kind="relationship" relationship="viewControllers" id="Ca1-xJ-Go8"/>
                         <segue destination="XGd-1B-C8g" kind="relationship" relationship="viewControllers" id="zKE-Vp-u8M"/>
                     </connections>
                 </tabBarController>
