@@ -25,7 +25,7 @@
 		55AA466A2516739B00AAF708 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 55AA46682516739B00AAF708 /* LaunchScreen.storyboard */; };
 		55AA46752516739B00AAF708 /* ForumTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46742516739B00AAF708 /* ForumTests.swift */; };
 		55AA46802516739B00AAF708 /* ForumUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA467F2516739B00AAF708 /* ForumUITests.swift */; };
-		55AA469C2516750100AAF708 /* MainTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA469B2516750100AAF708 /* MainTableViewController.swift */; };
+		55AA469C2516750100AAF708 /* MainVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA469B2516750100AAF708 /* MainVC.swift */; };
 		55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46A5251799B000AAF708 /* DataTypes.swift */; };
 		55D748F7253EC35E00F44EF8 /* NewThreadViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D748F6253EC35E00F44EF8 /* NewThreadViewController.swift */; };
 /* End PBXBuildFile section */
@@ -73,7 +73,7 @@
 		55AA467B2516739B00AAF708 /* ForumUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = ForumUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		55AA467F2516739B00AAF708 /* ForumUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ForumUITests.swift; sourceTree = "<group>"; };
 		55AA46812516739B00AAF708 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		55AA469B2516750100AAF708 /* MainTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTableViewController.swift; sourceTree = "<group>"; };
+		55AA469B2516750100AAF708 /* MainVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVC.swift; sourceTree = "<group>"; };
 		55AA46A5251799B000AAF708 /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
 		55D748F6253EC35E00F44EF8 /* NewThreadViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewThreadViewController.swift; sourceTree = "<group>"; };
 		AF686E2A70B2E6B517FDB96C /* Pods_Forum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Forum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -122,15 +122,15 @@
 			path = Pods;
 			sourceTree = "<group>";
 		};
-		55370A1F253DF111008FB742 /* ThreadViews */ = {
+		55370A1F253DF111008FB742 /* TableViews */ = {
 			isa = PBXGroup;
 			children = (
-				55AA469B2516750100AAF708 /* MainTableViewController.swift */,
+				55AA469B2516750100AAF708 /* MainVC.swift */,
 				5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */,
 				55557CDC25232912002F17AC /* MainCell.swift */,
 				55557CE125232966002F17AC /* MainCell.xib */,
 			);
-			path = ThreadViews;
+			path = TableViews;
 			sourceTree = "<group>";
 		};
 		55370A20253DF132008FB742 /* OtherViews */ = {
@@ -183,7 +183,7 @@
 				55AA465A2516739A00AAF708 /* AppDelegate.swift */,
 				55AA465C2516739A00AAF708 /* SceneDelegate.swift */,
 				55AA46602516739A00AAF708 /* Main.storyboard */,
-				55370A1F253DF111008FB742 /* ThreadViews */,
+				55370A1F253DF111008FB742 /* TableViews */,
 				55370A20253DF132008FB742 /* OtherViews */,
 				55370A21253DF14A008FB742 /* Misc */,
 				55AA46662516739B00AAF708 /* Assets.xcassets */,
@@ -394,7 +394,7 @@
 				5522CD53251CDAD800ED1657 /* DetailTableViewController.swift in Sources */,
 				55A59D44254D4CDD002E18F7 /* AboutTableViewCell.swift in Sources */,
 				55D748F7253EC35E00F44EF8 /* NewThreadViewController.swift in Sources */,
-				55AA469C2516750100AAF708 /* MainTableViewController.swift in Sources */,
+				55AA469C2516750100AAF708 /* MainVC.swift in Sources */,
 				55557CF025237F12002F17AC /* Network.swift in Sources */,
 				55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */,
 				55AA465B2516739A00AAF708 /* AppDelegate.swift in Sources */,

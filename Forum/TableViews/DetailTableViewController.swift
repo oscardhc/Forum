@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MJRefresh
 
 class DetailTableViewController: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
     
@@ -13,8 +14,19 @@ class DetailTableViewController: UIViewController, UITableViewDelegate, UITableV
     @IBOutlet weak var textField: UITextField!
     @IBOutlet weak var bottomSpace: NSLayoutConstraint!
     
+    @IBAction func reply(_ sender: Any) {
+        if let content = textField.text, content != "" {
+            let success = Network.newReply(for: thread.id, floor: nil, content: content)
+            if success {
+                getData()
+                tableView.reloadData()
+            }
+        }
+    }
+    
     var floors = [Floor]()
-    var detailThread = ""
+    var thread: Thread!
+//    var d: DataManager!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,14 +52,16 @@ class DetailTableViewController: UIViewController, UITableViewDelegate, UITableV
         tableView.addGestureRecognizer(gesture)
         
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
-        
-        floors += Network.getFloors(for: detailThread)
+        getData()
         
     }
     
+    func getData() {
+        floors = [thread.generateFirstFloor()] + Network.getFloors(for: thread.id)
+    }
+    
     func forThread(_ t: Thread) -> Self {
-        detailThread = t.id
-        floors = [t.generateFirstFloor()]
+        thread = t
         return self
     }
     

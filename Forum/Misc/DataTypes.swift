@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 enum ThreadType {
     case uncategorized
@@ -80,5 +81,97 @@ struct Floor {
         time = Util.stringToDate(floor["RTime"] as! String)
         liked = floor["Praise"] as! Int
     }
+    
+}
+
+protocol DataManager {
+    
+    var count: Int { get }
+    func initializeCell(_ cell: MainCell, index: Int) -> MainCell
+    
+    func getInitialContent()
+    /// return whether there is no more data
+    func getMoreContent() -> Bool
+    
+    func didSelectedRow(_ vc: UIViewController, index: Int)
+    
+}
+
+class ThreadData: DataManager {
+    
+    var sortType: Network.NetworkGetThreadType
+    var threads = [Thread]()
+    
+    init(type: Network.NetworkGetThreadType) {
+        sortType = type
+    }
+    
+    var count: Int {
+        threads.count
+    }
+    
+    func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
+        cell.setAsThread(thread: threads[index])
+    }
+    
+    func getInitialContent() {
+        print("getting initial")
+        threads = Network.getThreads(type: sortType)
+//            + [Thread.samplePost()]
+    }
+    
+    func getMoreContent() -> Bool {
+        if let last = threads.last?.id {
+            let data = Network.getThreads(type: sortType, lastSeenID: last)
+            threads += data
+            print("getting more treads", threads.count, data.count)
+            return data.isEmpty
+        }
+        return false
+    }
+    
+    func didSelectedRow(_ vc: UIViewController, index: Int) {
+        vc.navigationController?.pushViewController(
+            (*"MainVC" as! MainVC).fl(threads[index]),
+            animated: true
+        )
+    }
+    
+}
+
+class FloorData: DataManager {
+    
+    var thread: Thread
+    var floors = [Floor]()
+    
+    init(for t: Thread) {
+        thread = t
+    }
+    
+    var count: Int {
+        floors.count
+    }
+    
+    func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
+        cell.setAsFloorHead(floor: floors[index])
+    }
+    
+    func getInitialContent() {
+        floors = [thread.generateFirstFloor()] + Network.getFloors(for: thread.id)
+    }
+    
+    func getMoreContent() -> Bool {
+        if let last = floors.last?.id {
+            let data = Network.getFloors(for: thread.id, lastSeenID: last)
+            floors += data
+            return data.isEmpty
+        }
+        return false
+    }
+    
+    func didSelectedRow(_ vc: UIViewController, index: Int) {
+        
+    }
+    
     
 }

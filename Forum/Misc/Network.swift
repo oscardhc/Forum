@@ -55,15 +55,15 @@ class Network {
     }
     
     enum NetworkGetThreadType: String {
-        case Default = "1", Favoured = "6", My = "7"
+        case time = "1", favoured = "6", my = "7", trending = "d"
     }
     
     static func getThreads(type: NetworkGetThreadType, lastSeenID: String = "NULL") -> [Thread] {
         getData(op_code: type.rawValue, pa_1: lastSeenID, done: parseResultThreads) ?? []
     }
     
-    static func getFloors(for threadID: String) -> [Floor] {
-        getData(op_code: "2", pa_1: threadID) {
+    static func getFloors(for threadID: String, lastSeenID: String = "NULL") -> [Floor] {
+        getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID) {
             ($0["floor_list"]! as! [Any]).map() {
                 Floor(json: $0)
             }

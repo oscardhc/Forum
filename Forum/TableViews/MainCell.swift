@@ -50,14 +50,7 @@ class MainCell: UITableViewCell {
     }
     
     override func layoutSubviews() {
-        mainView.layer.cornerRadius = 10
-        mainView.layer.masksToBounds = false
-        mainView.layer.shadowColor = UIColor.black.cgColor
-        mainView.layer.shadowOffset = CGSize(width: 0, height: 3);
-        mainView.layer.shadowOpacity = 0.5
-        mainView.layer.borderWidth = 1.0
-        mainView.layer.borderColor = UIColor.gray.cgColor
-//        mainView.backgroundColor = .lightGray
+        mainView.applyCardStyle()
     }
     
 }

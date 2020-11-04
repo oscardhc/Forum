@@ -22,7 +22,7 @@ class AboutViewController: UIViewController, UITableViewDataSource, UITableViewD
             [
                 ("我的帖子", {
                     self.navigationController?.pushViewController(
-                        (*"MainVC" as! MainTableViewController).my(),
+                        (*"MainVC" as! MainVC).my(),
                         animated: true
                     )
                 })
@@ -50,6 +50,10 @@ class AboutViewController: UIViewController, UITableViewDataSource, UITableViewD
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         content[section].count
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        section == 0 ? 40 : 0
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {

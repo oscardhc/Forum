@@ -12,8 +12,8 @@ class NewThreadViewController: UIViewController {
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var contentTextField: UITextView!
     
-    private var fatherVC: MainTableViewController!
-    func withFather(_ vc: MainTableViewController) -> Self {
+    private var fatherVC: MainVC!
+    func withFather(_ vc: MainVC) -> Self {
         fatherVC = vc
         return self
     }
