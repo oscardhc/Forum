@@ -19,6 +19,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     var d: DataManager = ThreadData(type: .time)
     
     @IBOutlet weak var tableView: UITableView!
+    @IBOutlet weak var textField: UITextField!
+    @IBOutlet weak var bottomSpace: NSLayoutConstraint!
+    @IBOutlet weak var bottomViewHieght: NSLayoutConstraint!
+    @IBOutlet weak var newThreadButton: UIBarButtonItem!
     
     func my() -> Self {
         scene = .myThreads
@@ -45,15 +49,28 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             let nav = UINavigationController(rootViewController: (*"MainVC" as! MainVC).tr())
             nav.navigationBar.prefersLargeTitles = true
             tabBarController?.viewControllers?.insert(nav, at: 1)
-            tabBarController?.tabBar.items?[1].title = "Thrends"
+            
+            tabBarController?.tabBar.items?[0].image = UIImage(systemName: "house")
+            tabBarController?.tabBar.items?[0].selectedImage = UIImage(systemName: "house.fill")
+            tabBarController?.tabBar.items?[0].title = "首页"
+            
+            tabBarController?.tabBar.items?[1].image = UIImage(systemName: "crown")
+            tabBarController?.tabBar.items?[1].selectedImage = UIImage(systemName: "crown.fill")
+            tabBarController?.tabBar.items?[1].title = "趋势"
+            
+            tabBarController?.tabBar.items?[2].image = UIImage(systemName: "person")
+            tabBarController?.tabBar.items?[2].selectedImage = UIImage(systemName: "person.fill")
+            tabBarController?.tabBar.items?[2].title = "我"
         }
         navigationItem.title = scene.rawValue
-//        navigationController?.navigationBar.prefersLargeTitles = false
         tableView.contentInsetAdjustmentBehavior = .always
+//        tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 49, right: 0)
+//        tableView.scrollIndicatorInsets = tableView.contentInset
         
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
+        tableView.separatorStyle = .none
         
         footer.setRefreshingTarget(self, refreshingAction: #selector(loadmore))
         tableView.mj_footer = footer
@@ -62,15 +79,49 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
         
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        textField.delegate = self
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(_:)))
+        gesture.numberOfTouchesRequired = 1
+        gesture.cancelsTouchesInView = false
+        tableView.addGestureRecognizer(gesture)
+        
         refresh()
     }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if scene == .floors {
+            tabBarController?.tabBar.isHidden = true
+            bottomViewHieght.constant = 90
+        } else {
+            tabBarController?.tabBar.isHidden = false
+            bottomViewHieght.constant = 0
+        }
+        if scene != .main {
+            newThreadButton.title = ""
+        }
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if scene == .floors {
+//            tabBarController?.tabBar.isHidden = false
+        } else {
+            
+        }
+    }
+    
+    // MARK: - Selector functions
     
     @objc func refresh() {
 //        threads = Network.getThreads(type: sortType) + [Thread.samplePost()]
         print("REFRESHING.....")
         DispatchQueue.global().async {
             self.d.getInitialContent()
-            usleep(1000000)
+            usleep(100000)
             DispatchQueue.main.async {
                 self.tableView.reloadData()
                 self.tableView.refreshControl?.endRefreshing()
@@ -82,7 +133,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @objc func loadmore() {
         DispatchQueue.global().async {
             let noMore = self.d.getMoreContent()
-            usleep(1000000)
+            usleep(100000)
             DispatchQueue.main.async {
                 if noMore {
                     self.tableView.mj_footer?.endRefreshingWithNoMoreData()
@@ -90,6 +141,45 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                     self.tableView.reloadData()
                     self.tableView.mj_footer?.endRefreshing()
                 }
+            }
+        }
+    }
+    
+    @objc func keyboardWillShow(_ sender: Notification) {
+        print("WILL SHOW!!!")
+        let height = (sender.userInfo![UIResponder.keyboardFrameEndUserInfoKey]! as! NSValue).cgRectValue.height
+        var time: TimeInterval = 0
+        (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
+        print(height, time)
+        bottomSpace.constant = -height + G.bottomDelta
+        UIView.animate(withDuration: time) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    @objc func keyboardWillHide(_ sender: Notification) {
+        print("WILL HIDE!!!")
+        var time: TimeInterval = 0
+        (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
+        bottomSpace.constant = G.bottomDelta
+        UIView.animate(withDuration: time) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    @objc func viewTapped(_ sender: Any) {
+        print("VIEW TAPPED!!!")
+        self.view.endEditing(false)
+    }
+    
+    // MARK: - IBActions
+    
+    @IBAction func newComment(_ sender: Any) {
+        if let content = textField.text, content != "" {
+            let threadID = (d as! FloorData).thread.id
+            let success = Network.newReply(for: threadID, floor: nil, content: content)
+            if success {
+                refresh()
             }
         }
     }
@@ -119,7 +209,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         indexPath.section == 0
-            ? (scene == .main ? 150 : 0)
+            ? (scene == .main ? 200 : 50)
             : 200
     }
     

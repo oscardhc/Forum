@@ -104,6 +104,7 @@ class ThreadData: DataManager {
     
     init(type: Network.NetworkGetThreadType) {
         sortType = type
+        getInitialContent()
     }
     
     var count: Int {
@@ -116,7 +117,7 @@ class ThreadData: DataManager {
     
     func getInitialContent() {
         print("getting initial")
-        threads = Network.getThreads(type: sortType)
+        threads = [Thread.samplePost()] + Network.getThreads(type: sortType)
 //            + [Thread.samplePost()]
     }
     
@@ -146,6 +147,7 @@ class FloorData: DataManager {
     
     init(for t: Thread) {
         thread = t
+        getInitialContent()
     }
     
     var count: Int {

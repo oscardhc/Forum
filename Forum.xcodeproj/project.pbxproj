@@ -8,7 +8,6 @@
 
 /* Begin PBXBuildFile section */
 		40F49BCCEFE75E58EFCD3FFC /* Pods_Forum.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = AF686E2A70B2E6B517FDB96C /* Pods_Forum.framework */; };
-		5522CD53251CDAD800ED1657 /* DetailTableViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */; };
 		55370A2D253DF213008FB742 /* Utilities.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55370A2C253DF213008FB742 /* Utilities.swift */; };
 		55557CDD25232912002F17AC /* MainCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55557CDC25232912002F17AC /* MainCell.swift */; };
 		55557CE225232966002F17AC /* MainCell.xib in Resources */ = {isa = PBXBuildFile; fileRef = 55557CE125232966002F17AC /* MainCell.xib */; };
@@ -50,7 +49,6 @@
 /* Begin PBXFileReference section */
 		12080BD4FF9E97F712D2A919 /* Pods-Forum.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Forum.release.xcconfig"; path = "Target Support Files/Pods-Forum/Pods-Forum.release.xcconfig"; sourceTree = "<group>"; };
 		2A82A2E3DBBB7A58122F6AB4 /* Pods-Forum.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Forum.debug.xcconfig"; path = "Target Support Files/Pods-Forum/Pods-Forum.debug.xcconfig"; sourceTree = "<group>"; };
-		5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailTableViewController.swift; sourceTree = "<group>"; };
 		55370A2C253DF213008FB742 /* Utilities.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Utilities.swift; sourceTree = "<group>"; };
 		55557CDC25232912002F17AC /* MainCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainCell.swift; sourceTree = "<group>"; };
 		55557CE125232966002F17AC /* MainCell.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = MainCell.xib; sourceTree = "<group>"; };
@@ -126,7 +124,6 @@
 			isa = PBXGroup;
 			children = (
 				55AA469B2516750100AAF708 /* MainVC.swift */,
-				5522CD52251CDAD800ED1657 /* DetailTableViewController.swift */,
 				55557CDC25232912002F17AC /* MainCell.swift */,
 				55557CE125232966002F17AC /* MainCell.xib */,
 			);
@@ -391,7 +388,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				5522CD53251CDAD800ED1657 /* DetailTableViewController.swift in Sources */,
 				55A59D44254D4CDD002E18F7 /* AboutTableViewCell.swift in Sources */,
 				55D748F7253EC35E00F44EF8 /* NewThreadViewController.swift in Sources */,
 				55AA469C2516750100AAF708 /* MainVC.swift in Sources */,
