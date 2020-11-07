@@ -11,8 +11,9 @@ import UIKit
 class G {
     
     static let bottomDelta: CGFloat = 0
-    static var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyaWQiOiIyM2EzMDhiNjgxYTIwYjQ5YjlmYzFiNzA0MjdlNWNmNjQyMTAyMDdmMDQwZWZiZTEyZGViZDYxM2VmZDJlMGI5IiwiZGV2aWNlaWQiOiJDRDAwNTMwMS02RDlDLTQ2MEMtOUZBNS03RjZGRTRBQzkwMzUiLCJpYXQiOjE2MDMxNzU3NDIsImV4cCI6MTYwNTc2Nzc0Mn0.BqAbK7QDOOhR-IYl-PJI3lYDY8Lyd1fXbx4ERrA9jmQ"
-//    static var token = ""
+//    static var token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJ1c2VyaWQiOiIyM2EzMDhiNjgxYTIwYjQ5YjlmYzFiNzA0MjdlNWNmNjQyMTAyMDdmMDQwZWZiZTEyZGViZDYxM2VmZDJlMGI5IiwiZGV2aWNlaWQiOiJDRDAwNTMwMS02RDlDLTQ2MEMtOUZBNS03RjZGRTRBQzkwMzUiLCJpYXQiOjE2MDMxNzU3NDIsImV4cCI6MTYwNTc2Nzc0Mn0.BqAbK7QDOOhR-IYl-PJI3lYDY8Lyd1fXbx4ERrA9jmQ"
+    static var token = ""
+    static let numberPerFetch = 8
     
     static var hasLoggedIn: Bool {token != ""}
     

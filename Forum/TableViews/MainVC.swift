@@ -8,7 +8,7 @@
 import UIKit
 import MJRefresh
 
-class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate {
+class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UIScrollViewDelegate {
     
     enum Scene: String {
         case main = "Threads", myThreads = "My Threads", trends = "Trends", messages = "Messages", floors = "Thread#"
@@ -16,7 +16,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     // This is the default value for MainThread(the enter interface), any other types must overwrite this two properties
     private var scene = Scene.main
-    var d: DataManager = ThreadData(type: .time)
+    var d: DataManager = Thread.Manager(type: .time)
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var textField: UITextField!
@@ -26,21 +26,22 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     func my() -> Self {
         scene = .myThreads
-        d = ThreadData(type: .my)
+        d = Thread.Manager(type: .my)
         return self
     }
     func tr() -> Self {
         scene = .trends
-        d = ThreadData(type: .trending)
+        d = Thread.Manager(type: .trending)
         return self
     }
     func fl(_ thread: Thread) -> Self {
         scene = .floors
-        d = FloorData(for: thread)
+        d = Floor.Manager(for: thread)
         return self
     }
     
     let footer = MJRefreshAutoNormalFooter()
+    var originalOffset: CGFloat?
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -64,14 +65,12 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
         navigationItem.title = scene.rawValue
         tableView.contentInsetAdjustmentBehavior = .always
-//        tableView.contentInset = UIEdgeInsets(top: 64, left: 0, bottom: 49, right: 0)
-//        tableView.scrollIndicatorInsets = tableView.contentInset
         
         tableView.delegate = self
         tableView.dataSource = self
         tableView.register(UINib(nibName: "MainCell", bundle: .main), forCellReuseIdentifier: "MainCell")
         tableView.separatorStyle = .none
-        
+                
         footer.setRefreshingTarget(self, refreshingAction: #selector(loadmore))
         tableView.mj_footer = footer
 
@@ -92,7 +91,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
+        super.viewWillAppear(animated)
         if scene == .floors {
             tabBarController?.tabBar.isHidden = true
             bottomViewHieght.constant = 90
@@ -100,6 +99,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             tabBarController?.tabBar.isHidden = false
             bottomViewHieght.constant = 0
         }
+        print("<", self.tableView.contentOffset, self.tableView.refreshControl?.frame, self.navigationController?.navigationBar.frame, self.navigationController?.navigationBar.frame.height, self.tableView.frame)
+        
         if scene != .main {
             newThreadButton.title = ""
         }
@@ -114,32 +115,42 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
+    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
+//        print("will begin")
+    }
+    
+    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
+//        print("did end")
+    }
+    
     // MARK: - Selector functions
     
     @objc func refresh() {
-//        threads = Network.getThreads(type: sortType) + [Thread.samplePost()]
-        print("REFRESHING.....")
         DispatchQueue.global().async {
-            self.d.getInitialContent()
+            let count = self.d.getInitialContent()
             usleep(100000)
+//            while self.tableView.refreshControl?.frame.height +
             DispatchQueue.main.async {
-                self.tableView.reloadData()
                 self.tableView.refreshControl?.endRefreshing()
-                self.tableView.mj_footer?.resetNoMoreData()
+                self.tableView.reloadData()
+                if count == G.numberPerFetch {
+                    self.tableView.mj_footer?.resetNoMoreData()
+                } else {
+                    self.tableView.mj_footer?.endRefreshingWithNoMoreData()
+                }
             }
         }
     }
     
     @objc func loadmore() {
         DispatchQueue.global().async {
-            let noMore = self.d.getMoreContent()
+            let count = self.d.getMoreContent()
             usleep(100000)
             DispatchQueue.main.async {
-                if noMore {
+                self.tableView.mj_footer?.endRefreshing()
+                self.tableView.reloadData()
+                if count != G.numberPerFetch {
                     self.tableView.mj_footer?.endRefreshingWithNoMoreData()
-                } else {
-                    self.tableView.reloadData()
-                    self.tableView.mj_footer?.endRefreshing()
                 }
             }
         }
@@ -151,7 +162,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         var time: TimeInterval = 0
         (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
         print(height, time)
-        bottomSpace.constant = -height + G.bottomDelta
+        bottomSpace.constant = height + G.bottomDelta
         UIView.animate(withDuration: time) {
             self.view.layoutIfNeeded()
         }
@@ -176,7 +187,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @IBAction func newComment(_ sender: Any) {
         if let content = textField.text, content != "" {
-            let threadID = (d as! FloorData).thread.id
+            let threadID = (d as! Floor.Manager).thread.id
             let success = Network.newReply(for: threadID, floor: nil, content: content)
             if success {
                 refresh()
@@ -203,13 +214,13 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         indexPath.section == 0
-            ?  tableView.dequeueReusableCell(withIdentifier: "HeadCell", for: indexPath)
+            ?  (tableView.dequeueReusableCell(withIdentifier: "HeadCell", for: indexPath) as! HeaderCell).forBlock()
             :  d.initializeCell(tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell, index: indexPath.row)
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         indexPath.section == 0
-            ? (scene == .main ? 200 : 50)
+            ? (scene == .main ? 200 : 0)
             : 200
     }
     

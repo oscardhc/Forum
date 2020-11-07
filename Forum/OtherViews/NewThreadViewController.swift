@@ -30,7 +30,7 @@ class NewThreadViewController: UIViewController {
     }
     
     @IBAction func postBtnClicked(_ sender: Any) {
-        if let postTitle = titleTextField.text, let postContent = contentTextField.text {
+        if let postTitle = titleTextField.text, postTitle != "", let postContent = contentTextField.text, postContent != "" {
             if Network.newThread(title: postTitle, block: "1", content: postContent) {
                 print("post thread success!")
                 fatherVC.refresh()
