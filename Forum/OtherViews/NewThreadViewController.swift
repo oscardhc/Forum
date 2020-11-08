@@ -12,6 +12,10 @@ class NewThreadViewController: UIViewController {
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var contentTextField: UITextView!
     
+    var blocks: [[UIButton]]!
+    var getResult: (() -> (Int, Int))!
+    @IBOutlet weak var blockView: UIView!
+    
     private var fatherVC: MainVC!
     func withFather(_ vc: MainVC) -> Self {
         fatherVC = vc
@@ -27,7 +31,11 @@ class NewThreadViewController: UIViewController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
+        gridView = GridBtnView.basedOn(view: blockView)
+        blockView.backgroundColor = .blue
     }
+    
+    var gridView: GridBtnView!
     
     @IBAction func postBtnClicked(_ sender: Any) {
         if let postTitle = titleTextField.text, postTitle != "", let postContent = contentTextField.text, postContent != "" {

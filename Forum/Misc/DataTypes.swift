@@ -178,3 +178,49 @@ struct Floor {
     }
     
 }
+
+struct Message {
+    
+    class Manager: DataManager {
+        
+        var messages = [Message]()
+        
+        var count: Int {
+            messages.count
+        }
+        
+        func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
+            cell.setAsMessage(message: messages[index])
+        }
+        
+        func getInitialContent() -> Int {
+            let data = Network.getMessages()
+            messages = data
+            return data.count
+        }
+        
+        func getMoreContent() -> Int {
+            if let last = messages.last?.id {
+                let data = Network.getMessages(lastSeenID: last)
+                messages += data
+                return data.count
+            }
+            return 0
+        }
+        
+        func didSelectedRow(_ vc: UIViewController, index: Int) {
+            
+        }
+        
+        
+    }
+    
+    var id = ""
+    
+    init(json: Any) {
+        
+//        let list = Array<Thread.Type>()
+    }
+    
+    
+}

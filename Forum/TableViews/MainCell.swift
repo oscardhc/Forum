@@ -49,6 +49,10 @@ class MainCell: UITableViewCell {
         return self
     }
     
+    func setAsMessage(message m: Message) -> Self {
+        return self
+    }
+    
     override func layoutSubviews() {
         mainView.applyCardStyle()
     }

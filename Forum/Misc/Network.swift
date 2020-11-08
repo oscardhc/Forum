@@ -48,24 +48,36 @@ class Network {
         }
     }
     
-    static let parseResultThreads: ([String: Any]) -> [Thread] = {
-        ($0["thread_list"]! as! [Any]).map() {
-            Thread(json: $0)
-        }
-    }
-    
     enum NetworkGetThreadType: String {
         case time = "1", favoured = "6", my = "7", trending = "d"
     }
+//
+//    static let parseResultThreads: ([String: Any]) -> [Thread] = {
+//        ($0["thread_list"]! as! [Any]).map() {
+//            Thread(json: $0)
+//        }
+//    }
     
     static func getThreads(type: NetworkGetThreadType, lastSeenID: String = "NULL") -> [Thread] {
-        getData(op_code: type.rawValue, pa_1: lastSeenID, done: parseResultThreads) ?? []
+        getData(op_code: type.rawValue, pa_1: lastSeenID) {
+            ($0["thread_list"]! as! [Any]).map {
+                Thread(json: $0)
+            }
+        } ?? []
     }
     
     static func getFloors(for threadID: String, lastSeenID: String = "NULL") -> [Floor] {
         getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID) {
-            ($0["floor_list"]! as! [Any]).map() {
+            ($0["floor_list"]! as! [Any]).map {
                 Floor(json: $0)
+            }
+        } ?? []
+    }
+    
+    static func getMessages(lastSeenID: String = "NULL") -> [Message] {
+        getData(op_code: "a", pa_1: lastSeenID) {
+            ($0["message_list"]! as! [Any]).map {
+                Message(json: $0)
             }
         } ?? []
     }

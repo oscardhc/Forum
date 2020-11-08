@@ -7,63 +7,62 @@
 
 import UIKit
 
-extension UIView {
+
+class GridBtnView: UIView {
     
-    func addBlockBtn() -> [[UIButton]] {
-        var btns = [[UIButton]]()
+    static func basedOn(view: UIView) -> GridBtnView {
+        let grid = GridBtnView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height))
+        grid.addBlockBtn()
+        view.addSubview(grid)
+        return grid
+    }
+    
+    class GridButton: UIButton {
+        var location = (x: 0, y: 0)
+    }
+    
+    var btns = [[GridButton]]()
+    var chosen = (x: 0, y: 0)
+    
+    func addBlockBtn() {
         let r = 4, c = 2
-        let w = frame.width / CGFloat(r), h = frame.height / CGFloat(c)
-        print("frame", frame)
+        
         for i in 0..<r {
-            btns.append([UIButton]())
+            btns.append([GridButton]())
             for j in 0..<c {
-                let btn = UIButton(frame: CGRect(x: frame.minX + w * CGFloat(i), y: frame.minY + h * CGFloat(j), width: w, height: h))
-                btn.setTitle("\(i)\(j)", for: .normal)
+                let btn = GridButton(type: .custom)
+                btn.setTitle("N", for: .normal)
+                btn.setTitle("Y", for: .selected)
+                btn.location = (i, j)
+                btn.addTarget(self, action: #selector(chosenGrid(_:)), for: .touchUpInside)
                 if (i + j) % 2 == 0 {
-                    btn.backgroundColor = .red
+//                    btn.backgroundColor = .red
                 }
                 addSubview(btn)
                 btns[i].append(btn)
             }
         }
-        return btns
+        btns[0][0].isSelected = true
     }
     
-}
-
-class BlockView: UIView {
-
-    /*
-    // Only override draw() if you perform custom drawing.
-    // An empty implementation adversely affects performance during animation.
-    override func draw(_ rect: CGRect) {
-        // Drawing code
-    }
-    */
-    
-    var btns = [UIButton]()
-    
-    override init(frame: CGRect) {
-        super.init(frame: frame)
-        
+    override func layoutSubviews() {
+        print("layout subviews........")
         let r = 4, c = 2
-        let w = frame.width / CGFloat(r), h = frame.width / CGFloat(c)
-        print("frame", frame)
+        let w = frame.width / CGFloat(r), h = frame.height / CGFloat(c)
+        
         for i in 0..<r {
             for j in 0..<c {
-                let btn = UIButton(frame: CGRect(x: frame.minX + w * CGFloat(i), y: frame.minY + h * CGFloat(j), width: w, height: h))
-                btn.setTitle("\(i)\(j)", for: .normal)
-                if (i + j) % 2 == 0 {
-                    btn.backgroundColor = .red
-                }
-                addSubview(btn)
-                btns.append(btn)
+                btns[i][j].frame = CGRect(x: w * CGFloat(i), y: h * CGFloat(j), width: w, height: h)
             }
         }
+        
     }
     
-    required init?(coder: NSCoder) {
-        super.init(coder: coder)
+    @objc func chosenGrid(_ sender: GridButton) {
+        btns[chosen.x][chosen.y].isSelected = false
+        chosen = sender.location
+        btns[chosen.x][chosen.y].isSelected = true
     }
+    
     
 }

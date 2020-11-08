@@ -20,11 +20,11 @@ class HeaderCell: UITableViewCell {
 
         // Configure the view for the selected state
     }
-
-    var btns: [[UIButton]]!
+    
+    var gridView: GridBtnView!
     
     func forBlock() -> Self {
-        btns = contentView.addBlockBtn()
+        gridView = GridBtnView.basedOn(view: contentView)
         return self
     }
 

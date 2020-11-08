@@ -99,7 +99,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             tabBarController?.tabBar.isHidden = false
             bottomViewHieght.constant = 0
         }
-        print("<", self.tableView.contentOffset, self.tableView.refreshControl?.frame, self.navigationController?.navigationBar.frame, self.navigationController?.navigationBar.frame.height, self.tableView.frame)
         
         if scene != .main {
             newThreadButton.title = ""
@@ -132,7 +131,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
 //            while self.tableView.refreshControl?.frame.height +
             DispatchQueue.main.async {
                 self.tableView.refreshControl?.endRefreshing()
-                self.tableView.reloadData()
+                self.tableView.reloadSections(IndexSet([1]), with: .automatic)
                 if count == G.numberPerFetch {
                     self.tableView.mj_footer?.resetNoMoreData()
                 } else {
@@ -148,7 +147,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             usleep(100000)
             DispatchQueue.main.async {
                 self.tableView.mj_footer?.endRefreshing()
-                self.tableView.reloadData()
+                self.tableView.reloadSections(IndexSet([1]), with: .automatic)
                 if count != G.numberPerFetch {
                     self.tableView.mj_footer?.endRefreshingWithNoMoreData()
                 }
