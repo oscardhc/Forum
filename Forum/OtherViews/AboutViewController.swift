@@ -16,8 +16,18 @@ class AboutViewController: UIViewController, UITableViewDataSource, UITableViewD
             [
                 ("头像", {}),
                 ("账号", {}),
-                ("通知", {}),
-                ("收藏", {})
+                ("通知", {
+                    self.navigationController?.pushViewController(
+                        (*"MainVC" as! MainVC).ms(),
+                        animated: true
+                    )
+                }),
+                ("收藏", {
+                    self.navigationController?.pushViewController(
+                        (*"MainVC" as! MainVC).fv(),
+                        animated: true
+                    )
+                })
             ],
             [
                 ("我的帖子", {

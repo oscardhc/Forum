@@ -8,21 +8,44 @@
 import Foundation
 import UIKit
 
-protocol DataManager {
+protocol DATA {
+    var id: String {get}
+}
+
+class BaseManager {
+    var count: Int { 0 }
+    func initializeCell(_ cell: MainCell, index: Int) -> MainCell { cell }
+    func getInitialContent() -> Int { -1 }
+    func getMoreContent() -> Int { -1 }
+    func didSelectedRow(_ vc: UIViewController, index: Int) {}
+}
+
+class DataManager<T: DATA>: BaseManager {
     
-    var count: Int { get }
-    func initializeCell(_ cell: MainCell, index: Int) -> MainCell
+    var data = [T]()
+    override var count: Int { data.count }
+    
+    func networking(lastSeenID: String = "NULL") -> [T] { fatalError() }
     
     // return the number of data fetched
-    func getInitialContent() -> Int
-    func getMoreContent() -> Int
-    
-    func didSelectedRow(_ vc: UIViewController, index: Int)
+    override func getInitialContent() -> Int {
+        let fetched = networking()
+        data = fetched
+        return fetched.count
+    }
+    override func getMoreContent() -> Int {
+        if let last = data.last?.id {
+            let fetched = networking(lastSeenID: last)
+            data += fetched
+            return fetched.count
+        }
+        return 0
+    }
     
 }
 
 
-struct Thread {
+struct Thread: DATA {
     
     enum Category {
         case uncategorized
@@ -47,6 +70,7 @@ struct Thread {
         summary     = thread["Summary"] as! String
         liked       = thread["Praise"] as! Int
         title       = thread["Title"] as! String
+        postTime    = Util.stringToDate(thread["LastUpdateTime"] as! String)
     }
     
     static func samplePost() -> Thread {
@@ -69,42 +93,25 @@ struct Thread {
         return f
     }
     
-    class Manager: DataManager {
+    class Manager: DataManager<Thread> {
         
         var sortType: Network.NetworkGetThreadType
-        var threads = [Thread]()
         
         init(type: Network.NetworkGetThreadType) {
             sortType = type
-            getInitialContent()
         }
         
-        var count: Int {
-            threads.count
+        override func networking(lastSeenID: String) -> [Thread] {
+            Network.getThreads(type: sortType, lastSeenID: lastSeenID)
         }
         
-        func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAsThread(thread: threads[index])
+        override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
+            cell.setAs(thread: data[index])
         }
         
-        func getInitialContent() -> Int {
-            let data = Network.getThreads(type: sortType)
-            threads = [Thread.samplePost()] + data
-            return data.count
-        }
-        
-        func getMoreContent() -> Int {
-            if let last = threads.last?.id {
-                let data = Network.getThreads(type: sortType, lastSeenID: last)
-                threads += data
-                return data.count
-            }
-            return 0
-        }
-        
-        func didSelectedRow(_ vc: UIViewController, index: Int) {
+        override func didSelectedRow(_ vc: UIViewController, index: Int) {
             vc.navigationController?.pushViewController(
-                (*"MainVC" as! MainVC).fl(threads[index]),
+                (*"MainVC" as! MainVC).fl(data[index]),
                 animated: true
             )
         }
@@ -113,7 +120,7 @@ struct Thread {
     
 }
 
-struct Floor {
+struct Floor: DATA {
     
     var id = ""
     var name = "", content = ""
@@ -128,7 +135,7 @@ struct Floor {
     init(json: Any) {
 //        print(json)
         let floor = json as! [String: Any]
-        print(floor)
+//        print(floor)
         id = floor["FloorID"] as! String
         content = floor["Context"] as! String
         name = floor["Speakername"] as! String
@@ -138,88 +145,59 @@ struct Floor {
         liked = floor["Praise"] as! Int
     }
     
-    class Manager: DataManager {
+    class Manager: DataManager<Floor> {
         
         var thread: Thread
-        var floors = [Floor]()
         
         init(for t: Thread) {
             thread = t
-            getInitialContent()
+            super.init()
         }
         
-        var count: Int {
-            floors.count
+        override func getInitialContent() -> Int {
+            let res = super.getInitialContent()
+            data.insert(thread.generateFirstFloor(), at: 0)
+            print("floor getInitialContent")
+            return res
         }
         
-        func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAsFloorHead(floor: floors[index])
+        override func networking(lastSeenID: String = "NULL") -> [Floor] {
+            Network.getFloors(for: thread.id, lastSeenID: lastSeenID)
         }
         
-        func getInitialContent() -> Int {
-            let data = Network.getFloors(for: thread.id)
-            floors = [thread.generateFirstFloor()] + data
-            return data.count
-        }
-        
-        func getMoreContent() -> Int {
-            if let last = floors.last?.id {
-                let data = Network.getFloors(for: thread.id, lastSeenID: last)
-                floors += data
-                return data.count
-            }
-            return 0
-        }
-        
-        func didSelectedRow(_ vc: UIViewController, index: Int) {
-            
+        override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
+            cell.setAs(floor: data[index])
         }
         
     }
     
 }
 
-struct Message {
+struct Message: DATA {
     
-    class Manager: DataManager {
+    class Manager: DataManager<Message> {
         
-        var messages = [Message]()
-        
-        var count: Int {
-            messages.count
+        override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
+            cell.setAs(message: data[index])
         }
         
-        func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAsMessage(message: messages[index])
+        override func networking(lastSeenID: String = "NULL") -> [Message] {
+            Network.getMessages(lastSeenID: lastSeenID)
         }
-        
-        func getInitialContent() -> Int {
-            let data = Network.getMessages()
-            messages = data
-            return data.count
-        }
-        
-        func getMoreContent() -> Int {
-            if let last = messages.last?.id {
-                let data = Network.getMessages(lastSeenID: last)
-                messages += data
-                return data.count
-            }
-            return 0
-        }
-        
-        func didSelectedRow(_ vc: UIViewController, index: Int) {
-            
-        }
-        
         
     }
     
-    var id = ""
+    var id = "", title = "", summary = ""
+    var ty = "", judge = "", time = Date()
     
     init(json: Any) {
-        
-//        let list = Array<Thread.Type>()
+        let msg = json as! [String: Any]
+        id = msg["ThreadID"] as! String
+        title = msg["Title"] as! String
+        summary = msg["Summary"] as! String
+        ty = msg["Type"] as! String
+        judge = msg["Jusge"] as! String
+        time = Util.stringToDate(msg["PostTime"] as! String)
     }
     
     

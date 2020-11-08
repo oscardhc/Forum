@@ -11,12 +11,12 @@ import MJRefresh
 class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UIScrollViewDelegate {
     
     enum Scene: String {
-        case main = "Threads", myThreads = "My Threads", trends = "Trends", messages = "Messages", floors = "Thread#"
+        case main = "Threads", myThreads = "My Threads", trends = "Trends", messages = "Messages", floors = "Thread#", favour = "Favoured"
     }
     
     // This is the default value for MainThread(the enter interface), any other types must overwrite this two properties
     private var scene = Scene.main
-    var d: DataManager = Thread.Manager(type: .time)
+    var d: BaseManager = Thread.Manager(type: .time)
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var textField: UITextField!
@@ -34,9 +34,19 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         d = Thread.Manager(type: .trending)
         return self
     }
+    func fv() -> Self {
+        scene = .favour
+        d = Thread.Manager(type: .favoured)
+        return self
+    }
     func fl(_ thread: Thread) -> Self {
         scene = .floors
         d = Floor.Manager(for: thread)
+        return self
+    }
+    func ms() -> Self {
+        scene = .messages
+        d = Message.Manager()
         return self
     }
     
@@ -99,7 +109,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             tabBarController?.tabBar.isHidden = false
             bottomViewHieght.constant = 0
         }
-        
         if scene != .main {
             newThreadButton.title = ""
         }
@@ -126,12 +135,13 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @objc func refresh() {
         DispatchQueue.global().async {
+            usleep(300000)
             let count = self.d.getInitialContent()
-            usleep(100000)
 //            while self.tableView.refreshControl?.frame.height +
             DispatchQueue.main.async {
                 self.tableView.refreshControl?.endRefreshing()
                 self.tableView.reloadSections(IndexSet([1]), with: .automatic)
+                print("refresh", self.scene)
                 if count == G.numberPerFetch {
                     self.tableView.mj_footer?.resetNoMoreData()
                 } else {
@@ -143,8 +153,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @objc func loadmore() {
         DispatchQueue.global().async {
+            usleep(300000)
             let count = self.d.getMoreContent()
-            usleep(100000)
             DispatchQueue.main.async {
                 self.tableView.mj_footer?.endRefreshing()
                 self.tableView.reloadSections(IndexSet([1]), with: .automatic)
