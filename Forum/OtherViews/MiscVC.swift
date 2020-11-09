@@ -7,7 +7,7 @@
 
 import UIKit
 
-class MiscViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MiscVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -24,7 +24,7 @@ class MiscViewController: UIViewController, UITableViewDataSource, UITableViewDe
             ],
             [
                 ("设置", {}),
-                ("关于", {self >> *"AboutVC"})
+                ("关于", {self << (*"AboutVC" as! AboutVC).withFather(self)})
             ]
         ]
         : [
@@ -79,12 +79,15 @@ class MiscViewController: UIViewController, UITableViewDataSource, UITableViewDe
         
     }
     
+    func deselect() {
+        if let selectionIndexPath = self.tableView.indexPathForSelectedRow {
+            self.tableView.deselectRow(at: selectionIndexPath, animated: true)
+        }
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
-        
-        if let selectionIndexPath = self.tableView.indexPathForSelectedRow {
-            self.tableView.deselectRow(at: selectionIndexPath, animated: animated)
-        }
+        deselect()
     }
     
     /*

@@ -7,7 +7,7 @@
 
 import UIKit
 
-class NewThreadViewController: UIViewController {
+class NewThreadVC: UIViewController {
 
     @IBOutlet weak var titleTextField: UITextField!
     @IBOutlet weak var contentTextField: UITextView!

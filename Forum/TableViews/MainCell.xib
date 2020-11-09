@@ -3,6 +3,8 @@
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
+        <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
@@ -40,16 +42,6 @@
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fyk-PJ-aSy">
-                                <rect key="frame" x="12" y="126" width="30" height="24"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                <state key="normal" title="+赞数"/>
-                            </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MAi-70-Asr">
-                                <rect key="frame" x="271.5" y="126" width="38" height="24"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                <state key="normal" title="+评论数"/>
-                            </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="hYU-Wo-K4k">
                                 <rect key="frame" x="377" y="120" width="38" height="30"/>
                                 <state key="normal" title="-评论"/>
@@ -61,27 +53,43 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cPC-WZ-J29">
-                                <rect key="frame" x="287" y="18" width="131" height="15"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="131" id="WN9-vC-cXx"/>
-                                </constraints>
+                                <rect key="frame" x="8" y="18" width="410" height="15"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fyk-PJ-aSy">
+                                <rect key="frame" x="26" y="123" width="79" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <state key="normal" title="+赞数">
+                                    <color key="titleColor" name="AccentColor"/>
+                                    <imageReference key="image" image="hand.thumbsup" catalog="system" symbolScale="small"/>
+                                </state>
+                                <connections>
+                                    <action selector="like:" destination="qpm-S3-aEJ" eventType="touchUpInside" id="nUL-nB-KYK"/>
+                                </connections>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MAi-70-Asr">
+                                <rect key="frame" x="115" y="123" width="83" height="25"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <state key="normal" title="+评论数">
+                                    <color key="titleColor" name="AccentColor"/>
+                                    <imageReference key="image" image="text.bubble" catalog="system" symbolScale="small"/>
+                                </state>
+                            </button>
                         </subviews>
                         <color key="backgroundColor" systemColor="systemGray6Color"/>
                         <constraints>
-                            <constraint firstAttribute="bottom" secondItem="fyk-PJ-aSy" secondAttribute="bottom" constant="2" id="4jQ-uQ-dbZ"/>
+                            <constraint firstItem="cPC-WZ-J29" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="5hS-e3-ABK"/>
                             <constraint firstAttribute="trailing" secondItem="hYU-Wo-K4k" secondAttribute="trailing" constant="11" id="9Vt-tS-Wzn"/>
                             <constraint firstItem="cPC-WZ-J29" firstAttribute="top" secondItem="8Hc-IY-1NO" secondAttribute="top" constant="18" id="IaG-8Z-z0R"/>
-                            <constraint firstAttribute="bottom" secondItem="fyk-PJ-aSy" secondAttribute="bottom" constant="2" id="Odb-89-KfP"/>
                             <constraint firstAttribute="bottom" secondItem="hYU-Wo-K4k" secondAttribute="bottom" constant="2" id="cYd-Mm-0Cc"/>
-                            <constraint firstItem="fyk-PJ-aSy" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="12" id="coc-nv-lOw"/>
                             <constraint firstAttribute="bottom" secondItem="lsx-F7-MSG" secondAttribute="bottom" constant="8" id="dI0-ys-M9e"/>
                             <constraint firstAttribute="trailing" secondItem="cPC-WZ-J29" secondAttribute="trailing" constant="8" id="dS3-ho-WOU"/>
-                            <constraint firstAttribute="bottom" secondItem="MAi-70-Asr" secondAttribute="bottom" constant="2" id="fn1-pt-Emk"/>
-                            <constraint firstItem="lsx-F7-MSG" firstAttribute="leading" secondItem="MAi-70-Asr" secondAttribute="trailing" constant="18" id="gjj-yR-z5s"/>
                             <constraint firstItem="hYU-Wo-K4k" firstAttribute="leading" secondItem="lsx-F7-MSG" secondAttribute="trailing" constant="12" id="vdB-dl-n4V"/>
                         </constraints>
                     </view>
@@ -108,6 +116,11 @@
         </tableViewCell>
     </objects>
     <resources>
+        <image name="hand.thumbsup" catalog="system" width="128" height="128"/>
+        <image name="text.bubble" catalog="system" width="128" height="110"/>
+        <namedColor name="AccentColor">
+            <color red="1" green="0.23100003600120544" blue="0.18799999356269836" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+        </namedColor>
         <systemColor name="systemGray6Color">
             <color red="0.94901960784313721" green="0.94901960784313721" blue="0.96862745098039216" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </systemColor>

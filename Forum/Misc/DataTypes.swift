@@ -55,7 +55,7 @@ struct Thread: DATA {
     
     var id = "", title = "", summary = ""
     var type: Category = .uncategorized
-    var liked = 0, read = 0, commented = 0
+    var nLiked = 0, nRead = 0, nCommented = 0
     var visible = true, hasLiked = false, hasDisliked = false, hasFavoured = false
     var postTime = Date(), lastUpdateTime = Date()
     
@@ -64,11 +64,11 @@ struct Thread: DATA {
     init() {}
     init(json: Any) {
         let thread  = json as! [String: Any]
-        commented   = thread["Comment"] as! Int
+        nCommented   = thread["Comment"] as! Int
         id          = thread["ThreadID"] as! String
-        read        = thread["Read"] as! Int
+        nRead        = thread["Read"] as! Int
         summary     = thread["Summary"] as! String
-        liked       = thread["Praise"] as! Int
+        nLiked       = thread["Praise"] as! Int
         title       = thread["Title"] as! String
         postTime    = Util.stringToDate(thread["LastUpdateTime"] as! String)
     }
@@ -78,9 +78,9 @@ struct Thread: DATA {
         p.id = "00001"
         p.title = "This is a title"
         p.summary = "From the first floor"
-        p.liked = cnt * 333
-        p.commented = cnt * 2
-        p.read = cnt * 114514
+        p.nLiked = cnt * 333
+        p.nCommented = cnt * 2
+        p.nRead = cnt * 114514
         cnt += 1
         return p
     }
@@ -89,7 +89,8 @@ struct Thread: DATA {
         var f = Floor()
         f.content = summary
         f.name = "1"
-        f.liked = liked
+        f.nLiked = nLiked
+        f.id = "0"
         return f
     }
     
@@ -121,7 +122,7 @@ struct Floor: DATA {
     
     var id = ""
     var name = "", content = ""
-    var liked = 233
+    var nLiked = 233
     var hasLiked = false
     var time = Date()
     
@@ -139,7 +140,8 @@ struct Floor: DATA {
         replyToName = floor["Replytoname"] as? String
         replyToFloor = floor["Replytofloor"] as? Int
         time = Util.stringToDate(floor["RTime"] as! String)
-        liked = floor["Praise"] as! Int
+        hasLiked = 1 == (floor["WhetherPraise"] as! Int)
+        nLiked = floor["Praise"] as! Int
     }
     
     class Manager: DataManager<Floor> {
@@ -163,7 +165,7 @@ struct Floor: DATA {
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAs(floor: data[index])
+            cell.setAs(floor: data[index], forThread: thread)
         }
         
     }

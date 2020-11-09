@@ -117,14 +117,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
-    func scrollViewWillBeginDragging(_ scrollView: UIScrollView) {
-//        print("will begin")
-    }
-    
-    func scrollViewDidEndDragging(_ scrollView: UIScrollView, willDecelerate decelerate: Bool) {
-//        print("did end")
-    }
-    
     // MARK: - Selector functions
     
     @objc func refresh() {
@@ -200,7 +192,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @IBAction func newThread(_ sender: Any) {
         print("new thread!")
-        present((*"NewThreadVC" as! NewThreadViewController).withFather(self), animated: true, completion: nil)
+        self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
     }
     
     // MARK: - Table view data source

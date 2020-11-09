@@ -29,7 +29,7 @@
         <!--Me-->
         <scene sceneID="7Nt-Xb-OAT">
             <objects>
-                <viewController title="Me" id="ls2-8T-Wkw" customClass="MiscViewController" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Me" id="ls2-8T-Wkw" customClass="MiscVC" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="nww-jU-EuS">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -147,7 +147,7 @@
         <!--Title-->
         <scene sceneID="EcB-tU-q3k">
             <objects>
-                <viewController storyboardIdentifier="NewThreadVC" id="ehu-UO-yBm" customClass="NewThreadViewController" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="NewThreadVC" id="ehu-UO-yBm" customClass="NewThreadVC" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="hPf-lL-cAl">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -345,13 +345,28 @@
         <!--About-->
         <scene sceneID="3Bv-r6-dYR">
             <objects>
-                <viewController storyboardIdentifier="AboutVC" title="About" id="WW9-9j-KNh" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="AboutVC" title="About" id="WW9-9j-KNh" customClass="AboutVC" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="9RH-VT-bFw">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
+                            <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="nib-Hx-ljO">
+                                <rect key="frame" x="0.0" y="0.0" width="414" height="44"/>
+                                <items>
+                                    <navigationItem title="About" id="yt1-Jq-L0j">
+                                        <barButtonItem key="rightBarButtonItem" title="Dismiss" id="1cP-nY-cKN">
+                                            <connections>
+                                                <action selector="dismissClicked:" destination="WW9-9j-KNh" id="dFv-6L-Wcu"/>
+                                            </connections>
+                                        </barButtonItem>
+                                    </navigationItem>
+                                </items>
+                            </navigationBar>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="About" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PRS-sC-hhv">
-                                <rect key="frame" x="17" y="44" width="46" height="21"/>
+                                <rect key="frame" x="20" y="68" width="46" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="46" id="nTN-NO-lIg"/>
+                                </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="17"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -360,8 +375,11 @@
                         <viewLayoutGuide key="safeArea" id="hlY-eT-I3B"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="PRS-sC-hhv" firstAttribute="leading" secondItem="hlY-eT-I3B" secondAttribute="leading" constant="17" id="5dP-tw-zqS"/>
-                            <constraint firstItem="PRS-sC-hhv" firstAttribute="top" secondItem="hlY-eT-I3B" secondAttribute="top" id="5sL-z4-6fJ"/>
+                            <constraint firstItem="nib-Hx-ljO" firstAttribute="top" secondItem="9RH-VT-bFw" secondAttribute="top" id="2pU-8O-h5P"/>
+                            <constraint firstAttribute="trailing" secondItem="nib-Hx-ljO" secondAttribute="trailing" id="8zK-ts-Nh2"/>
+                            <constraint firstItem="nib-Hx-ljO" firstAttribute="leading" secondItem="9RH-VT-bFw" secondAttribute="leading" id="EUZ-PH-8OP"/>
+                            <constraint firstItem="PRS-sC-hhv" firstAttribute="top" secondItem="nib-Hx-ljO" secondAttribute="bottom" constant="24" id="H0e-R4-eqD"/>
+                            <constraint firstItem="PRS-sC-hhv" firstAttribute="leading" secondItem="hlY-eT-I3B" secondAttribute="leading" constant="20" id="pFH-kj-gBd"/>
                         </constraints>
                     </view>
                 </viewController>
