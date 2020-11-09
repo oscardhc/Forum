@@ -110,10 +110,7 @@ struct Thread: DATA {
         }
         
         override func didSelectedRow(_ vc: UIViewController, index: Int) {
-            vc.navigationController?.pushViewController(
-                (*"MainVC" as! MainVC).fl(data[index]),
-                animated: true
-            )
+            vc >> MainVC.new(.floors, data[index])
         }
         
     }

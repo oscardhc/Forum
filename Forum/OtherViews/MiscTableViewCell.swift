@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AboutTableViewCell: UITableViewCell {
+class MiscTableViewCell: UITableViewCell {
 
     @IBOutlet weak var icon: UIImageView!
     

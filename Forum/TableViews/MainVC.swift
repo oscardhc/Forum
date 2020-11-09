@@ -11,7 +11,7 @@ import MJRefresh
 class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UIScrollViewDelegate {
     
     enum Scene: String {
-        case main = "Threads", myThreads = "My Threads", trends = "Trends", messages = "Messages", floors = "Thread#", favour = "Favoured"
+        case main = "Threads", my = "My Threads", trends = "Trends", messages = "Messages", floors = "Thread#", favour = "Favoured"
     }
     
     // This is the default value for MainThread(the enter interface), any other types must overwrite this two properties
@@ -24,30 +24,24 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var bottomViewHieght: NSLayoutConstraint!
     @IBOutlet weak var newThreadButton: UIBarButtonItem!
     
-    func my() -> Self {
-        scene = .myThreads
-        d = Thread.Manager(type: .my)
-        return self
-    }
-    func tr() -> Self {
-        scene = .trends
-        d = Thread.Manager(type: .trending)
-        return self
-    }
-    func fv() -> Self {
-        scene = .favour
-        d = Thread.Manager(type: .favoured)
-        return self
-    }
-    func fl(_ thread: Thread) -> Self {
-        scene = .floors
-        d = Floor.Manager(for: thread)
-        return self
-    }
-    func ms() -> Self {
-        scene = .messages
-        d = Message.Manager()
-        return self
+    static func new(_ scene: Scene, _ args: Any...) -> MainVC {
+        let vc = *"MainVC" as! MainVC
+        vc.scene = scene
+        switch vc.scene {
+        case .my:
+            vc.d = Thread.Manager(type: .my)
+        case .trends:
+            vc.d = Thread.Manager(type: .trending)
+        case .favour:
+            vc.d = Thread.Manager(type: .favoured)
+        case .floors:
+            vc.d = Floor.Manager(for: args[0] as! Thread)
+        case .messages:
+            vc.d = Message.Manager()
+        case .main:
+            fatalError()
+        }
+        return vc
     }
     
     let footer = MJRefreshAutoNormalFooter()
@@ -57,7 +51,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         super.viewDidLoad()
         
         if tabBarController?.viewControllers?.count == 2 {
-            let nav = UINavigationController(rootViewController: (*"MainVC" as! MainVC).tr())
+            let nav = UINavigationController(rootViewController: MainVC.new(.trends))
             nav.navigationBar.prefersLargeTitles = true
             tabBarController?.viewControllers?.insert(nav, at: 1)
             

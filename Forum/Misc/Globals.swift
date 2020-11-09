@@ -48,3 +48,15 @@ extension UIView {
         self.layer.borderColor = UIColor.gray.cgColor
     }
 }
+
+extension UIViewController {
+    
+    static func >> (_ vc: UIViewController, _ to: UIViewController) {
+        vc.navigationController?.pushViewController(to, animated: true)
+    }
+    
+    static func << (_ vc: UIViewController, _ to: UIViewController) {
+        vc.present(to, animated: true, completion: nil)
+    }
+    
+}

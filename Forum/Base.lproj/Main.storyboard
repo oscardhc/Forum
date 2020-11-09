@@ -26,10 +26,10 @@
             </objects>
             <point key="canvasLocation" x="858" y="424"/>
         </scene>
-        <!--About-->
+        <!--Me-->
         <scene sceneID="7Nt-Xb-OAT">
             <objects>
-                <viewController id="ls2-8T-Wkw" customClass="AboutViewController" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Me" id="ls2-8T-Wkw" customClass="MiscViewController" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="nww-jU-EuS">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -37,7 +37,7 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="3mQ-rZ-tu7">
                                 <rect key="frame" x="0.0" y="88" width="414" height="725"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="AboutCell" rowHeight="65" id="yRd-XO-4G1" customClass="AboutTableViewCell" customModule="Forum" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" accessoryType="disclosureIndicator" indentationWidth="10" reuseIdentifier="MiscCell" rowHeight="65" id="yRd-XO-4G1" customClass="MiscTableViewCell" customModule="Forum" customModuleProvider="target">
                                         <rect key="frame" x="20" y="55.5" width="374" height="65"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="yRd-XO-4G1" id="4Xl-gc-1EN">
@@ -73,7 +73,7 @@
                             <constraint firstItem="3mQ-rZ-tu7" firstAttribute="top" secondItem="bkf-h9-Vo6" secondAttribute="top" id="kBz-rt-CWv"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="About" id="nM7-RG-JbZ"/>
+                    <navigationItem key="navigationItem" title="Me" id="nM7-RG-JbZ"/>
                     <connections>
                         <outlet property="tableView" destination="3mQ-rZ-tu7" id="9N5-nW-q9R"/>
                     </connections>
@@ -264,7 +264,7 @@
             </objects>
             <point key="canvasLocation" x="-32" y="34"/>
         </scene>
-        <!--THREADS-->
+        <!--MainVC-->
         <scene sceneID="n5W-ec-T4z">
             <objects>
                 <viewController storyboardIdentifier="MainVC" id="BH7-QK-pMN" customClass="MainVC" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
@@ -323,7 +323,7 @@
                             <constraint firstItem="Wa6-wE-ev8" firstAttribute="centerX" secondItem="nri-P3-JWk" secondAttribute="centerX" id="zvP-yt-qYK"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" title="THREADS" id="9cw-c9-bas">
+                    <navigationItem key="navigationItem" id="9cw-c9-bas">
                         <barButtonItem key="rightBarButtonItem" title="New Thread" id="rAJ-EU-CCN">
                             <connections>
                                 <action selector="newThread:" destination="BH7-QK-pMN" id="eUW-RD-khN"/>
@@ -342,10 +342,37 @@
             </objects>
             <point key="canvasLocation" x="1631.8840579710147" y="-333.48214285714283"/>
         </scene>
+        <!--About-->
+        <scene sceneID="3Bv-r6-dYR">
+            <objects>
+                <viewController storyboardIdentifier="AboutVC" title="About" id="WW9-9j-KNh" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="9RH-VT-bFw">
+                        <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="About" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="PRS-sC-hhv">
+                                <rect key="frame" x="17" y="44" width="46" height="21"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <nil key="textColor"/>
+                                <nil key="highlightedColor"/>
+                            </label>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="hlY-eT-I3B"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="PRS-sC-hhv" firstAttribute="leading" secondItem="hlY-eT-I3B" secondAttribute="leading" constant="17" id="5dP-tw-zqS"/>
+                            <constraint firstItem="PRS-sC-hhv" firstAttribute="top" secondItem="hlY-eT-I3B" secondAttribute="top" id="5sL-z4-6fJ"/>
+                        </constraints>
+                    </view>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="mSg-6F-GoO" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="2503" y="-333"/>
+        </scene>
     </scenes>
     <resources>
         <namedColor name="AccentColor">
-            <color red="0.0" green="0.46000000000000002" blue="0.89000000000000001" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="1" green="0.23100003600120544" blue="0.18799999356269836" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

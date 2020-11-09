@@ -7,7 +7,7 @@
 
 import UIKit
 
-class AboutViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
+class MiscViewController: UIViewController, UITableViewDataSource, UITableViewDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -16,37 +16,20 @@ class AboutViewController: UIViewController, UITableViewDataSource, UITableViewD
             [
                 ("头像", {}),
                 ("账号", {}),
-                ("通知", {
-                    self.navigationController?.pushViewController(
-                        (*"MainVC" as! MainVC).ms(),
-                        animated: true
-                    )
-                }),
-                ("收藏", {
-                    self.navigationController?.pushViewController(
-                        (*"MainVC" as! MainVC).fv(),
-                        animated: true
-                    )
-                })
+                ("通知", {self >> MainVC.new(.messages)}),
+                ("收藏", {self >> MainVC.new(.favour)})
             ],
             [
-                ("我的帖子", {
-                    self.navigationController?.pushViewController(
-                        (*"MainVC" as! MainVC).my(),
-                        animated: true
-                    )
-                })
+                ("我的帖子", {self >> MainVC.new(.my)})
             ],
             [
                 ("设置", {}),
-                ("关于", {})
+                ("关于", {self >> *"AboutVC"})
             ]
         ]
         : [
             [
-                ("请登录", {
-                    self.present(*"LoginVC", animated: true, completion: nil)
-                })
+                ("请登录", {self << *"LoginVC"})
             ]
         ]
     
@@ -67,7 +50,7 @@ class AboutViewController: UIViewController, UITableViewDataSource, UITableViewD
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "AboutCell", for: indexPath) as! AboutTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: "MiscCell", for: indexPath) as! MiscTableViewCell
         cell.textLabel?.text = content[indexPath.section][indexPath.row].title
         if isIconIndex(indexPath) {
             cell.icon.image = UIImage(named: "avator")
@@ -92,7 +75,16 @@ class AboutViewController: UIViewController, UITableViewDataSource, UITableViewD
         tableView.delegate = self
         tableView.dataSource = self
         tableView.tableFooterView = UIView(frame: CGRect.zero)
+        tableView.contentInsetAdjustmentBehavior = .always
         
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewWillAppear(animated)
+        
+        if let selectionIndexPath = self.tableView.indexPathForSelectedRow {
+            self.tableView.deselectRow(at: selectionIndexPath, animated: animated)
+        }
     }
     
     /*

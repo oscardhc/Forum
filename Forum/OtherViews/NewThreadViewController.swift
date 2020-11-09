@@ -32,7 +32,7 @@ class NewThreadViewController: UIViewController {
 
         // Do any additional setup after loading the view.
         gridView = GridBtnView.basedOn(view: blockView)
-        blockView.backgroundColor = .blue
+        blockView.backgroundColor = UIColor(named: "AccentColor")
     }
     
     var gridView: GridBtnView!
