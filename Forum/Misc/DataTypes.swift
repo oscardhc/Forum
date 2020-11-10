@@ -10,6 +10,7 @@ import UIKit
 
 protocol DATA {
     var id: String {get}
+    var content: String {get}
 }
 
 class BaseManager {
@@ -18,6 +19,7 @@ class BaseManager {
     func getInitialContent() -> Int { -1 }
     func getMoreContent() -> Int { -1 }
     func didSelectedRow(_ vc: UIViewController, index: Int) {}
+    func height(width: CGFloat, for index: Int) -> CGFloat { 0 }
 }
 
 class DataManager<T: DATA>: BaseManager {
@@ -41,6 +43,13 @@ class DataManager<T: DATA>: BaseManager {
         }
         return 0
     }
+    override func height(width: CGFloat, for index: Int) -> CGFloat {
+//        NSString("123").size(withAttributes: [.font: UIFont(descriptor: UIFontDescriptor(name: "Helvetica", size: 20))])
+        let fontAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
+        let sz = data[index].content.size(withAttributes: fontAttributes)
+        print(width, sz, data[index].content)
+        return CGFloat(Int(sz.width) / Int(width) + 1) * sz.height + 170
+    }
     
 }
 
@@ -53,10 +62,10 @@ struct Thread: DATA {
         case study
     }
     
-    var id = "", title = "", summary = ""
+    var id = "", title = "", content = ""
     var type: Category = .uncategorized
     var nLiked = 0, nRead = 0, nCommented = 0
-    var visible = true, hasLiked = false, hasDisliked = false, hasFavoured = false
+    var visible = true, hasLiked = false, hasFavoured = false
     var postTime = Date(), lastUpdateTime = Date()
     
     static var cnt = 1
@@ -64,12 +73,15 @@ struct Thread: DATA {
     init() {}
     init(json: Any) {
         let thread  = json as! [String: Any]
+        print(thread)
         nCommented   = thread["Comment"] as! Int
         id          = thread["ThreadID"] as! String
         nRead        = thread["Read"] as! Int
-        summary     = thread["Summary"] as! String
+        content     = thread["Summary"] as! String
         nLiked       = thread["Praise"] as! Int
         title       = thread["Title"] as! String
+        hasFavoured = (thread["Praise"] as! Int) == 1
+        hasLiked = (thread["WhetherLike"] as! Int) == 1
         postTime    = Util.stringToDate(thread["LastUpdateTime"] as! String)
     }
     
@@ -77,7 +89,10 @@ struct Thread: DATA {
         var p = Thread()
         p.id = "00001"
         p.title = "This is a title"
-        p.summary = "From the first floor"
+        p.content = "From the first floor."
+        for _ in 0..<cnt * 3 + 2 {
+            p.content += "\nFrom the first floor."
+        }
         p.nLiked = cnt * 333
         p.nCommented = cnt * 2
         p.nRead = cnt * 114514
@@ -87,10 +102,12 @@ struct Thread: DATA {
     
     func generateFirstFloor() -> Floor {
         var f = Floor()
-        f.content = summary
         f.name = "1"
-        f.nLiked = nLiked
         f.id = "0"
+        f.content = content
+        f.nLiked = nLiked
+        f.time = postTime
+        f.hasLiked = hasLiked
         return f
     }
     
@@ -101,6 +118,11 @@ struct Thread: DATA {
         init(type: Network.NetworkGetThreadType) {
             sortType = type
         }
+        
+//        override func getInitialContent() -> Int {
+//            data = [Thread.samplePost()] + [Thread.samplePost()]
+//            return 1
+//        }
         
         override func networking(lastSeenID: String) -> [Thread] {
             Network.getThreads(type: sortType, lastSeenID: lastSeenID)
@@ -165,7 +187,7 @@ struct Floor: DATA {
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAs(floor: data[index], forThread: thread)
+            cell.setAs(floor: data[index], forThread: thread, firstFloor: index == 0)
         }
         
     }
@@ -186,16 +208,16 @@ struct Message: DATA {
         
     }
     
-    var id = "", title = "", summary = ""
-    var ty = "", judge = "", time = Date()
+    var id = "", title = "", content = ""
+    var ty = 0, judge = 0, time = Date()
     
     init(json: Any) {
         let msg = json as! [String: Any]
         id = msg["ThreadID"] as! String
         title = msg["Title"] as! String
-        summary = msg["Summary"] as! String
-        ty = msg["Type"] as! String
-        judge = msg["Jusge"] as! String
+        content = msg["Summary"] as! String
+        ty = msg["Type"] as! Int
+        judge = msg["Judge"] as! Int
         time = Util.stringToDate(msg["PostTime"] as! String)
     }
     

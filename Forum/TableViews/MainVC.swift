@@ -8,7 +8,7 @@
 import UIKit
 import MJRefresh
 
-class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextFieldDelegate, UIScrollViewDelegate {
+class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate {
     
     enum Scene: String {
         case main = "Threads", my = "My Threads", trends = "Trends", messages = "Messages", floors = "Thread#", favour = "Favoured"
@@ -19,9 +19,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     var d: BaseManager = Thread.Manager(type: .time)
     
     @IBOutlet weak var tableView: UITableView!
-    @IBOutlet weak var textField: UITextField!
+    @IBOutlet weak var textView: UITextView!
     @IBOutlet weak var bottomSpace: NSLayoutConstraint!
-    @IBOutlet weak var bottomViewHieght: NSLayoutConstraint!
+    @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
+    @IBOutlet weak var textViewHeight: NSLayoutConstraint!
     @IBOutlet weak var newThreadButton: UIBarButtonItem!
     
     static func new(_ scene: Scene, _ args: Any...) -> MainVC {
@@ -67,7 +68,12 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             tabBarController?.tabBar.items?[2].selectedImage = UIImage(systemName: "person.fill")
             tabBarController?.tabBar.items?[2].title = "我"
         }
-        navigationItem.title = scene.rawValue
+        
+        navigationItem.title = scene == .floors
+            ? "Thread#\((d as! Floor.Manager).thread.id)"
+            : scene.rawValue
+        
+        
         tableView.contentInsetAdjustmentBehavior = .always
         
         tableView.delegate = self
@@ -84,7 +90,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        textField.delegate = self
+        textView.delegate = self
         
         let gesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(_:)))
         gesture.numberOfTouchesRequired = 1
@@ -94,17 +100,25 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         refresh()
     }
     
+    let bottomInitialHeight: CGFloat = 80
+    let bottomExpandHeight: CGFloat = 36 + 16
+    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if scene == .floors {
             tabBarController?.tabBar.isHidden = true
-            bottomViewHieght.constant = 90
+            bottomViewHeight.constant = bottomInitialHeight
         } else {
             tabBarController?.tabBar.isHidden = false
-            bottomViewHieght.constant = 0
+            bottomViewHeight.constant = 0
         }
         if scene != .main {
             newThreadButton.title = ""
+        }
+        if scene == .floors {
+            newThreadButton.image = UIImage(systemName: "star")
+//            newThreadButton.
+            newThreadButton.isEnabled = false
         }
     }
     
@@ -119,15 +133,21 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     // MARK: - Selector functions
     
+    func updateFavour() {
+        if scene == .floors {
+            newThreadButton.image = UIImage(systemName: (d as! Floor.Manager).thread.hasFavoured ? "star.fill" : "star")
+            newThreadButton.isEnabled = true
+        }
+    }
+    
     @objc func refresh() {
         DispatchQueue.global().async {
             usleep(300000)
             let count = self.d.getInitialContent()
-//            while self.tableView.refreshControl?.frame.height +
             DispatchQueue.main.async {
+                self.updateFavour()
                 self.tableView.refreshControl?.endRefreshing()
                 self.tableView.reloadSections(IndexSet([1]), with: .automatic)
-                print("refresh", self.scene)
                 if count == G.numberPerFetch {
                     self.tableView.mj_footer?.resetNoMoreData()
                 } else {
@@ -151,13 +171,25 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
+    var floor: String = "-1" {
+        didSet {
+//            textView.placeholder = "Replying to Floor #\(floor)"
+        }
+    }
+    
+    func tryToReplyTo(floor f: String) {
+        floor = f
+        textView.becomeFirstResponder()
+        textView.text = ""
+    }
+    
     @objc func keyboardWillShow(_ sender: Notification) {
         print("WILL SHOW!!!")
         let height = (sender.userInfo![UIResponder.keyboardFrameEndUserInfoKey]! as! NSValue).cgRectValue.height
         var time: TimeInterval = 0
         (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
-        print(height, time)
-        bottomSpace.constant = height + G.bottomDelta
+        bottomViewHeight.constant = bottomExpandHeight
+        bottomSpace.constant = height
         UIView.animate(withDuration: time) {
             self.view.layoutIfNeeded()
         }
@@ -167,8 +199,18 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         print("WILL HIDE!!!")
         var time: TimeInterval = 0
         (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
-        bottomSpace.constant = G.bottomDelta
+        bottomViewHeight.constant = bottomInitialHeight
+        bottomSpace.constant = 0
         UIView.animate(withDuration: time) {
+            self.view.layoutIfNeeded()
+        }
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        let height = max(min(textView.contentSize.height, 100), 36)
+        textViewHeight.constant = height
+        bottomViewHeight.constant = height + 16
+        UIView.animate(withDuration: 0.3) {
             self.view.layoutIfNeeded()
         }
     }
@@ -181,18 +223,30 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     // MARK: - IBActions
     
     @IBAction func newComment(_ sender: Any) {
-        if let content = textField.text, content != "" {
+        if let content = textView.text, content != "" {
             let threadID = (d as! Floor.Manager).thread.id
-            let success = Network.newReply(for: threadID, floor: nil, content: content)
+            let success = Network.newReply(for: threadID, content: content)
             if success {
                 refresh()
             }
         }
     }
     
-    @IBAction func newThread(_ sender: Any) {
-        print("new thread!")
-        self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
+    @IBAction func barBtnClicked(_ sender: Any) {
+        if scene == .main {
+            self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
+        } else if scene == .floors {
+            if ({
+                if (d as! Floor.Manager).thread.hasFavoured {
+                    return Network.cancelFavourThread(for: (d as! Floor.Manager).thread.id)
+                } else {
+                    return Network.favourThread(for: (d as! Floor.Manager).thread.id)
+                }
+            }()) {
+                (d as! Floor.Manager).thread.hasFavoured = !(d as! Floor.Manager).thread.hasFavoured
+                updateFavour()
+            }
+        }
     }
     
     // MARK: - Table view data source
@@ -210,13 +264,26 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         indexPath.section == 0
             ?  (tableView.dequeueReusableCell(withIdentifier: "HeadCell", for: indexPath) as! HeaderCell).forBlock()
-            :  d.initializeCell(tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell, index: indexPath.row)
+            :  d.initializeCell(tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell, index: indexPath.row).withVC(self)
     }
+    
+    func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
+        300
+    }
+    
+//    var cellHeights = [IndexPath: CGFloat]()
+//
+//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        cellHeights[indexPath] = cell.frame.size.height
+//    }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         indexPath.section == 0
             ? (scene == .main ? 200 : 0)
-            : 200
+//            : (d.height(width: tableView.frame.width - 30, for: indexPath.row))
+//            : cellHeights[indexPath] ?? UITableView.automaticDimension
+//            : 200
+            : UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {

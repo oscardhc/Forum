@@ -18,16 +18,37 @@ class MainCell: UITableViewCell {
     var thread: Thread!
     var floor: Floor!
     var message: Message!
+    var isFirstFloor: Bool!
+    var parentVC: MainVC!
     
     @IBOutlet weak var mainView: UIView!
     @IBOutlet weak var idLabel: UILabel!
-    @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var contentLabel: UILabel!
     @IBOutlet weak var likedBtn: UIButton!
     @IBOutlet weak var commentBtn: UIButton!
     @IBOutlet weak var readLabel: UILabel!
-    @IBOutlet weak var realCommentBtn: UIButton!
     @IBOutlet weak var cornerLabel: UILabel!
+    @IBOutlet weak var topLabel: UILabel!
+    @IBOutlet weak var topDist: NSLayoutConstraint!
+    @IBOutlet weak var titleLabel: UILabel!
+    @IBOutlet weak var titleDist: NSLayoutConstraint!
+    @IBOutlet weak var commentDist: NSLayoutConstraint!
+    
+    var content = (title: "", content: "") {
+        didSet {
+            if scene != .floor || content.title == "" {
+                topLabel.isHidden = true
+                topDist.constant = -topLabel.frame.height
+            }
+            if scene != .thread {
+                titleLabel.isHidden = true
+                titleDist.constant = -titleLabel.frame.height
+            }
+            topLabel.text = content.title
+            titleLabel.text = content.title
+            contentLabel.text = content.content
+        }
+    }
     
     var liked = false {
         didSet {
@@ -44,8 +65,8 @@ class MainCell: UITableViewCell {
         
         // Initialization code
         selectionStyle = .none
-        likedBtn.titleLabel?.textAlignment = .left
-        commentBtn.titleLabel?.textAlignment = .left
+        likedBtn.adjustsImageWhenDisabled = false
+        commentBtn.adjustsImageWhenDisabled = false
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -55,16 +76,38 @@ class MainCell: UITableViewCell {
     }
     
     @IBAction func like(_ sender: Any) {
-        if liked {
-            Network.cancelLikeFloor(for: thread.id, floor: floor.id)
-            floor.nLiked -= 1
-        } else {
-            Network.likeFloor(for: thread.id, floor: floor.id)
-            floor.nLiked += 1
+        if ({
+            if liked {
+                if floor.id == "0" {
+                    return Network.cancelLikeThread(for: thread.id)
+                } else {
+                    return Network.cancelLikeFloor(for: thread.id, floor: floor.id)
+                }
+            } else {
+                if floor.id == "0" {
+                    return Network.likeThread(for: thread.id)
+                } else {
+                    return Network.likeFloor(for: thread.id, floor: floor.id)
+                }
+            }
+        }()) {
+            if liked {
+                floor.nLiked -= 1
+            } else {
+                floor.nLiked += 1
+            }
+            likedBtn.setTitle("\(floor.nLiked)", for: .normal)
+            liked = !liked
         }
-        likedBtn.setTitle("\(floor.nLiked)", for: .normal)
-        
-        liked = !liked
+    }
+    
+    func withVC(_ vc: MainVC) -> Self {
+        parentVC = vc
+        return self
+    }
+    
+    @IBAction func comment(_ sender: Any) {
+        parentVC.tryToReplyTo(floor: floor.id)
     }
     
     // MARK: - Thread
@@ -73,33 +116,37 @@ class MainCell: UITableViewCell {
         thread = t
         scene = .thread
         
-        titleLabel.text = t.title
         idLabel.text = "#\(t.id)"
-        contentLabel.text = t.summary
+        content = (t.title, t.content)
         likedBtn.setTitle("\(t.nLiked)", for: .normal)
         readLabel.text = "\(t.nRead) read"
         commentBtn.setTitle("\(t.nCommented)", for: .normal)
-        cornerLabel.text = Util.dateToString(t.postTime)
+        cornerLabel.text = Util.dateToDeltaString(t.postTime)
         liked = t.hasLiked
+        
+        likedBtn.isEnabled = false
+        commentBtn.isEnabled = false
+        
         return self
     }
     
     // MARK: - Floor
     
-    func setAs(floor f: Floor, forThread t: Thread) -> Self {
+    func setAs(floor f: Floor, forThread t: Thread, firstFloor: Bool = false) -> Self {
         thread = t
         floor = f
+        isFirstFloor = firstFloor
         scene = .floor
         
         idLabel.text = f.name + " -> " + (f.replyToName ?? "NIL")
-        contentLabel.text = f.content
-        contentLabel.frame = titleLabel.frame
-        titleLabel.text = ""
+        content = (isFirstFloor ? t.title : "", f.content)
         likedBtn.setTitle("\(f.nLiked)", for: .normal)
-        cornerLabel.text = Util.dateToString(f.time) + " #\(floor.id)"
+        cornerLabel.text = Util.dateToDeltaString(f.time) + " #\(floor.id)"
         liked = f.hasLiked
+        commentBtn.setTitle("回复", for: .normal)
+        commentBtn.contentHorizontalAlignment = .right
         
-        commentBtn.isHidden = true
+        commentDist.constant = -readLabel.frame.width
         readLabel.isHidden = true
         
         return self
@@ -111,10 +158,12 @@ class MainCell: UITableViewCell {
         message = m
         scene = .message
         
-        titleLabel.text = m.title
+//        titleLabel.text = m.title
         idLabel.text = m.id
-        contentLabel.text = m.summary
-        cornerLabel.text = Util.dateToString(m.time)
+//        contentLabel.text = m.content
+        
+        content = (m.title, m.content)
+        cornerLabel.text = Util.dateToDeltaString(m.time)
         
         likedBtn.isHidden = true
         commentBtn.isHidden = true
@@ -124,6 +173,7 @@ class MainCell: UITableViewCell {
     }
     
     override func layoutSubviews() {
+//        print("layout", content, self.frame.height)
         mainView.applyCardStyle()
     }
     

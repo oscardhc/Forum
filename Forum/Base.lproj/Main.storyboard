@@ -3,6 +3,7 @@
     <device id="retina6_1" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="Safe area layout guides" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -290,23 +291,37 @@
                             <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="YaK-0y-yVB">
                                 <rect key="frame" x="0.0" y="641" width="414" height="255"/>
                                 <subviews>
-                                    <textField opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2rK-zf-4Qz">
-                                        <rect key="frame" x="29" y="17" width="286" height="34"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                        <textInputTraits key="textInputTraits"/>
-                                    </textField>
-                                    <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E5U-ji-gjv">
-                                        <rect key="frame" x="323" y="19" width="63" height="30"/>
-                                        <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                        <state key="normal" title="发表"/>
+                                    <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="E5U-ji-gjv">
+                                        <rect key="frame" x="354" y="15" width="25" height="22"/>
+                                        <constraints>
+                                            <constraint firstAttribute="width" constant="25" id="Gwk-h1-vbR"/>
+                                        </constraints>
+                                        <state key="normal">
+                                            <imageReference key="image" image="paperplane" catalog="system" symbolScale="medium"/>
+                                        </state>
                                         <connections>
                                             <action selector="newComment:" destination="BH7-QK-pMN" eventType="touchUpInside" id="bHc-YO-UKu"/>
                                         </connections>
                                     </button>
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="initial" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="TL7-aM-57h">
+                                        <rect key="frame" x="35" y="8" width="301" height="36"/>
+                                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                        <constraints>
+                                            <constraint firstAttribute="height" constant="36" id="Dfh-iK-9OU"/>
+                                        </constraints>
+                                        <color key="textColor" systemColor="labelColor"/>
+                                        <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                        <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                                    </textView>
                                 </subviews>
                                 <color key="backgroundColor" systemColor="systemGray5Color"/>
                                 <constraints>
+                                    <constraint firstItem="TL7-aM-57h" firstAttribute="centerY" secondItem="E5U-ji-gjv" secondAttribute="centerY" id="02Q-Gk-eMG"/>
+                                    <constraint firstItem="E5U-ji-gjv" firstAttribute="top" secondItem="YaK-0y-yVB" secondAttribute="top" constant="15" id="AK1-fI-PBG"/>
+                                    <constraint firstItem="E5U-ji-gjv" firstAttribute="leading" secondItem="TL7-aM-57h" secondAttribute="trailing" constant="18" id="DPK-sW-oeK"/>
+                                    <constraint firstItem="TL7-aM-57h" firstAttribute="top" secondItem="YaK-0y-yVB" secondAttribute="topMargin" id="KiK-31-Kdh"/>
+                                    <constraint firstItem="TL7-aM-57h" firstAttribute="leading" secondItem="YaK-0y-yVB" secondAttribute="leading" constant="35" id="udl-DB-fAd"/>
+                                    <constraint firstAttribute="trailing" secondItem="E5U-ji-gjv" secondAttribute="trailing" constant="35" id="vY9-Bs-y7c"/>
                                     <constraint firstAttribute="height" constant="255" id="zTw-Jh-o87"/>
                                 </constraints>
                             </view>
@@ -326,16 +341,17 @@
                     <navigationItem key="navigationItem" id="9cw-c9-bas">
                         <barButtonItem key="rightBarButtonItem" title="New Thread" id="rAJ-EU-CCN">
                             <connections>
-                                <action selector="newThread:" destination="BH7-QK-pMN" id="eUW-RD-khN"/>
+                                <action selector="barBtnClicked:" destination="BH7-QK-pMN" id="eUW-RD-khN"/>
                             </connections>
                         </barButtonItem>
                     </navigationItem>
                     <connections>
                         <outlet property="bottomSpace" destination="Nq5-Nn-XjH" id="0ba-pS-kjs"/>
-                        <outlet property="bottomViewHieght" destination="zTw-Jh-o87" id="k52-px-2Cp"/>
+                        <outlet property="bottomViewHeight" destination="zTw-Jh-o87" id="k52-px-2Cp"/>
                         <outlet property="newThreadButton" destination="rAJ-EU-CCN" id="v8I-wg-2LD"/>
                         <outlet property="tableView" destination="Wa6-wE-ev8" id="w1E-FL-uLb"/>
-                        <outlet property="textField" destination="2rK-zf-4Qz" id="eY3-R4-Ocq"/>
+                        <outlet property="textView" destination="TL7-aM-57h" id="5pL-dA-gmp"/>
+                        <outlet property="textViewHeight" destination="Dfh-iK-9OU" id="f52-G0-VeK"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yZD-ct-32V" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
@@ -389,6 +405,7 @@
         </scene>
     </scenes>
     <resources>
+        <image name="paperplane" catalog="system" width="128" height="118"/>
         <namedColor name="AccentColor">
             <color red="1" green="0.23100003600120544" blue="0.18799999356269836" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
