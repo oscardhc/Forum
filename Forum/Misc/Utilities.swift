@@ -43,7 +43,7 @@ class NameGenerator {
         case aliceAndBob
     }
     static let data: [Theme: [String]] = [
-        .aliceAndBob: ["Alice", "Bob", "Carol", "Dave", "Eve", "F", "G", "Issac", "Justin", "K", "L", "Mallory", "N", "Oscar", "Pat", "Q", "R", "Steve", "Trent", "U", "V", "Walter", "X", "Y", "Zoe"]
+        .aliceAndBob: ["Alice", "Bob", "Carol", "Dave", "Eve", "Forest", "George", "Harry", "Issac", "Justin", "Kevin", "Laura", "Mallory", "Neal", "Oscar", "Pat", "Quentin", "Rose", "Steve", "Trent", "Utopia", "Victor", "Walter", "Xavier", "Young", "Zoe"]
     ]
     
     static func getName(_ theme: Theme, _ str: String) -> String {

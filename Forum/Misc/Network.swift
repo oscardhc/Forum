@@ -90,7 +90,7 @@ class Network {
     
     static func performLogin(with email: String, verificationCode: String) -> (Bool, String) {
         getData(op_code: "f", pa_1: email, pa_2: verificationCode, pa_3: UIDevice.current.identifierForVendor!.uuidString) {
-            ($0["login_flag"] as! Int == 0, $0["Token"] as! String)
+            ($0["login_flag"] as! Int == 1, $0["Token"] as! String)
         } ?? (false, "")
     }
     
