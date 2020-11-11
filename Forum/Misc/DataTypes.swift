@@ -73,7 +73,6 @@ struct Thread: DATA {
     init() {}
     init(json: Any) {
         let thread  = json as! [String: Any]
-        print(thread)
         nCommented   = thread["Comment"] as! Int
         id          = thread["ThreadID"] as! String
         nRead        = thread["Read"] as! Int

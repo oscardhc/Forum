@@ -39,17 +39,31 @@ class Util {
 
 class NameGenerator {
     
-    var data = [String]()
+    enum Theme {
+        case aliceAndBob
+    }
+    static let data: [Theme: [String]] = [
+        .aliceAndBob: ["Alice", "Bob", "Carol", "Dave", "Eve", "F", "G", "Issac", "Justin", "K", "L", "Mallory", "N", "Oscar", "Pat", "Q", "R", "Steve", "Trent", "U", "V", "Walter", "X", "Y", "Zoe"]
+    ]
     
-    subscript(str: String) -> String {
-        if let i = Int(str) {
-            if i > data.count {
-                return data[i % data.count] + "-\(i / data.count)"
+    static func getName(_ theme: Theme, _ str: String) -> String {
+        if var i = Int(str) {
+            i -= 1
+            if i >= data[theme]!.count {
+                return data[theme]![i % data.count] + "<\(i / data.count)>"
             } else {
-                return data[i]
+                return data[theme]![i]
             }
         }
         return "ERROR"
+    }
+    
+}
+
+extension String {
+    
+    func getName(theme: NameGenerator.Theme) -> String {
+        NameGenerator.getName(theme, self)
     }
     
 }

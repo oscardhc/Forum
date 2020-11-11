@@ -166,7 +166,15 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             let count = self.d.getMoreContent()
             DispatchQueue.main.async {
                 self.tableView.mj_footer?.endRefreshing()
-                self.tableView.reloadSections(IndexSet([1]), with: .automatic)
+                
+                if count > 0 {
+                    var idx = [IndexPath]()
+                    for i in 1...count {
+                        idx.append(IndexPath(row: self.d.count - i, section: 1))
+                    }
+                    self.tableView.insertRows(at: idx, with: .automatic)
+                }
+                
                 if count != G.numberPerFetch {
                     self.tableView.mj_footer?.endRefreshingWithNoMoreData()
                 }
@@ -174,7 +182,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
-    var floor: String = "-1" {
+    var floor: String = "0" {
         didSet {
 //            textView.placeholder = "Replying to Floor #\(floor)"
         }
@@ -220,7 +228,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     @objc func viewTapped(_ sender: Any) {
-        print("VIEW TAPPED!!!")
         self.view.endEditing(false)
     }
     
@@ -229,8 +236,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBAction func newComment(_ sender: Any) {
         if let content = textView.text, content != "" {
             let threadID = (d as! Floor.Manager).thread.id
-            let success = Network.newReply(for: threadID, content: content)
-            if success {
+            print(">>>>>>> reply", content, threadID, floor)
+            if Network.newReply(for: threadID, floor: floor, content: content) {
+                textView.text = ""
+                self.view.endEditing(false)
                 refresh()
             }
         }
@@ -267,7 +276,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         indexPath.section == 0
-            ?  (tableView.dequeueReusableCell(withIdentifier: "HeadCell", for: indexPath) as! HeaderCell).forBlock()
+            ?  tableView.dequeueReusableCell(withIdentifier: "HeadCell", for: indexPath)
             :  d.initializeCell(tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell, index: indexPath.row).withVC(self)
     }
     

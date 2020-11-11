@@ -142,7 +142,11 @@ class MainCell: UITableViewCell {
         isFirstFloor = firstFloor
         scene = .floor
         
-        idBtn.setTitle(f.name + " -> " + (f.replyToName ?? "NIL"), for: .normal)
+        idBtn.setTitle(f.name.getName(theme: .aliceAndBob) +
+                        (((f.replyToFloor ?? 0) == 0)
+                            ? ""
+                            : " -> #\(f.replyToFloor!) \(f.replyToName!.getName(theme: .aliceAndBob))"
+                        ), for: .normal)
         content = (isFirstFloor ? t.title : "", f.content)
         likedBtn.setTitle("\(f.nLiked)", for: .normal)
         cornerLabel.text = Util.dateToDeltaString(f.time) + " #\(floor.id)"
@@ -175,6 +179,7 @@ class MainCell: UITableViewCell {
     
     override func layoutSubviews() {
 //        print("layout", content, self.frame.height)
+        super.layoutSubviews()
         mainView.applyCardStyle()
     }
     

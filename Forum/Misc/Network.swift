@@ -130,8 +130,8 @@ class Network {
         getData(op_code: "3", pa_1: title, pa_2: block, pa_3: content, done: {_ in true}) ?? false
     }
     
-    static func newReply(for threadID: String, floor: String = "0", content: String) -> Bool {
-        getData(op_code: floor == nil ? "4" : "4_2", pa_1: threadID, pa_3: content, pa_4: floor, done: {_ in true}) ?? false
+    static func newReply(for threadID: String, floor: String, content: String) -> Bool {
+        getData(op_code: floor == "0" ? "4" : "4_2", pa_1: threadID, pa_3: content, pa_4: floor, done: {_ in true}) ?? false
     }
     
 }

@@ -32,7 +32,16 @@ class NewThreadVC: UIViewController {
 
         // Do any additional setup after loading the view.
         gridView = GridBtnView.basedOn(view: blockView)
-        blockView.backgroundColor = UIColor(named: "AccentColor")
+        
+        let gesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(_:)))
+        gesture.numberOfTouchesRequired = 1
+        gesture.cancelsTouchesInView = false
+        self.view.addGestureRecognizer(gesture)
+        
+    }
+    
+    @objc func viewTapped(_ sender: Any) {
+        self.view.endEditing(false)
     }
     
     var gridView: GridBtnView!
@@ -47,6 +56,11 @@ class NewThreadVC: UIViewController {
                 print("...new thread post failed")
             }
         }
+    }
+    
+    override func viewDidLayoutSubviews() {
+        super.viewDidLayoutSubviews()
+        gridView.setFrame(basedOn: blockView.frame)
     }
     
     /*
