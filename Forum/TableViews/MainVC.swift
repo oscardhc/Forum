@@ -7,6 +7,7 @@
 
 import UIKit
 import MJRefresh
+import UITextView_Placeholder
 
 class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate {
     
@@ -91,6 +92,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         textView.delegate = self
+        textView.placeholder = "Comment"
+        textView.placeholderColor = .gray
         
         let gesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(_:)))
         gesture.numberOfTouchesRequired = 1
@@ -181,6 +184,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         floor = f
         textView.becomeFirstResponder()
         textView.text = ""
+        textView.placeholder = "Replying to Floor #\(floor)"
     }
     
     @objc func keyboardWillShow(_ sender: Notification) {
@@ -279,7 +283,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         indexPath.section == 0
-            ? (scene == .main ? 200 : 0)
+            ? (scene == .main ? 100 : 0)
 //            : (d.height(width: tableView.frame.width - 30, for: indexPath.row))
 //            : cellHeights[indexPath] ?? UITableView.automaticDimension
 //            : 200

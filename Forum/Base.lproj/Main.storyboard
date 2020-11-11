@@ -303,7 +303,7 @@
                                             <action selector="newComment:" destination="BH7-QK-pMN" eventType="touchUpInside" id="bHc-YO-UKu"/>
                                         </connections>
                                     </button>
-                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" text="initial" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="TL7-aM-57h">
+                                    <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="TL7-aM-57h">
                                         <rect key="frame" x="35" y="8" width="301" height="36"/>
                                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                         <constraints>

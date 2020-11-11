@@ -22,11 +22,11 @@ class MainCell: UITableViewCell {
     var parentVC: MainVC!
     
     @IBOutlet weak var mainView: UIView!
-    @IBOutlet weak var idLabel: UILabel!
+    @IBOutlet weak var idBtn: UIButton!
     @IBOutlet weak var contentLabel: UILabel!
     @IBOutlet weak var likedBtn: UIButton!
     @IBOutlet weak var commentBtn: UIButton!
-    @IBOutlet weak var readLabel: UILabel!
+    @IBOutlet weak var readBtn: UIButton!
     @IBOutlet weak var cornerLabel: UILabel!
     @IBOutlet weak var topLabel: UILabel!
     @IBOutlet weak var topDist: NSLayoutConstraint!
@@ -67,6 +67,9 @@ class MainCell: UITableViewCell {
         selectionStyle = .none
         likedBtn.adjustsImageWhenDisabled = false
         commentBtn.adjustsImageWhenDisabled = false
+        readBtn.adjustsImageWhenDisabled = false
+        idBtn.adjustsImageWhenDisabled = false
+        idBtn.isEnabled = false
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -116,16 +119,17 @@ class MainCell: UITableViewCell {
         thread = t
         scene = .thread
         
-        idLabel.text = "#\(t.id)"
+        idBtn.setTitle("#\(t.id)", for: .normal)
         content = (t.title, t.content)
         likedBtn.setTitle("\(t.nLiked)", for: .normal)
-        readLabel.text = "\(t.nRead) read"
+        readBtn.setTitle("\(t.nRead)", for: .normal)
         commentBtn.setTitle("\(t.nCommented)", for: .normal)
         cornerLabel.text = Util.dateToDeltaString(t.postTime)
         liked = t.hasLiked
         
         likedBtn.isEnabled = false
         commentBtn.isEnabled = false
+        readBtn.isEnabled = false
         
         return self
     }
@@ -138,7 +142,7 @@ class MainCell: UITableViewCell {
         isFirstFloor = firstFloor
         scene = .floor
         
-        idLabel.text = f.name + " -> " + (f.replyToName ?? "NIL")
+        idBtn.setTitle(f.name + " -> " + (f.replyToName ?? "NIL"), for: .normal)
         content = (isFirstFloor ? t.title : "", f.content)
         likedBtn.setTitle("\(f.nLiked)", for: .normal)
         cornerLabel.text = Util.dateToDeltaString(f.time) + " #\(floor.id)"
@@ -146,8 +150,8 @@ class MainCell: UITableViewCell {
         commentBtn.setTitle("回复", for: .normal)
         commentBtn.contentHorizontalAlignment = .right
         
-        commentDist.constant = -readLabel.frame.width
-        readLabel.isHidden = true
+        commentDist.constant = -readBtn.frame.width
+        readBtn.isHidden = true
         
         return self
     }
@@ -158,16 +162,13 @@ class MainCell: UITableViewCell {
         message = m
         scene = .message
         
-//        titleLabel.text = m.title
-        idLabel.text = m.id
-//        contentLabel.text = m.content
-        
+        idBtn.setTitle(m.id, for: .normal)
         content = (m.title, m.content)
         cornerLabel.text = Util.dateToDeltaString(m.time)
         
         likedBtn.isHidden = true
         commentBtn.isHidden = true
-        readLabel.isHidden = true
+        readBtn.isHidden = true
         
         return self
     }

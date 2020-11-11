@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
-    <device id="retina6_1" orientation="portrait" appearance="light"/>
+    <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -18,43 +19,32 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Hc-IY-1NO">
-                        <rect key="frame" x="20" y="20" width="408" height="222"/>
+                        <rect key="frame" x="20" y="20" width="408" height="242"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="aaaaaaaaaaaaaaa" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zry-Zh-Xdg">
-                                <rect key="frame" x="8" y="95" width="392" height="86"/>
+                                <rect key="frame" x="8" y="95" width="392" height="106"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="+阅读量" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="lsx-F7-MSG">
-                                <rect key="frame" x="310" y="189" width="90" height="25"/>
-                                <constraints>
-                                    <constraint firstAttribute="width" constant="90" id="irL-yh-HPs"/>
-                                    <constraint firstAttribute="height" constant="25" id="qLF-F2-EEO"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="10"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cPC-WZ-J29">
-                                <rect key="frame" x="160" y="37" width="240" height="21"/>
+                                <rect key="frame" x="156" y="37" width="244" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="Gi1-hW-Rgm"/>
-                                    <constraint firstAttribute="width" constant="240" id="s6r-na-sv7"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="14"/>
+                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="12"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fyk-PJ-aSy">
-                                <rect key="frame" x="8" y="189" width="90" height="25"/>
+                                <rect key="frame" x="8" y="209" width="60" height="25"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="90" id="BOF-8q-OLf"/>
+                                    <constraint firstAttribute="width" constant="60" id="CGb-de-KUM"/>
                                     <constraint firstAttribute="height" constant="25" id="jeh-cA-C2g"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <state key="normal" title="+赞数">
+                                <state key="normal" title="赞数">
                                     <color key="titleColor" name="AccentColor"/>
                                     <imageReference key="image" image="hand.thumbsup" catalog="system" symbolScale="small"/>
                                 </state>
@@ -63,14 +53,14 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MAi-70-Asr">
-                                <rect key="frame" x="106" y="189" width="196" height="25"/>
+                                <rect key="frame" x="76" y="209" width="246" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="25" id="gZc-0X-7bo"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
                                 <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="5" maxY="0.0"/>
-                                <state key="normal" title="+评论数">
+                                <state key="normal" title="评论数">
                                     <color key="titleColor" name="AccentColor"/>
                                     <imageReference key="image" image="text.bubble" catalog="system" symbolScale="small"/>
                                 </state>
@@ -78,22 +68,12 @@
                                     <action selector="comment:" destination="qpm-S3-aEJ" eventType="touchUpInside" id="yDV-Xc-lVo"/>
                                 </connections>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="#12345678" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Lqv-IQ-YSq">
-                                <rect key="frame" x="69" y="37" width="83" height="21"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="21" id="1QG-tZ-fYa"/>
-                                    <constraint firstAttribute="width" constant="83" id="WsM-sQ-moV"/>
-                                </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Qon-hB-WZn">
                                 <rect key="frame" x="8" y="8" width="400" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="PqM-EY-hd4"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
@@ -102,65 +82,96 @@
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="8bd-Xe-g4A"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" type="system" pointSize="17"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="15"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JcH-jd-QAf">
+                                <rect key="frame" x="330" y="209" width="70" height="25"/>
+                                <constraints>
+                                    <constraint firstAttribute="width" constant="70" id="ImC-Bn-QA1"/>
+                                    <constraint firstAttribute="height" constant="25" id="mT8-8O-rze"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <inset key="titleEdgeInsets" minX="5" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <inset key="imageEdgeInsets" minX="0.0" minY="0.0" maxX="5" maxY="0.0"/>
+                                <state key="normal" title="阅读数">
+                                    <color key="titleColor" name="AccentColor"/>
+                                    <imageReference key="image" image="eyeglasses" catalog="system" symbolScale="small"/>
+                                </state>
+                            </button>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p86-H8-tzd">
+                                <rect key="frame" x="8" y="37" width="140" height="21"/>
+                                <constraints>
+                                    <constraint firstAttribute="height" constant="21" id="B1q-JF-neI"/>
+                                    <constraint firstAttribute="width" constant="140" id="juQ-jz-FQG"/>
+                                </constraints>
+                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
+                                <state key="normal" title="Button">
+                                    <color key="titleColor" systemColor="labelColor"/>
+                                </state>
+                            </button>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="cPC-WZ-J29" secondAttribute="trailing" constant="8" id="14h-ba-FPW"/>
-                            <constraint firstItem="MAi-70-Asr" firstAttribute="leading" secondItem="fyk-PJ-aSy" secondAttribute="trailing" constant="8" symbolic="YES" id="27H-pM-dFq"/>
+                            <constraint firstItem="UT9-uR-gHU" firstAttribute="top" secondItem="p86-H8-tzd" secondAttribute="bottom" constant="8" symbolic="YES" id="6sb-KE-z2f"/>
                             <constraint firstAttribute="trailing" secondItem="Qon-hB-WZn" secondAttribute="trailing" id="8mO-7d-L0J"/>
                             <constraint firstAttribute="bottom" secondItem="MAi-70-Asr" secondAttribute="bottom" constant="8" id="C98-m4-bpg"/>
-                            <constraint firstItem="lsx-F7-MSG" firstAttribute="top" secondItem="zry-Zh-Xdg" secondAttribute="bottom" constant="8" symbolic="YES" id="JxG-Gk-qdD"/>
+                            <constraint firstItem="p86-H8-tzd" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="FQb-rv-LcQ"/>
                             <constraint firstItem="fyk-PJ-aSy" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="Kc8-am-hA1"/>
-                            <constraint firstAttribute="bottom" secondItem="lsx-F7-MSG" secondAttribute="bottom" constant="8" id="Mco-6h-xm0"/>
                             <constraint firstItem="UT9-uR-gHU" firstAttribute="top" secondItem="cPC-WZ-J29" secondAttribute="bottom" constant="8" symbolic="YES" id="N3p-0E-dbg"/>
-                            <constraint firstItem="Lqv-IQ-YSq" firstAttribute="top" secondItem="Qon-hB-WZn" secondAttribute="bottom" constant="8" symbolic="YES" id="QKs-1n-hMw"/>
+                            <constraint firstAttribute="bottom" secondItem="JcH-jd-QAf" secondAttribute="bottom" constant="8" id="PCu-EK-zWM"/>
                             <constraint firstItem="UT9-uR-gHU" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="QXx-1c-o1z"/>
-                            <constraint firstAttribute="trailing" secondItem="lsx-F7-MSG" secondAttribute="trailing" constant="8" id="Rr7-wo-ZCg"/>
                             <constraint firstItem="zry-Zh-Xdg" firstAttribute="top" secondItem="UT9-uR-gHU" secondAttribute="bottom" constant="8" symbolic="YES" id="Rtj-FJ-myu"/>
                             <constraint firstAttribute="trailing" secondItem="UT9-uR-gHU" secondAttribute="trailing" constant="8" id="c4G-DR-XXW"/>
+                            <constraint firstItem="MAi-70-Asr" firstAttribute="leading" secondItem="fyk-PJ-aSy" secondAttribute="trailing" constant="8" symbolic="YES" id="dyx-Jw-BZX"/>
                             <constraint firstAttribute="trailing" secondItem="zry-Zh-Xdg" secondAttribute="trailing" constant="8" id="fM7-fg-0Xi"/>
+                            <constraint firstItem="cPC-WZ-J29" firstAttribute="leading" secondItem="p86-H8-tzd" secondAttribute="trailing" constant="8" symbolic="YES" id="fXC-16-gZR"/>
                             <constraint firstAttribute="bottom" secondItem="fyk-PJ-aSy" secondAttribute="bottom" constant="8" id="hDe-oL-Yni"/>
+                            <constraint firstAttribute="trailing" secondItem="JcH-jd-QAf" secondAttribute="trailing" constant="8" id="jgX-Am-HQN"/>
+                            <constraint firstItem="fyk-PJ-aSy" firstAttribute="top" secondItem="zry-Zh-Xdg" secondAttribute="bottom" constant="8" symbolic="YES" id="lPl-ZI-CVb"/>
                             <constraint firstItem="Qon-hB-WZn" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="mJ6-E1-21x"/>
-                            <constraint firstItem="cPC-WZ-J29" firstAttribute="leading" secondItem="Lqv-IQ-YSq" secondAttribute="trailing" constant="8" symbolic="YES" id="pVv-u2-tjg"/>
-                            <constraint firstItem="lsx-F7-MSG" firstAttribute="leading" secondItem="MAi-70-Asr" secondAttribute="trailing" constant="8" symbolic="YES" id="seT-lq-HI0"/>
+                            <constraint firstItem="JcH-jd-QAf" firstAttribute="leading" secondItem="MAi-70-Asr" secondAttribute="trailing" constant="8" symbolic="YES" id="sg9-WM-F7Q"/>
                             <constraint firstItem="Qon-hB-WZn" firstAttribute="top" secondItem="8Hc-IY-1NO" secondAttribute="top" constant="8" id="tQX-cH-dEM"/>
                             <constraint firstItem="zry-Zh-Xdg" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="vsG-dX-7W3"/>
                             <constraint firstItem="cPC-WZ-J29" firstAttribute="top" secondItem="Qon-hB-WZn" secondAttribute="bottom" constant="8" symbolic="YES" id="wZr-u0-ReD"/>
+                            <constraint firstItem="p86-H8-tzd" firstAttribute="top" secondItem="Qon-hB-WZn" secondAttribute="bottom" constant="8" symbolic="YES" id="xYQ-La-JOx"/>
                         </constraints>
                     </view>
                 </subviews>
                 <constraints>
                     <constraint firstAttribute="trailing" secondItem="8Hc-IY-1NO" secondAttribute="trailing" constant="20" symbolic="YES" id="KHB-OL-z2Z"/>
                     <constraint firstItem="8Hc-IY-1NO" firstAttribute="leading" secondItem="men-34-OVS" secondAttribute="leading" constant="20" symbolic="YES" id="KsG-VM-wqK"/>
-                    <constraint firstAttribute="bottom" secondItem="8Hc-IY-1NO" secondAttribute="bottom" constant="20" symbolic="YES" id="QUA-MH-dEm"/>
+                    <constraint firstAttribute="bottom" secondItem="8Hc-IY-1NO" secondAttribute="bottom" id="QUA-MH-dEm"/>
                     <constraint firstItem="8Hc-IY-1NO" firstAttribute="top" secondItem="men-34-OVS" secondAttribute="top" constant="20" symbolic="YES" id="q6E-jG-W8U"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
                 <outlet property="commentBtn" destination="MAi-70-Asr" id="Bzg-ZX-YS0"/>
-                <outlet property="commentDist" destination="seT-lq-HI0" id="Dzs-XE-T8n"/>
+                <outlet property="commentDist" destination="sg9-WM-F7Q" id="olT-FO-UEi"/>
                 <outlet property="contentLabel" destination="zry-Zh-Xdg" id="1D2-RM-klS"/>
                 <outlet property="cornerLabel" destination="cPC-WZ-J29" id="nO5-Vs-0IS"/>
-                <outlet property="idLabel" destination="Lqv-IQ-YSq" id="Pwd-hV-mWY"/>
+                <outlet property="idBtn" destination="p86-H8-tzd" id="gPx-h6-eHE"/>
                 <outlet property="likedBtn" destination="fyk-PJ-aSy" id="fKn-HN-FMU"/>
                 <outlet property="mainView" destination="8Hc-IY-1NO" id="7Xo-tQ-eaB"/>
-                <outlet property="readLabel" destination="lsx-F7-MSG" id="lkJ-Nm-64E"/>
+                <outlet property="readBtn" destination="JcH-jd-QAf" id="Yos-Vx-DUX"/>
                 <outlet property="titleDist" destination="Rtj-FJ-myu" id="eqt-mA-rje"/>
                 <outlet property="titleLabel" destination="UT9-uR-gHU" id="iog-Qd-5DK"/>
                 <outlet property="topDist" destination="tQX-cH-dEM" id="o3d-lV-pc8"/>
                 <outlet property="topLabel" destination="Qon-hB-WZn" id="3tP-kl-o8P"/>
             </connections>
-            <point key="canvasLocation" x="-63.768115942028992" y="141.29464285714286"/>
+            <point key="canvasLocation" x="-64" y="141.13300492610838"/>
         </tableViewCell>
     </objects>
     <resources>
+        <image name="eyeglasses" catalog="system" width="128" height="54"/>
         <image name="hand.thumbsup" catalog="system" width="128" height="128"/>
         <image name="text.bubble" catalog="system" width="128" height="110"/>
         <namedColor name="AccentColor">
             <color red="1" green="0.23100003600120544" blue="0.18799999356269836" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>

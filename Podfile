@@ -4,5 +4,6 @@ use_frameworks!
 target 'Forum' do
     pod 'BlueSocket'
     pod 'Material', '~> 3.1.0'
-    pod "MJRefresh"
+    pod 'MJRefresh'
+    pod 'UITextView+Placeholder'
 end
