@@ -48,7 +48,6 @@ class NameGenerator {
     
     static func getName(_ theme: Theme, _ str: String) -> String {
         if var i = Int(str) {
-            i -= 1
             if i >= data[theme]!.count {
                 return data[theme]![i % data.count] + "<\(i / data.count)>"
             } else {

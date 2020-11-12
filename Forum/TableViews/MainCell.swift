@@ -142,11 +142,12 @@ class MainCell: UITableViewCell {
         isFirstFloor = firstFloor
         scene = .floor
         
-        idBtn.setTitle(f.name.getName(theme: .aliceAndBob) +
+        idBtn.setTitle(f.name.getName(theme: t.theme) +
                         (((f.replyToFloor ?? 0) == 0)
                             ? ""
-                            : " -> #\(f.replyToFloor!) \(f.replyToName!.getName(theme: .aliceAndBob))"
+                            : " -> #\(f.replyToFloor!) \(f.replyToName!.getName(theme: t.theme))"
                         ), for: .normal)
+        
         content = (isFirstFloor ? t.title : "", f.content)
         likedBtn.setTitle("\(f.nLiked)", for: .normal)
         cornerLabel.text = Util.dateToDeltaString(f.time) + " #\(floor.id)"

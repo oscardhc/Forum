@@ -67,6 +67,8 @@ struct Thread: DATA {
     var nLiked = 0, nRead = 0, nCommented = 0
     var visible = true, hasLiked = false, hasFavoured = false
     var postTime = Date(), lastUpdateTime = Date()
+    var theme = NameGenerator.Theme.aliceAndBob, seed = 0
+    
     
     static var cnt = 1
     
@@ -101,7 +103,7 @@ struct Thread: DATA {
     
     func generateFirstFloor() -> Floor {
         var f = Floor()
-        f.name = "1"
+        f.name = "0"
         f.id = "0"
         f.content = content
         f.nLiked = nLiked
