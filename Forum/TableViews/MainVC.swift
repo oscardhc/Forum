@@ -196,7 +196,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     @objc func keyboardWillShow(_ sender: Notification) {
-        print("WILL SHOW!!!")
         let height = (sender.userInfo![UIResponder.keyboardFrameEndUserInfoKey]! as! NSValue).cgRectValue.height
         var time: TimeInterval = 0
         (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)

@@ -54,12 +54,10 @@ class GridBtnView: UIView {
     override func layoutSubviews() {
         let r = 4, c = 2
         let w = frame.width / CGFloat(r), h = frame.height / CGFloat(c)
-        print("layout", w, h, frame)
         
         for i in 0..<r {
             for j in 0..<c {
                 btns[i][j].frame = CGRect(x: w * CGFloat(i), y: h * CGFloat(j), width: w, height: h)
-                print(">", btns[i][j].frame)
             }
         }
         

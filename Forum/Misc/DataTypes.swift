@@ -67,7 +67,7 @@ struct Thread: DATA {
     var nLiked = 0, nRead = 0, nCommented = 0
     var visible = true, hasLiked = false, hasFavoured = false
     var postTime = Date(), lastUpdateTime = Date()
-    var theme = NameGenerator.Theme.aliceAndBob, seed = 0
+    var theme = NameGenerator.Theme.usPresident, seed = 0
     
     
     static var cnt = 1

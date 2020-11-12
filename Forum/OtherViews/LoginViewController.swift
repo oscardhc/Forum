@@ -36,6 +36,7 @@ class LoginViewController: UIViewController {
     }
     
     @IBAction func loginBtnClicked(_ sender: Any) {
+        print(codeTextField.text, sentEmail)
         if let code = codeTextField.text, sentEmail != "" {
             let (success, token) = Network.performLogin(with: sentEmail, verificationCode: code)
             if success {
