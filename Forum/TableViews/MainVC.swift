@@ -26,6 +26,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet weak var textViewHeight: NSLayoutConstraint!
     @IBOutlet weak var newThreadButton: UIBarButtonItem!
+    @IBOutlet weak var replyCountLabel: UILabel!
     
     static func new(_ scene: Scene, _ args: Any...) -> MainVC {
         let vc = *"MainVC" as! MainVC
@@ -91,22 +92,22 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
         tableView.refreshControl = refreshControl
         
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
-        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        textView.delegate = self
-        textView.placeholder = "Comment"
-        textView.placeholderColor = .gray
-        
         let gesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(_:)))
         gesture.numberOfTouchesRequired = 1
         gesture.cancelsTouchesInView = false
         tableView.addGestureRecognizer(gesture)
         
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        textView.delegate = self
+        textViewDidChange(textView)
+        floor = "0"
+        
         refresh()
     }
     
     let bottomInitialHeight: CGFloat = 80
-    let bottomExpandHeight: CGFloat = 36 + 16
+    let bottomExpandHeight: CGFloat = 36 + 16 + 10
     
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
@@ -122,7 +123,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
         if scene == .floors {
             newThreadButton.image = UIImage(systemName: "star")
-//            newThreadButton.
             newThreadButton.isEnabled = false
         }
     }
@@ -220,12 +220,15 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        let height = max(min(textView.contentSize.height, 100), 36)
-        textViewHeight.constant = height
-        bottomViewHeight.constant = height + 16
-        UIView.animate(withDuration: 0.3) {
-            self.view.layoutIfNeeded()
+        if textView.text.count > 0 {
+            let height = max(min(textView.contentSize.height, 100), 36)
+            textViewHeight.constant = height
+            bottomViewHeight.constant = height + 16 + 10
+            UIView.animate(withDuration: 0.3) {
+                self.view.layoutIfNeeded()
+            }
         }
+        updateCountingLabel(label: replyCountLabel, text: textView.text, lineLimit: 20, charLimit: 817)
     }
     
     @objc func viewTapped(_ sender: Any) {
@@ -299,21 +302,17 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             lbl.font = UIFont.systemFont(ofSize: 12)
             view.addSubview(lbl)
             
-            let btn = UIButton(frame: CGRect(x: width*3/4, y: 0, width: width/4, height: headerHeight))
+            let btn = UIButton(frame: CGRect(x: width*3/4, y: 0, width: width/4 - 8, height: headerHeight))
             btn.addTarget(self, action: #selector(chooseBlock(_:)), for: .touchUpInside)
-            btn.setTitle("主干道", for: .normal)
-            btn.contentHorizontalAlignment = .right
-            btn.setTitleColor(UIColor(named: "AccentColor"), for: .normal)
-            btn.setImage(UIImage(systemName: "chevron.compact.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
-            btn.semanticContentAttribute = .forceRightToLeft
-            btn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
-            btn.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5)
-            btn.titleLabel!.font = UIFont.systemFont(ofSize: 12)
+            btn.setTitle(dropDown.dataSource.first!, for: .normal)
+            btn.setDropDownStyle()
             
             dropDown.anchorView = btn
             dropDown.selectionAction = { (index: Int, item: String) in
                 print("Selected item: \(item) at index: \(index)")
                 btn.setTitle(item, for: .normal)
+                (self.d as! Thread.Manager).block = Thread.Category.init(rawValue: item)!
+                self.refresh()
             }
             
             view.addSubview(btn)

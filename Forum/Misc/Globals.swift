@@ -9,8 +9,8 @@ import Foundation
 import UIKit
 
 extension String {
-    var spaces: Int {
-        self.reduce(0) {
+    var linebreaks: Int {
+        self.reduce(1) {
             $0 + ($1 == "\n" ? 1 : 0)
         }
     }
@@ -24,6 +24,8 @@ class G {
         }
         set(val) {
             UserDefaults.standard.setValue(val, forKey: "ForumUserToken")
+            print("set to: ", val)
+            print(UserDefaults.standard.string(forKey: "ForumUserToken"))
         }
     }
     static let numberPerFetch = 8
@@ -79,4 +81,53 @@ public func Init<Type>(_ value: Type, _ block: (_ object: Type) -> Void) -> Type
 {
     block(value)
     return value
+}
+
+func updateCountingLabel(label: UILabel, text: String, lineLimit: Int, charLimit: Int) {
+    let lc = text.linebreaks, cc = text.count
+    let line = NSAttributedString(string: "\(lc)/\(lineLimit) 行\t", attributes: [NSAttributedString.Key.foregroundColor: lc > lineLimit ? UIColor.red : UIColor.gray])
+    let char = NSMutableAttributedString(string: "\(cc)/\(charLimit) 字", attributes: [NSAttributedString.Key.foregroundColor: cc > charLimit ? UIColor.red : UIColor.gray])
+    if lineLimit > 1 {
+        char.insert(line, at: 0)
+    }
+    label.attributedText = char
+}
+
+extension UIButton {
+    
+    func setDropDownStyle(fontSize: CGFloat = 12) {
+        self.contentHorizontalAlignment = .right
+        self.setTitleColor(UIColor(named: "AccentColor"), for: .normal)
+        self.setImage(UIImage(systemName: "chevron.compact.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+        self.semanticContentAttribute = .forceRightToLeft
+        self.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
+        self.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5)
+        self.titleLabel!.font = UIFont.systemFont(ofSize: fontSize)
+    }
+    
+}
+
+class CheckerButton: UIButton {
+    
+    var checked = false {
+        didSet {
+            self.setImage(UIImage(systemName: checked ? "checkmark.square" : "squareshape", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+        }
+    }
+    
+    func setCheckBoxStyle(fontSize: CGFloat = 12) {
+        self.contentHorizontalAlignment = .right
+        self.setTitleColor(UIColor(named: "AccentColor"), for: .normal)
+        self.semanticContentAttribute = .forceRightToLeft
+        self.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
+        self.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5)
+        self.titleLabel!.font = UIFont.systemFont(ofSize: fontSize)
+        self.addTarget(self, action: #selector(checked(_:)), for: .touchUpInside)
+        checked = false
+    }
+    
+    @objc func checked(_ sender: UIButton) {
+        checked = !checked
+    }
+    
 }

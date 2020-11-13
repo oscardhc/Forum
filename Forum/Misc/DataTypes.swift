@@ -110,13 +110,14 @@ struct Thread: DATA {
     class Manager: DataManager<Thread> {
         
         var sortType: Network.NetworkGetThreadType
+        var block = Thread.Category.all
         
         init(type: Network.NetworkGetThreadType) {
             sortType = type
         }
         
         override func networking(lastSeenID: String) -> [Thread] {
-            Network.getThreads(type: sortType, lastSeenID: lastSeenID)
+            Network.getThreads(type: sortType, inBlock: block, lastSeenID: lastSeenID)
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {

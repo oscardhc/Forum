@@ -63,8 +63,8 @@ class Network {
         case time = "1", favoured = "6", my = "7", trending = "d"
     }
     
-    static func getThreads(type: NetworkGetThreadType, lastSeenID: String = "NULL") -> [Thread] {
-        getData(op_code: type.rawValue, pa_1: lastSeenID) {
+    static func getThreads(type: NetworkGetThreadType, inBlock: Thread.Category, lastSeenID: String = "NULL") -> [Thread] {
+        getData(op_code: type.rawValue, pa_1: lastSeenID, pa_2: String(Thread.Category.allCases.firstIndex(of: inBlock)!)) {
             ($0["thread_list"]! as! [Any]).map {
                 Thread(json: $0)
             }
@@ -141,8 +141,8 @@ class Network {
         getData(op_code: "9_2", pa_1: threadID, pa_3: "1", pa_4: "1", done: {_ in true}) ?? false
     }
     
-    static func newThread(title: String, block: String, content: String) -> Bool {
-        getData(op_code: "3", pa_1: title, pa_2: block, pa_3: content, done: {_ in true}) ?? false
+    static func newThread(title: String, inBlock: Thread.Category, content: String, anonymousType: NameGenerator.Theme, seed: Int) -> Bool {
+        getData(op_code: "3", pa_1: title, pa_2: String(Thread.Category.allCases.firstIndex(of: inBlock)!), pa_3: content, pa_4: anonymousType.rawValue, pa_5: String(seed), done: {_ in true}) ?? false
     }
     
     static func newReply(for threadID: String, floor: String, content: String) -> Bool {
