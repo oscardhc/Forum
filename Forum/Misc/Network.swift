@@ -110,35 +110,27 @@ class Network {
     }
     
     static func favourThread(for threadID: String) -> Bool {
-        getData(op_code: "5", pa_1: threadID, pa_3: "1", done: {_ in true}) ?? false
+        getData(op_code: "5", pa_1: threadID, done: {_ in true}) ?? false
     }
     
     static func cancelFavourThread(for threadID: String) -> Bool {
-        getData(op_code: "5", pa_1: threadID, pa_3: "2", done: {_ in true}) ?? false
+        getData(op_code: "5_2", pa_1: threadID, done: {_ in true}) ?? false
     }
     
     static func likeFloor(for threadID: String, floor: String) -> Bool {
-        getData(op_code: "8", pa_1: threadID, pa_3: "1", pa_4: floor, done: {_ in true}) ?? false
+        getData(op_code: "8", pa_1: threadID, pa_4: floor, done: {_ in true}) ?? false
     }
     
     static func cancelLikeFloor(for threadID: String, floor: String) -> Bool {
-        getData(op_code: "8_2", pa_1: threadID, pa_3: "2", pa_4: floor, done: {_ in true}) ?? false
+        getData(op_code: "8_2", pa_1: threadID, pa_4: floor, done: {_ in true}) ?? false
     }
     
     static func likeThread(for threadID: String) -> Bool {
-        getData(op_code: "8_3", pa_1: threadID, pa_3: "1", pa_4: "1", done: {_ in true}) ?? false
+        getData(op_code: "8_3", pa_1: threadID, done: {_ in true}) ?? false
     }
     
     static func cancelLikeThread(for threadID: String) -> Bool {
-        getData(op_code: "8_3", pa_1: threadID, pa_3: "2", pa_4: "1", done: {_ in true}) ?? false
-    }
-    
-    static func dislikeThread(for threadID: String) -> Bool {
-        getData(op_code: "9", pa_1: threadID, pa_3: "1", pa_4: "1", done: {_ in true}) ?? false
-    }
-    
-    static func cancelDislikeThread(for threadID: String) -> Bool {
-        getData(op_code: "9_2", pa_1: threadID, pa_3: "1", pa_4: "1", done: {_ in true}) ?? false
+        getData(op_code: "8_4", pa_1: threadID, done: {_ in true}) ?? false
     }
     
     static func newThread(title: String, inBlock: Thread.Category, content: String, anonymousType: NameGenerator.Theme, seed: Int) -> Bool {

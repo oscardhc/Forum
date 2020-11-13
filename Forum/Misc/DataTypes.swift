@@ -51,13 +51,13 @@ class DataManager<T: DATA>: BaseManager {
 struct Thread: DATA {
     
     enum Category: String, CaseIterable {
-        case all = "主干道", sport = "体育", music = "音乐", science = "科学", it = "数码", entertainment = "娱乐", emotion = "情感", social = "社会"
+        case all = "主干道", sport = "体育", music = "音乐", science = "科学", it = "数码", entertainment = "娱乐", emotion = "情感", social = "社会", others = "其他"
     }
     
     var id = "", title = "", content = ""
     var type: Category = .all
     var nLiked = 0, nRead = 0, nCommented = 0
-    var hasLiked, hasFavoured: Bool!
+    var hasLiked = false, hasFavoured = false
     var postTime = Date(), lastUpdateTime = Date()
     var theme = NameGenerator.Theme.usPresident, seed = 0
     
@@ -165,7 +165,7 @@ struct Floor: DATA {
             super.init()
         }
         
-        override var count: Int {data.isEmpty ? 0 : data.count + 1}
+        override var count: Int {data.count + 1}
         
         override func networking(lastSeenID: String = "NULL") -> [Floor] {
             (data, thread.hasLiked, thread.hasFavoured) = Network.getFloors(for: thread.id, lastSeenID: lastSeenID)

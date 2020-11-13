@@ -23,16 +23,13 @@
                         <rect key="frame" x="20" y="4" width="408" height="250"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="aaaaaaaaaaaaaaa" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zry-Zh-Xdg">
-                                <rect key="frame" x="8" y="95" width="392" height="114"/>
+                                <rect key="frame" x="8" y="94" width="392" height="115"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cPC-WZ-J29">
-                                <rect key="frame" x="156" y="37" width="244" height="21"/>
-                                <constraints>
-                                    <constraint firstAttribute="height" constant="21" id="Gi1-hW-Rgm"/>
-                                </constraints>
+                                <rect key="frame" x="316" y="37" width="84" height="20"/>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="12"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -79,7 +76,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="UT9-uR-gHU">
-                                <rect key="frame" x="8" y="66" width="392" height="21"/>
+                                <rect key="frame" x="8" y="65" width="392" height="21"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="21" id="8bd-Xe-g4A"/>
                                 </constraints>
@@ -101,11 +98,11 @@
                                     <imageReference key="image" image="eyeglasses" catalog="system" symbolScale="small"/>
                                 </state>
                             </button>
-                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="p86-H8-tzd">
-                                <rect key="frame" x="8" y="37" width="140" height="21"/>
+                            <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="characterWrap" translatesAutoresizingMaskIntoConstraints="NO" id="p86-H8-tzd">
+                                <rect key="frame" x="8" y="37" width="300" height="20"/>
                                 <constraints>
-                                    <constraint firstAttribute="height" constant="21" id="B1q-JF-neI"/>
-                                    <constraint firstAttribute="width" constant="140" id="juQ-jz-FQG"/>
+                                    <constraint firstAttribute="height" constant="20" id="B1q-JF-neI"/>
+                                    <constraint firstAttribute="width" constant="300" id="juQ-jz-FQG"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <state key="normal" title="Button">
@@ -124,6 +121,7 @@
                             <constraint firstAttribute="bottom" secondItem="JcH-jd-QAf" secondAttribute="bottom" constant="8" id="PCu-EK-zWM"/>
                             <constraint firstItem="UT9-uR-gHU" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="QXx-1c-o1z"/>
                             <constraint firstItem="zry-Zh-Xdg" firstAttribute="top" secondItem="UT9-uR-gHU" secondAttribute="bottom" constant="8" symbolic="YES" id="Rtj-FJ-myu"/>
+                            <constraint firstItem="cPC-WZ-J29" firstAttribute="height" secondItem="p86-H8-tzd" secondAttribute="height" id="W1f-1V-iHx"/>
                             <constraint firstAttribute="trailing" secondItem="UT9-uR-gHU" secondAttribute="trailing" constant="8" id="c4G-DR-XXW"/>
                             <constraint firstItem="MAi-70-Asr" firstAttribute="leading" secondItem="fyk-PJ-aSy" secondAttribute="trailing" constant="8" symbolic="YES" id="dyx-Jw-BZX"/>
                             <constraint firstAttribute="trailing" secondItem="zry-Zh-Xdg" secondAttribute="trailing" constant="8" id="fM7-fg-0Xi"/>
@@ -153,6 +151,7 @@
                 <outlet property="contentLabel" destination="zry-Zh-Xdg" id="1D2-RM-klS"/>
                 <outlet property="cornerLabel" destination="cPC-WZ-J29" id="nO5-Vs-0IS"/>
                 <outlet property="idBtn" destination="p86-H8-tzd" id="gPx-h6-eHE"/>
+                <outlet property="idHeight" destination="B1q-JF-neI" id="0kH-OX-gnN"/>
                 <outlet property="likedBtn" destination="fyk-PJ-aSy" id="fKn-HN-FMU"/>
                 <outlet property="mainView" destination="8Hc-IY-1NO" id="7Xo-tQ-eaB"/>
                 <outlet property="readBtn" destination="JcH-jd-QAf" id="Yos-Vx-DUX"/>

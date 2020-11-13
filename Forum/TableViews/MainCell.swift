@@ -33,6 +33,7 @@ class MainCell: UITableViewCell {
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var titleDist: NSLayoutConstraint!
     @IBOutlet weak var commentDist: NSLayoutConstraint!
+    @IBOutlet weak var idHeight: NSLayoutConstraint!
     
     var content = (title: "", content: "") {
         didSet {
@@ -144,15 +145,24 @@ class MainCell: UITableViewCell {
         isFirstFloor = firstFloor
         scene = .floor
         
-        idBtn.setTitle(f.name.getName(theme: t.theme) +
-                        (((f.replyToFloor ?? 0) == 0)
-                            ? ""
-                            : " -> #\(f.replyToFloor!) \(f.replyToName!.getName(theme: t.theme))"
-                        ), for: .normal)
+        let ss = f.name.getName(theme: t.theme) +
+            (((f.replyToFloor ?? 0) == 0)
+                ? ""
+                : " -> #\(f.replyToFloor!) \(f.replyToName!.getName(theme: t.theme))"
+            )
+        let speaker = NSMutableAttributedString(string: ss + "\n", attributes: [:])
+        
+        let tt = Util.dateToDeltaString(f.time)
+        let time = NSAttributedString(string: tt, attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
+        
+        speaker.append(time)
+        
+        idBtn.setAttributedTitle(speaker, for: .normal)
+        idHeight.constant = 40
         
         content = (isFirstFloor ? t.title : "", f.content)
         likedBtn.setTitle("\(f.nLiked)", for: .normal)
-        cornerLabel.text = Util.dateToDeltaString(f.time) + " #\(floor.id)"
+        cornerLabel.text = " #\(floor.id)"
         liked = f.hasLiked
         commentBtn.setTitle("回复", for: .normal)
         commentBtn.contentHorizontalAlignment = .right

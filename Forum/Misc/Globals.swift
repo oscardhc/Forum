@@ -32,6 +32,14 @@ class G {
     
     static var hasLoggedIn: Bool {token != ""}
     
+    
+    static let alert: UIAlertController = ({
+        let a = UIAlertController(title: "发帖失败", message: "", preferredStyle: .actionSheet)
+        a.addAction(UIAlertAction(title: "Got it", style: .cancel, handler: nil))
+        return a
+    })()
+    
+    
 }
 
 func sugar<T>(_ content: (cond: () -> Bool, value: () -> T)...) -> T {
@@ -83,7 +91,7 @@ public func Init<Type>(_ value: Type, _ block: (_ object: Type) -> Void) -> Type
     return value
 }
 
-func updateCountingLabel(label: UILabel, text: String, lineLimit: Int, charLimit: Int) {
+func updateCountingLabel(label: StateLabel, text: String, lineLimit: Int, charLimit: Int) {
     let lc = text.linebreaks, cc = text.count
     let line = NSAttributedString(string: "\(lc)/\(lineLimit) 行\t", attributes: [NSAttributedString.Key.foregroundColor: lc > lineLimit ? UIColor.red : UIColor.gray])
     let char = NSMutableAttributedString(string: "\(cc)/\(charLimit) 字", attributes: [NSAttributedString.Key.foregroundColor: cc > charLimit ? UIColor.red : UIColor.gray])
@@ -91,6 +99,7 @@ func updateCountingLabel(label: UILabel, text: String, lineLimit: Int, charLimit
         char.insert(line, at: 0)
     }
     label.attributedText = char
+    label.ok = lc <= lineLimit && cc <= charLimit
 }
 
 extension UIButton {
@@ -129,5 +138,11 @@ class CheckerButton: UIButton {
     @objc func checked(_ sender: UIButton) {
         checked = !checked
     }
+    
+}
+
+class StateLabel: UILabel {
+    
+    var ok = true
     
 }

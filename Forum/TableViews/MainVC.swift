@@ -10,6 +10,16 @@ import MJRefresh
 import UITextView_Placeholder
 import DropDown
 
+extension UIRefreshControl {
+    func refreshManually() {
+        if let scrollView = superview as? UIScrollView {
+            scrollView.setContentOffset(CGPoint(x: 0, y: scrollView.contentOffset.y - frame.height), animated: false)
+        }
+        beginRefreshing()
+        sendActions(for: .valueChanged)
+    }
+}
+
 class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate {
     
     enum Scene: String {
@@ -26,7 +36,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet weak var textViewHeight: NSLayoutConstraint!
     @IBOutlet weak var newThreadButton: UIBarButtonItem!
-    @IBOutlet weak var replyCountLabel: UILabel!
+    @IBOutlet weak var replyCountLabel: StateLabel!
     
     static func new(_ scene: Scene, _ args: Any...) -> MainVC {
         let vc = *"MainVC" as! MainVC
@@ -103,6 +113,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         textViewDidChange(textView)
         floor = "0"
         
+        footer.setTitle("正在加载...", for: .idle)
+        tableView.isScrollEnabled = false
         refresh()
     }
     
@@ -146,11 +158,14 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     @objc func refresh() {
+//        print("refresh...")
         DispatchQueue.global().async {
-            usleep(300000)
+            usleep(1000000)
             let count = self.d.getInitialContent()
             DispatchQueue.main.async {
                 self.updateFavour()
+                self.footer.setTitle("点击或上拉以加载更多", for: .idle)
+                self.tableView.isScrollEnabled = true
                 self.tableView.refreshControl?.endRefreshing()
                 self.tableView.reloadData()
                 if count == G.numberPerFetch {
@@ -164,7 +179,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @objc func loadmore() {
         DispatchQueue.global().async {
-            usleep(300000)
+//            usleep(300000)
             let count = self.d.getMoreContent()
             DispatchQueue.main.async {
                 self.tableView.mj_footer?.endRefreshing()
@@ -209,7 +224,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     @objc func keyboardWillHide(_ sender: Notification) {
-        print("WILL HIDE!!!")
         var time: TimeInterval = 0
         (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
         bottomViewHeight.constant = bottomInitialHeight
@@ -238,14 +252,16 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     // MARK: - IBActions
     
     @IBAction func newComment(_ sender: Any) {
-        if let content = textView.text, content != "" {
+        if let content = textView.text, content != "", replyCountLabel.ok {
             let threadID = (d as! Floor.Manager).thread.id
-            print(">>>>>>> reply", content, threadID, floor)
             if Network.newReply(for: threadID, floor: floor, content: content) {
                 textView.text = ""
                 self.view.endEditing(false)
                 refresh()
             }
+        } else {
+            G.alert.message = "请输入合适长度的内容"
+            self.present(G.alert, animated: true, completion: nil)
         }
     }
     
@@ -282,7 +298,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     var dropDown: DropDown = ({
         let d = DropDown()
-        d.dataSource = Thread.Category.allCases.map {
+        d.dataSource = Thread.Category.allCases.dropLast().map {
             $0.rawValue
         }
         d.backgroundColor = .systemBackground
@@ -304,7 +320,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             
             let btn = UIButton(frame: CGRect(x: width*3/4, y: 0, width: width/4 - 8, height: headerHeight))
             btn.addTarget(self, action: #selector(chooseBlock(_:)), for: .touchUpInside)
-            btn.setTitle(dropDown.dataSource.first!, for: .normal)
+            btn.setTitle((d as! Thread.Manager).block.rawValue, for: .normal)
             btn.setDropDownStyle()
             
             dropDown.anchorView = btn
