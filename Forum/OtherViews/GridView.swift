@@ -32,7 +32,6 @@ class GridBtnView: UIView {
             for j in 0..<c {
                 let btn = GridButton(type: .custom)
                 btn.setTitle("N", for: .normal)
-                btn.setTitle("Y", for: .selected)
                 btn.setTitleColor(.systemRed, for: .normal)
                 btn.location = (i, j)
                 btn.addTarget(self, action: #selector(chosenGrid(_:)), for: .touchUpInside)
@@ -43,7 +42,7 @@ class GridBtnView: UIView {
                 btns[i].append(btn)
             }
         }
-        btns[0][0].isSelected = true
+        btns[0][0].setTitle("Y", for: .normal)
     }
     
     func setFrame(basedOn f: CGRect) {
@@ -64,9 +63,9 @@ class GridBtnView: UIView {
     }
     
     @objc func chosenGrid(_ sender: GridButton) {
-        btns[chosen.x][chosen.y].isSelected = false
+        btns[chosen.x][chosen.y].setTitle("N", for: .normal)
         chosen = sender.location
-        btns[chosen.x][chosen.y].isSelected = true
+        btns[chosen.x][chosen.y].setTitle("Y", for: .normal)
     }
     
     

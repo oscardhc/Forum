@@ -7,12 +7,13 @@
 
 import UIKit
 
-class LoginViewController: UIViewController {
+class LoginVC: UIViewController {
 
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var codeTextField: UITextField!
     
     var sentEmail = ""
+    var isBase = false
     
     @IBAction func dismissBtnClicked(_ sender: Any) {
         dismiss(animated: true, completion: nil)
@@ -21,7 +22,10 @@ class LoginViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
-        
+        isBase = presentingViewController == nil
+        if isBase {
+            self.navigationController?.navigationBar.isHidden = true
+        }
     }
     
     @IBAction func sendVerificationCode(_ sender: Any) {
@@ -42,7 +46,13 @@ class LoginViewController: UIViewController {
             if success {
                 G.token = token
                 print("Success! token = \(token)")
-                dismiss(animated: true, completion: nil)
+                if isBase {
+                    let vc = *"InitTabVC"
+                    vc.modalPresentationStyle = .fullScreen
+                    self.present(vc, animated: true, completion: nil)
+                } else {
+                    dismiss(animated: true, completion: nil)
+                }
             }
         }
     }

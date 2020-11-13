@@ -1,8 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
+        <deployment identifier="iOS"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
         <capability name="System colors in document resources" minToolsVersion="11.0"/>
@@ -19,10 +20,10 @@
                 <autoresizingMask key="autoresizingMask"/>
                 <subviews>
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Hc-IY-1NO">
-                        <rect key="frame" x="20" y="2" width="408" height="252"/>
+                        <rect key="frame" x="20" y="4" width="408" height="250"/>
                         <subviews>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="aaaaaaaaaaaaaaa" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zry-Zh-Xdg">
-                                <rect key="frame" x="8" y="95" width="392" height="116"/>
+                                <rect key="frame" x="8" y="95" width="392" height="114"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="12"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
@@ -37,7 +38,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="fyk-PJ-aSy">
-                                <rect key="frame" x="8" y="219" width="60" height="25"/>
+                                <rect key="frame" x="8" y="217" width="60" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="60" id="CGb-de-KUM"/>
                                     <constraint firstAttribute="height" constant="25" id="jeh-cA-C2g"/>
@@ -53,7 +54,7 @@
                                 </connections>
                             </button>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="MAi-70-Asr">
-                                <rect key="frame" x="76" y="219" width="246" height="25"/>
+                                <rect key="frame" x="76" y="217" width="246" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="25" id="gZc-0X-7bo"/>
                                 </constraints>
@@ -87,7 +88,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="JcH-jd-QAf">
-                                <rect key="frame" x="330" y="219" width="70" height="25"/>
+                                <rect key="frame" x="330" y="217" width="70" height="25"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="70" id="ImC-Bn-QA1"/>
                                     <constraint firstAttribute="height" constant="25" id="mT8-8O-rze"/>
@@ -143,7 +144,7 @@
                     <constraint firstAttribute="trailing" secondItem="8Hc-IY-1NO" secondAttribute="trailing" constant="20" symbolic="YES" id="KHB-OL-z2Z"/>
                     <constraint firstItem="8Hc-IY-1NO" firstAttribute="leading" secondItem="men-34-OVS" secondAttribute="leading" constant="20" symbolic="YES" id="KsG-VM-wqK"/>
                     <constraint firstAttribute="bottom" secondItem="8Hc-IY-1NO" secondAttribute="bottom" constant="8" id="QUA-MH-dEm"/>
-                    <constraint firstItem="8Hc-IY-1NO" firstAttribute="top" secondItem="men-34-OVS" secondAttribute="top" constant="2" id="q6E-jG-W8U"/>
+                    <constraint firstItem="8Hc-IY-1NO" firstAttribute="top" secondItem="men-34-OVS" secondAttribute="top" constant="4" id="q6E-jG-W8U"/>
                 </constraints>
             </tableViewCellContentView>
             <connections>
@@ -168,7 +169,7 @@
         <image name="hand.thumbsup" catalog="system" width="128" height="128"/>
         <image name="text.bubble" catalog="system" width="128" height="110"/>
         <namedColor name="AccentColor">
-            <color red="1" green="0.23100003600120544" blue="0.18799999356269836" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+            <color red="0.0" green="0.4779999852180481" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>

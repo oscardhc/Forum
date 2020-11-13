@@ -39,6 +39,9 @@ class MainCell: UITableViewCell {
             if scene != .floor || content.title == "" {
                 topLabel.isHidden = true
                 topDist.constant = -topLabel.frame.height
+            } else {
+                topLabel.isHidden = false
+                topDist.constant = 8
             }
             if scene != .thread {
                 titleLabel.isHidden = true
@@ -125,7 +128,6 @@ class MainCell: UITableViewCell {
         readBtn.setTitle("\(t.nRead)", for: .normal)
         commentBtn.setTitle("\(t.nCommented)", for: .normal)
         cornerLabel.text = Util.dateToDeltaString(t.postTime)
-        liked = t.hasLiked
         
         likedBtn.isEnabled = false
         commentBtn.isEnabled = false

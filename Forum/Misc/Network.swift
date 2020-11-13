@@ -34,14 +34,25 @@ class Network {
     }
     
     static private func getData<T>(
-        op_code: String,
+        op_code: String, needChecking: Bool = true,
         pa_1: String = "0", pa_2: String = "0", pa_3: String = "0", pa_4: String = "0", pa_5: String = "0",
         done: (([String: Any]) -> T)
     ) -> T? {
         if let result = connect([
             "op_code": op_code, "pa_1": pa_1, "pa_2": pa_2, "pa_3": pa_3, "pa_4": pa_4, "pa_5": pa_5, "Token": G.token
         ]) {
-            return done(result)
+            if needChecking, let x = result["login_flag"] as? String, x != "1" {
+                print("not Authorized", result)
+                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+                    UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        exit(0)
+                    }
+                }
+                return nil
+            } else {
+                return done(result)
+            }
         } else {
             print("FAIL!")
             return nil
@@ -51,12 +62,6 @@ class Network {
     enum NetworkGetThreadType: String {
         case time = "1", favoured = "6", my = "7", trending = "d"
     }
-//
-//    static let parseResultThreads: ([String: Any]) -> [Thread] = {
-//        ($0["thread_list"]! as! [Any]).map() {
-//            Thread(json: $0)
-//        }
-//    }
     
     static func getThreads(type: NetworkGetThreadType, lastSeenID: String = "NULL") -> [Thread] {
         getData(op_code: type.rawValue, pa_1: lastSeenID) {
@@ -66,12 +71,16 @@ class Network {
         } ?? []
     }
     
-    static func getFloors(for threadID: String, lastSeenID: String = "NULL") -> [Floor] {
+    static func getFloors(for threadID: String, lastSeenID: String = "NULL") -> (floors: [Floor], hasLiked: Bool, hasFavoured: Bool) {
         getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID) {
-            ($0["floor_list"]! as! [Any]).map {
-                Floor(json: $0)
-            }
-        } ?? []
+            (
+                ($0["floor_list"]! as! [Any]).map {
+                    Floor(json: $0)
+                },
+                $0["WhetherLike"] as! Int == 1,
+                $0["WhetherFavour"] as! Int == 1
+            )
+        } ?? ([], false, false)
     }
     
     static func getMessages(lastSeenID: String = "NULL") -> [Message] {
@@ -82,15 +91,21 @@ class Network {
         } ?? []
     }
     
+    static func verifyToken() -> Bool {
+        getData(op_code: "-1", needChecking: false) {
+            $0["login_flag"]! as! String == "1"
+        } ?? false
+    }
+    
     static func requestLogin(with email: String) -> Bool {
-        getData(op_code: "0", pa_1: email) {
+        getData(op_code: "0", needChecking: false, pa_1: email) {
             $0["VarifiedEmailAddress"] as! Int == 1
         } ?? false
     }
     
     static func performLogin(with email: String, verificationCode: String) -> (Bool, String) {
-        getData(op_code: "f", pa_1: email, pa_2: verificationCode, pa_3: UIDevice.current.identifierForVendor!.uuidString) {
-            ($0["login_flag"] as! Int == 1, $0["Token"] as! String)
+        getData(op_code: "f", needChecking: false, pa_1: email, pa_2: verificationCode, pa_3: UIDevice.current.identifierForVendor!.uuidString) {
+            ($0["login_flag"] as! Int == 0, $0["Token"] as! String)
         } ?? (false, "")
     }
     

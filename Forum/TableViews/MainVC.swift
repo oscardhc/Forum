@@ -8,6 +8,7 @@
 import UIKit
 import MJRefresh
 import UITextView_Placeholder
+import DropDown
 
 class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate {
     
@@ -71,10 +72,11 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
         
         navigationItem.title = scene == .floors
-            ? "Thread#\((d as! Floor.Manager).thread.id)"
+            ? "#\((d as! Floor.Manager).thread.id)"
             : scene.rawValue
         
         
+//        navigationController?.navigationBar.prefersLargeTitles = true
         tableView.contentInsetAdjustmentBehavior = .always
         
         tableView.delegate = self
@@ -150,7 +152,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             DispatchQueue.main.async {
                 self.updateFavour()
                 self.tableView.refreshControl?.endRefreshing()
-                self.tableView.reloadSections(IndexSet([1]), with: .automatic)
+                self.tableView.reloadData()
                 if count == G.numberPerFetch {
                     self.tableView.mj_footer?.resetNoMoreData()
                 } else {
@@ -170,7 +172,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                 if count > 0 {
                     var idx = [IndexPath]()
                     for i in 1...count {
-                        idx.append(IndexPath(row: self.d.count - i, section: 1))
+                        idx.append(IndexPath(row: self.d.count - i, section: 0))
                     }
                     self.tableView.insertRows(at: idx, with: .automatic)
                 }
@@ -184,7 +186,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     var floor: String = "0" {
         didSet {
-//            textView.placeholder = "Replying to Floor #\(floor)"
+            textView.placeholder = "Replying to Floor #\(floor)"
         }
     }
     
@@ -264,48 +266,84 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     // MARK: - Table view data source
 
     func numberOfSections(in tableView: UITableView) -> Int {
-        2
+        1
+    }
+    
+    var headerHeight: CGFloat {
+        scene == .main ? 50 : 10
+    }
+    
+    func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        headerHeight
+    }
+    
+    var dropDown: DropDown = ({
+        let d = DropDown()
+        d.dataSource = Thread.Category.allCases.map {
+            $0.rawValue
+        }
+        d.backgroundColor = .systemBackground
+        return d
+    })()
+    
+    func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        let width = tableView.frame.width
+        let view = UIView(frame: CGRect(x: 0, y: 0, width: width, height: headerHeight))
+        if scene == .main {
+            view.backgroundColor = .systemBackground
+            
+            let lbl = UILabel(frame: CGRect(x: width/2, y: 0, width: width/4, height: headerHeight))
+            lbl.text = "板块："
+            lbl.textColor = .black
+            lbl.textAlignment = .right
+            lbl.font = UIFont.systemFont(ofSize: 12)
+            view.addSubview(lbl)
+            
+            let btn = UIButton(frame: CGRect(x: width*3/4, y: 0, width: width/4, height: headerHeight))
+            btn.addTarget(self, action: #selector(chooseBlock(_:)), for: .touchUpInside)
+            btn.setTitle("主干道", for: .normal)
+            btn.contentHorizontalAlignment = .right
+            btn.setTitleColor(UIColor(named: "AccentColor"), for: .normal)
+            btn.setImage(UIImage(systemName: "chevron.compact.down", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
+            btn.semanticContentAttribute = .forceRightToLeft
+            btn.titleEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 10)
+            btn.imageEdgeInsets = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 5)
+            btn.titleLabel!.font = UIFont.systemFont(ofSize: 12)
+            
+            dropDown.anchorView = btn
+            dropDown.selectionAction = { (index: Int, item: String) in
+                print("Selected item: \(item) at index: \(index)")
+                btn.setTitle(item, for: .normal)
+            }
+            
+            view.addSubview(btn)
+        }
+        return view
+    }
+    
+    @objc func chooseBlock(_ sender: Any) {
+        dropDown.show()
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        section == 0
-            ? 1
-            : d.count
+        d.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        indexPath.section == 0
-            ?  tableView.dequeueReusableCell(withIdentifier: "HeadCell", for: indexPath)
-            :  d.initializeCell(tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell, index: indexPath.row).withVC(self)
+        d.initializeCell(tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell, index: indexPath.row).withVC(self)
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
         300
     }
     
-//    var cellHeights = [IndexPath: CGFloat]()
-//
-//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
-//        cellHeights[indexPath] = cell.frame.size.height
-//    }
-    
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        indexPath.section == 0
-            ? (scene == .main ? 100 : 0)
-//            : (d.height(width: tableView.frame.width - 30, for: indexPath.row))
-//            : cellHeights[indexPath] ?? UITableView.automaticDimension
-//            : 200
-            : UITableView.automaticDimension
-    }
-    
-    func tableView(_ tableView: UITableView, willSelectRowAt indexPath: IndexPath) -> IndexPath? {
-        return indexPath
+        UITableView.automaticDimension
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        if indexPath.section == 1 {
-            d.didSelectedRow(self, index: indexPath.row)
-        }
+        d.didSelectedRow(self, index: indexPath.row)
+//        dropDown.show()
     }
 
 }

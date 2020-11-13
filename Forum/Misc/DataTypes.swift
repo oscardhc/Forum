@@ -19,7 +19,6 @@ class BaseManager {
     func getInitialContent() -> Int { -1 }
     func getMoreContent() -> Int { -1 }
     func didSelectedRow(_ vc: UIViewController, index: Int) {}
-    func height(width: CGFloat, for index: Int) -> CGFloat { 0 }
 }
 
 class DataManager<T: DATA>: BaseManager {
@@ -43,47 +42,43 @@ class DataManager<T: DATA>: BaseManager {
         }
         return 0
     }
-    override func height(width: CGFloat, for index: Int) -> CGFloat {
-//        NSString("123").size(withAttributes: [.font: UIFont(descriptor: UIFontDescriptor(name: "Helvetica", size: 20))])
-        let fontAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 16)]
-        let sz = data[index].content.size(withAttributes: fontAttributes)
-        print(width, sz, data[index].content)
-        return CGFloat(Int(sz.width) / Int(width) + 1) * sz.height + 170
-    }
     
 }
+
+// RandomSeed
 
 
 struct Thread: DATA {
     
-    enum Category {
-        case uncategorized
-        case sport
-        case study
+    enum Category: String, CaseIterable {
+        case all = "主干道", sport = "体育", music = "音乐", science = "科学", it = "数码", entertainment = "娱乐", emotion = "情感", social = "社会"
     }
     
     var id = "", title = "", content = ""
-    var type: Category = .uncategorized
+    var type: Category = .all
     var nLiked = 0, nRead = 0, nCommented = 0
-    var visible = true, hasLiked = false, hasFavoured = false
+    var hasLiked, hasFavoured: Bool!
     var postTime = Date(), lastUpdateTime = Date()
     var theme = NameGenerator.Theme.usPresident, seed = 0
-    
     
     static var cnt = 1
     
     init() {}
     init(json: Any) {
         let thread  = json as! [String: Any]
-        nCommented   = thread["Comment"] as! Int
-        id          = thread["ThreadID"] as! String
-        nRead        = thread["Read"] as! Int
-        content     = thread["Summary"] as! String
-        nLiked       = thread["Praise"] as! Int
-        title       = thread["Title"] as! String
-        hasFavoured = (thread["Praise"] as! Int) == 1
-        hasLiked = (thread["WhetherLike"] as! Int) == 1
-        postTime    = Util.stringToDate(thread["LastUpdateTime"] as! String)
+//        print("trying to init thread from json", thread)
+        nCommented = thread["Comment"] as! Int
+        id = thread["ThreadID"] as! String
+        nRead = thread["Read"] as! Int
+        content = thread["Summary"] as! String
+        nLiked = thread["Like"] as! Int
+        title = thread["Title"] as! String
+        
+        theme = NameGenerator.Theme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob
+        seed = thread["RandomSeed"] as! Int
+        
+        lastUpdateTime = Util.stringToDate(thread["LastUpdateTime"] as! String)
+        postTime = Util.stringToDate(thread["PostTime"] as! String)
     }
     
     static func samplePost() -> Thread {
@@ -120,11 +115,6 @@ struct Thread: DATA {
             sortType = type
         }
         
-//        override func getInitialContent() -> Int {
-//            data = [Thread.samplePost()] + [Thread.samplePost()]
-//            return 1
-//        }
-        
         override func networking(lastSeenID: String) -> [Thread] {
             Network.getThreads(type: sortType, lastSeenID: lastSeenID)
         }
@@ -154,17 +144,15 @@ struct Floor: DATA {
     
     init() {}
     init(json: Any) {
-//        print(json)
         let floor = json as! [String: Any]
-//        print(floor)
         id = floor["FloorID"] as! String
         content = floor["Context"] as! String
         name = floor["Speakername"] as! String
         replyToName = floor["Replytoname"] as? String
         replyToFloor = floor["Replytofloor"] as? Int
         time = Util.stringToDate(floor["RTime"] as! String)
-        hasLiked = 1 == (floor["WhetherPraise"] as! Int)
-        nLiked = floor["Praise"] as! Int
+        hasLiked = (floor["WhetherLike"] as! Int) == 1
+        nLiked = floor["Like"] as! Int
     }
     
     class Manager: DataManager<Floor> {
@@ -176,19 +164,17 @@ struct Floor: DATA {
             super.init()
         }
         
-        override func getInitialContent() -> Int {
-            let res = super.getInitialContent()
-            data.insert(thread.generateFirstFloor(), at: 0)
-            print("floor getInitialContent")
-            return res
-        }
+        override var count: Int {data.isEmpty ? 0 : data.count + 1}
         
         override func networking(lastSeenID: String = "NULL") -> [Floor] {
-            Network.getFloors(for: thread.id, lastSeenID: lastSeenID)
+            (data, thread.hasLiked, thread.hasFavoured) = Network.getFloors(for: thread.id, lastSeenID: lastSeenID)
+            return data
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAs(floor: data[index], forThread: thread, firstFloor: index == 0)
+            index == 0
+                ? cell.setAs(floor: thread.generateFirstFloor(), forThread: thread, firstFloor: true)
+                : cell.setAs(floor: data[index - 1], forThread: thread, firstFloor: false)
         }
         
     }

@@ -39,8 +39,8 @@ class Util {
 
 class NameGenerator {
     
-    enum Theme {
-        case aliceAndBob, usPresident
+    enum Theme: String {
+        case aliceAndBob = "abc", usPresident = "us_president"
     }
     static let data: [Theme: [String]] = [
         .aliceAndBob: ["Alice", "Bob", "Carol", "Dave", "Eve", "Forest", "George", "Harry", "Issac", "Justin", "Kevin", "Laura", "Mallory", "Neal", "Oscar", "Pat", "Quentin", "Rose", "Steve", "Trent", "Utopia", "Victor", "Walter", "Xavier", "Young", "Zoe"],
@@ -48,7 +48,7 @@ class NameGenerator {
     ]
     
     static func getName(_ theme: Theme, _ str: String) -> String {
-        if var i = Int(str) {
+        if let i = Int(str) {
             if i >= data[theme]!.count {
                 return data[theme]![i % data.count] + "<\(i / data.count)>"
             } else {
