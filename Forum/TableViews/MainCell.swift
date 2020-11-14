@@ -145,10 +145,10 @@ class MainCell: UITableViewCell {
         isFirstFloor = firstFloor
         scene = .floor
         
-        let ss = f.name.getName(theme: t.theme) +
+        let ss = t.name.getName(Int(f.name)!) +
             (((f.replyToFloor ?? 0) == 0)
                 ? ""
-                : " -> #\(f.replyToFloor!) \(f.replyToName!.getName(theme: t.theme))"
+                : " -> #\(f.replyToFloor!) \(t.name.getName(Int(f.replyToName!)!))"
             )
         let speaker = NSMutableAttributedString(string: ss + "\n", attributes: [:])
         

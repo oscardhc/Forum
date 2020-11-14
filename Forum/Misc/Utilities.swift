@@ -43,28 +43,50 @@ class NameGenerator {
         case aliceAndBob = "abc", usPresident = "us_president"
     }
     
-    static let data: [Theme: [String]] = [
+    static let nameList: [Theme: [String]] = [
         .aliceAndBob: ["Alice", "Bob", "Carol", "Dave", "Eve", "Forest", "George", "Harry", "Issac", "Justin", "Kevin", "Laura", "Mallory", "Neal", "Oscar", "Pat", "Quentin", "Rose", "Steve", "Trent", "Utopia", "Victor", "Walter", "Xavier", "Young", "Zoe"],
         .usPresident: ["Washington", "J.Adams", "Jefferson", "Madison", "Monroe", "J.Q.Adams", "Jackson", "Buren", "W.H.Harrison", "J.Tyler", "Polk", "Z.Tylor", "Fillmore", "Pierce", "Buchanan", "Lincoln", "A.Johnson", "Grant", "Hayes", "Garfield", "Arthur", "Cleveland", "B.Harrison", "McKinley", "T.T.Roosevelt","Taft", "Wilson", "Harding", "Coolidge", "Hoover", "F.D.Roosevelt", "Truman", "Eisenhower", "Kennedy", "L.B.Johnson", "Nixon", "Ford", "Carter", "Reagan", "G.H.W.Bush", "Clinton","G.W.Bush", "Obama", "Trump"]
     ]
     
-    static func getName(_ theme: Theme, _ str: String) -> String {
-        if let i = Int(str) {
-            if i >= data[theme]!.count {
-                return data[theme]![i % data.count] + "<\(i / data.count)>"
-            } else {
-                return data[theme]![i]
-            }
+    var names: [String]
+    
+    init(theme t: Theme, seed s: UInt) {
+        names = Self.nameList[t]!
+        let random = RandomGenerator(s)
+        for i in 1..<names.count {
+            names.swapAt(i, Int(random.next() % UInt(i + 1)))
         }
-        return "ERROR"
+    }
+    
+    func getName(_ i: Int) -> String {
+        i >= names.count
+            ? "\(names[i % names.count])<\(i / names.count)>"
+            : names[i]
     }
     
 }
 
-extension String {
+class RandomGenerator {
     
-    func getName(theme: NameGenerator.Theme) -> String {
-        NameGenerator.getName(theme, self)
+    var seed, a, b: UInt
+    
+    init(_ s: UInt) {
+        (seed, a, b) = (s, s, 19260817)
+    }
+    
+    func next() -> UInt {
+        if seed == 0 {
+            a += 1
+            return a
+        } else {
+            var t = a, s = b
+            a = s
+            t ^= t << 23;
+            t ^= t >> 17;
+            t ^= s ^ (s >> 26);
+            b = t
+            return s &+ t; // allow overflow
+        }
     }
     
 }

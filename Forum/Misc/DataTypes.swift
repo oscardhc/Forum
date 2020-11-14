@@ -59,11 +59,11 @@ struct Thread: DATA {
     var nLiked = 0, nRead = 0, nCommented = 0
     var hasLiked = false, hasFavoured = false
     var postTime = Date(), lastUpdateTime = Date()
-    var theme = NameGenerator.Theme.usPresident, seed = 0
+    var name: NameGenerator
     
     static var cnt = 1
     
-    init() {}
+//    init() {}
     init(json: Any) {
         let thread  = json as! [String: Any]
 //        print("trying to init thread from json", thread)
@@ -74,27 +74,28 @@ struct Thread: DATA {
         nLiked = thread["Like"] as! Int
         title = thread["Title"] as! String
         
-        theme = NameGenerator.Theme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob
-        seed = thread["RandomSeed"] as! Int
+        name = NameGenerator(
+            theme: NameGenerator.Theme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
+            seed: thread["RandomSeed"] as! UInt)
         
         lastUpdateTime = Util.stringToDate(thread["LastUpdateTime"] as! String)
         postTime = Util.stringToDate(thread["PostTime"] as! String)
     }
     
-    static func samplePost() -> Thread {
-        var p = Thread()
-        p.id = "00001"
-        p.title = "This is a title"
-        p.content = "From the first floor."
-        for _ in 0..<cnt * 3 + 2 {
-            p.content += "\nFrom the first floor."
-        }
-        p.nLiked = cnt * 333
-        p.nCommented = cnt * 2
-        p.nRead = cnt * 114514
-        cnt += 1
-        return p
-    }
+//    static func samplePost() -> Thread {
+//        var p = Thread()
+//        p.id = "00001"
+//        p.title = "This is a title"
+//        p.content = "From the first floor."
+//        for _ in 0..<cnt * 3 + 2 {
+//            p.content += "\nFrom the first floor."
+//        }
+//        p.nLiked = cnt * 333
+//        p.nCommented = cnt * 2
+//        p.nRead = cnt * 114514
+//        cnt += 1
+//        return p
+//    }
     
     func generateFirstFloor() -> Floor {
         var f = Floor()
