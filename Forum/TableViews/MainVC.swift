@@ -160,7 +160,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @objc func refresh() {
 //        print("refresh...")
         DispatchQueue.global().async {
-            usleep(1000000)
+            usleep(100000)
             let count = self.d.getInitialContent()
             DispatchQueue.main.async {
                 self.updateFavour()
@@ -179,7 +179,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @objc func loadmore() {
         DispatchQueue.global().async {
-//            usleep(300000)
+            usleep(100000)
             let count = self.d.getMoreContent()
             DispatchQueue.main.async {
                 self.tableView.mj_footer?.endRefreshing()

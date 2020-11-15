@@ -18,10 +18,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
         
-        
+
         print(NameGenerator(theme: .aliceAndBob, seed: 0).names)
         print(NameGenerator(theme: .aliceAndBob, seed: 1).names)
-        NameGenerator.nameList.forEach({print($1.count)})
         
         if !Network.verifyToken() {
             window?.rootViewController = *"LoginVC"

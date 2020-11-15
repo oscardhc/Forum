@@ -60,7 +60,7 @@ class NameGenerator {
     
     func getName(_ i: Int) -> String {
         i >= names.count
-            ? "\(names[i % names.count])<\(i / names.count)>"
+            ? "\(names[i % names.count]).\(i / names.count + 1)"
             : names[i]
     }
     
@@ -85,7 +85,7 @@ class RandomGenerator {
             t ^= t >> 17;
             t ^= s ^ (s >> 26);
             b = t
-            return (s &+ t) & (Int.max); // allow overflow
+            return (s &+ t) & (Int.max) // allow overflow
         }
     }
     

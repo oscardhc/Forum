@@ -25,6 +25,7 @@ class MainCell: UITableViewCell {
     @IBOutlet weak var idLabel: UILabel!
     @IBOutlet weak var headLabel: UILabel!
     @IBOutlet weak var headDistance: NSLayoutConstraint!
+    @IBOutlet weak var headWidth: NSLayoutConstraint!
     @IBOutlet weak var contentLabel: UILabel!
     @IBOutlet weak var likedBtn: UIButton!
     @IBOutlet weak var commentBtn: UIButton!
@@ -133,6 +134,7 @@ class MainCell: UITableViewCell {
         likedBtn.isEnabled = false
         commentBtn.isEnabled = false
         readBtn.isEnabled = false
+        headDistance.constant = -headWidth.constant
         
         return self
     }
@@ -157,8 +159,14 @@ class MainCell: UITableViewCell {
         
         speaker.append(time)
         
+        let cons: CGFloat = 30
+        
         idLabel.attributedText = speaker
-        idHeight.constant = 40
+        idHeight.constant = cons
+        headWidth.constant = cons
+        headLabel.text = String(ss.first!)
+        headLabel.layer.backgroundColor = UIColor.lightGray.cgColor
+        headLabel.layer.cornerRadius = cons / 2
         
         content = (isFirstFloor ? t.title : "", f.content)
         likedBtn.setTitle("\(f.nLiked)", for: .normal)

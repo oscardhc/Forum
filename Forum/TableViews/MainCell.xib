@@ -28,7 +28,7 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cPC-WZ-J29">
-                                <rect key="frame" x="285" y="37" width="115" height="30"/>
+                                <rect key="frame" x="204" y="37" width="196" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="30" id="GC1-i5-K61"/>
                                 </constraints>
@@ -100,19 +100,19 @@
                                     <imageReference key="image" image="eyeglasses" catalog="system" symbolScale="small"/>
                                 </state>
                             </button>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rQp-gg-1Cg">
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="" textAlignment="center" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="rQp-gg-1Cg">
                                 <rect key="frame" x="8" y="37" width="30" height="30"/>
                                 <constraints>
                                     <constraint firstAttribute="width" constant="30" id="EGy-P1-neQ"/>
                                 </constraints>
-                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="12"/>
+                                <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="20"/>
                                 <nil key="textColor"/>
                                 <nil key="highlightedColor"/>
                             </label>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nsw-Jb-kVp">
-                                <rect key="frame" x="46" y="37" width="231" height="30"/>
+                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" lineBreakMode="characterWrap" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="Nsw-Jb-kVp">
+                                <rect key="frame" x="46" y="37" width="150" height="30"/>
                                 <constraints>
-                                    <constraint firstAttribute="width" constant="231" id="7Yw-SY-jJZ"/>
+                                    <constraint firstAttribute="width" constant="150" id="7Yw-SY-jJZ"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" name=".AppleSystemUIFont" family=".AppleSystemUIFont" pointSize="12"/>
                                 <nil key="textColor"/>
@@ -163,6 +163,8 @@
                 <outlet property="cornerLabel" destination="cPC-WZ-J29" id="nO5-Vs-0IS"/>
                 <outlet property="headDistance" destination="K20-sP-Ex8" id="EEB-YD-dxO"/>
                 <outlet property="headLabel" destination="rQp-gg-1Cg" id="c2Q-SD-zBF"/>
+                <outlet property="headWidth" destination="EGy-P1-neQ" id="3sK-Iy-MEy"/>
+                <outlet property="idHeight" destination="GC1-i5-K61" id="wx1-dg-gdB"/>
                 <outlet property="idLabel" destination="Nsw-Jb-kVp" id="cHD-Ce-Iu3"/>
                 <outlet property="likedBtn" destination="fyk-PJ-aSy" id="fKn-HN-FMU"/>
                 <outlet property="mainView" destination="8Hc-IY-1NO" id="7Xo-tQ-eaB"/>
