@@ -22,7 +22,9 @@ class MainCell: UITableViewCell {
     var parentVC: MainVC!
     
     @IBOutlet weak var mainView: UIView!
-    @IBOutlet weak var idBtn: UIButton!
+    @IBOutlet weak var idLabel: UILabel!
+    @IBOutlet weak var headLabel: UILabel!
+    @IBOutlet weak var headDistance: NSLayoutConstraint!
     @IBOutlet weak var contentLabel: UILabel!
     @IBOutlet weak var likedBtn: UIButton!
     @IBOutlet weak var commentBtn: UIButton!
@@ -72,8 +74,6 @@ class MainCell: UITableViewCell {
         likedBtn.adjustsImageWhenDisabled = false
         commentBtn.adjustsImageWhenDisabled = false
         readBtn.adjustsImageWhenDisabled = false
-        idBtn.adjustsImageWhenDisabled = false
-        idBtn.isEnabled = false
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -123,7 +123,7 @@ class MainCell: UITableViewCell {
         thread = t
         scene = .thread
         
-        idBtn.setTitle("#\(t.id)", for: .normal)
+        idLabel.text = "#\(t.id)"
         content = (t.title, t.content)
         likedBtn.setTitle("\(t.nLiked)", for: .normal)
         readBtn.setTitle("\(t.nRead)", for: .normal)
@@ -157,7 +157,7 @@ class MainCell: UITableViewCell {
         
         speaker.append(time)
         
-        idBtn.setAttributedTitle(speaker, for: .normal)
+        idLabel.attributedText = speaker
         idHeight.constant = 40
         
         content = (isFirstFloor ? t.title : "", f.content)
@@ -179,7 +179,7 @@ class MainCell: UITableViewCell {
         message = m
         scene = .message
         
-        idBtn.setTitle(m.id, for: .normal)
+        idLabel.text = m.id
         content = (m.title, m.content)
         cornerLabel.text = Util.dateToDeltaString(m.time)
         
@@ -191,7 +191,6 @@ class MainCell: UITableViewCell {
     }
     
     override func layoutSubviews() {
-//        print("layout", content, self.frame.height)
         super.layoutSubviews()
         mainView.applyCardStyle()
     }

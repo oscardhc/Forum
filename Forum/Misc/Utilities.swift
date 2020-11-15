@@ -50,11 +50,11 @@ class NameGenerator {
     
     var names: [String]
     
-    init(theme t: Theme, seed s: UInt) {
+    init(theme t: Theme, seed s: Int) {
         names = Self.nameList[t]!
         let random = RandomGenerator(s)
         for i in 1..<names.count {
-            names.swapAt(i, Int(random.next() % UInt(i + 1)))
+            names.swapAt(i, random.next() % (i + 1))
         }
     }
     
@@ -68,13 +68,13 @@ class NameGenerator {
 
 class RandomGenerator {
     
-    var seed, a, b: UInt
+    var seed, a, b: Int
     
-    init(_ s: UInt) {
+    init(_ s: Int) {
         (seed, a, b) = (s, s, 19260817)
     }
     
-    func next() -> UInt {
+    func next() -> Int {
         if seed == 0 {
             a += 1
             return a
@@ -85,7 +85,7 @@ class RandomGenerator {
             t ^= t >> 17;
             t ^= s ^ (s >> 26);
             b = t
-            return s &+ t; // allow overflow
+            return (s &+ t) & (Int.max); // allow overflow
         }
     }
     

@@ -76,7 +76,7 @@ struct Thread: DATA {
         
         name = NameGenerator(
             theme: NameGenerator.Theme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
-            seed: thread["RandomSeed"] as! UInt)
+            seed: thread["RandomSeed"] as! Int)
         
         lastUpdateTime = Util.stringToDate(thread["LastUpdateTime"] as! String)
         postTime = Util.stringToDate(thread["PostTime"] as! String)

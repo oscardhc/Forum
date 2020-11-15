@@ -21,6 +21,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         print(NameGenerator(theme: .aliceAndBob, seed: 0).names)
         print(NameGenerator(theme: .aliceAndBob, seed: 1).names)
+        NameGenerator.nameList.forEach({print($1.count)})
         
         if !Network.verifyToken() {
             window?.rootViewController = *"LoginVC"
