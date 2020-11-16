@@ -33,7 +33,7 @@ class TabBarController: UITabBarController {
     override func tabBar(_ tabBar: UITabBar, didSelect item: UITabBarItem) {
         if selectedIndex == tabBar.items!.firstIndex(of: item)! {
             let nav = viewControllers?[selectedIndex] as! UINavigationController
-            if let vc = nav.viewControllers[0] as? DoubleTapEnabled {
+            if let vc = nav.viewControllers[0] as? DoubleTappable {
                 vc.hasTappedAgain()
             }
         }

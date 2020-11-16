@@ -6,6 +6,7 @@
 //
 
 import Foundation
+import UIKit
 
 class Util {
     
@@ -37,6 +38,17 @@ class Util {
     
 }
 
+extension Array {
+    
+    mutating func shuffle(seed s: Int) {
+        let random = RandomGenerator(s)
+        for i in 1..<count {
+            swapAt(i, random.next() % (i + 1))
+        }
+    }
+    
+}
+
 class NameGenerator {
     
     enum Theme: String, CaseIterable {
@@ -52,13 +64,10 @@ class NameGenerator {
     
     init(theme t: Theme, seed s: Int) {
         names = Self.nameList[t]!
-        let random = RandomGenerator(s)
-        for i in 1..<names.count {
-            names.swapAt(i, random.next() % (i + 1))
-        }
+        names.shuffle(seed: s)
     }
     
-    func getName(_ i: Int) -> String {
+    subscript(i: Int) -> String {
         i >= names.count
             ? "\(names[i % names.count]).\(i / names.count + 1)"
             : names[i]
@@ -91,8 +100,37 @@ class RandomGenerator {
     
 }
 
-protocol DoubleTapEnabled {
+protocol DoubleTappable {
     
     func hasTappedAgain()
+    
+}
+
+
+class ColorGenerator {
+    
+    static let colorList: [UIColor] = [
+        "89e1ae", "8ad3bf", "8ec4ca", "8fb1cf", "899dd1", "7f86d3", "7a75d3", "7c67d1", "6850d0"
+    ].map {
+        var s = Scanner(string: $0), res: UInt64 = 0
+        s.scanHexInt64(&res)
+        return UIColor(
+            red: CGFloat((res & 0xff0000) >> 16)  / 255,
+            green: CGFloat((res & 0x00ff00) >> 8) / 255,
+            blue: CGFloat((res & 0x0000ff)) / 255,
+            alpha: 0.25
+        )
+    }
+    
+    var colors: [UIColor]
+    
+    init(_ s: Int) {
+        colors = Self.colorList
+        colors.shuffle(seed: s)
+    }
+    
+    subscript(i: Int) -> UIColor {
+        colors[i % colors.count]
+    }
     
 }

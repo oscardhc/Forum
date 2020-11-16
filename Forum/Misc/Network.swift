@@ -14,23 +14,31 @@ class Network {
     static let e = JSONEncoder(), ip = "172.81.215.104", port: Int32 = 8080
     
     static private func connect<T: Encodable>(_ data: T) -> [String: Any]? {
-        do {
-            let data = try e.encode(data)
-            
-            let s = try Socket.create()
-            try s.connect(to: ip, port: port)
-            try s.write(from: data)
-            
-            let rec = try JSONSerialization.jsonObject(
-                with: try s.readString()!.data(using: .utf8)!,
-                options: .allowFragments
-            )
-            
-            s.close()
-            return rec as? [String: Any]
-        } catch {
-            return nil
+        func singleConnect() -> [String: Any]? {
+            do {
+                let data = try e.encode(data)
+                
+                let s = try Socket.create()
+                try s.connect(to: ip, port: port)
+                try s.write(from: data)
+                
+                let rec = try JSONSerialization.jsonObject(
+                    with: try s.readString()!.data(using: .utf8)!,
+                    options: .allowFragments
+                )
+                
+                s.close()
+                return rec as! [String: Any]
+            } catch {
+                return nil
+            }
         }
+        for _ in 0..<3 {
+            if let res = singleConnect() {
+                return res
+            }
+        }
+        return nil
     }
     
     static private func getData<T>(
@@ -65,6 +73,14 @@ class Network {
     
     static func getThreads(type: NetworkGetThreadType, inBlock: Thread.Category, lastSeenID: String = "NULL") -> [Thread] {
         getData(op_code: type.rawValue, pa_1: lastSeenID, pa_2: String(Thread.Category.allCases.firstIndex(of: inBlock)!)) {
+            ($0["thread_list"]! as! [Any]).map {
+                Thread(json: $0)
+            }
+        } ?? []
+    }
+    
+    static func searchThreads(keyword: String, lastSeenID: String = "NULL") -> [Thread] {
+        getData(op_code: "b", pa_1: keyword, pa_2: lastSeenID) {
             ($0["thread_list"]! as! [Any]).map {
                 Thread(json: $0)
             }

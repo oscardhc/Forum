@@ -64,6 +64,8 @@ class MainCell: UITableViewCell {
                         withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
                 for: .normal
             )
+//            likedBtn.tintColor = liked ? .systemBlue : .black
+//            likedBtn.setTitleColor(liked ? .systemBlue : .black, for: .normal)
         }
     }
     
@@ -147,10 +149,12 @@ class MainCell: UITableViewCell {
         isFirstFloor = firstFloor
         scene = .floor
         
-        let ss = t.name.getName(Int(f.name)!) +
+        let color = t.color[Int(f.name)!]
+        
+        let ss = t.name[Int(f.name)!] +
             (((f.replyToFloor ?? 0) == 0)
                 ? ""
-                : " -> #\(f.replyToFloor!) \(t.name.getName(Int(f.replyToName!)!))"
+                : " -> #\(f.replyToFloor!) \(t.name[Int(f.replyToName!)!])"
             )
         let speaker = NSMutableAttributedString(string: ss + "\n", attributes: [:])
         
@@ -165,7 +169,8 @@ class MainCell: UITableViewCell {
         idHeight.constant = cons
         headWidth.constant = cons
         headLabel.text = String(ss.first!)
-        headLabel.layer.backgroundColor = UIColor.systemGray4.cgColor
+//        headLabel.layer.backgroundColor = UIColor.systemGray4.cgColor
+        headLabel.layer.backgroundColor = color.cgColor
         headLabel.layer.cornerRadius = cons / 2
         
         content = (isFirstFloor ? t.title : "", f.content)

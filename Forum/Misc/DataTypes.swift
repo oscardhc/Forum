@@ -45,9 +45,6 @@ class DataManager<T: DATA>: BaseManager {
     
 }
 
-// RandomSeed
-
-
 struct Thread: DATA {
     
     enum Category: String, CaseIterable {
@@ -59,11 +56,10 @@ struct Thread: DATA {
     var nLiked = 0, nRead = 0, nCommented = 0
     var hasLiked = false, hasFavoured = false
     var postTime = Date(), lastUpdateTime = Date()
-    var name: NameGenerator
+    var name: NameGenerator, color: ColorGenerator
     
     static var cnt = 1
     
-//    init() {}
     init(json: Any) {
         let thread  = json as! [String: Any]
 //        print("trying to init thread from json", thread)
@@ -77,25 +73,11 @@ struct Thread: DATA {
         name = NameGenerator(
             theme: NameGenerator.Theme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
             seed: thread["RandomSeed"] as! Int)
+        color = ColorGenerator(Int(id)!)
         
         lastUpdateTime = Util.stringToDate(thread["LastUpdateTime"] as! String)
         postTime = Util.stringToDate(thread["PostTime"] as! String)
     }
-    
-//    static func samplePost() -> Thread {
-//        var p = Thread()
-//        p.id = "00001"
-//        p.title = "This is a title"
-//        p.content = "From the first floor."
-//        for _ in 0..<cnt * 3 + 2 {
-//            p.content += "\nFrom the first floor."
-//        }
-//        p.nLiked = cnt * 333
-//        p.nCommented = cnt * 2
-//        p.nRead = cnt * 114514
-//        cnt += 1
-//        return p
-//    }
     
     func generateFirstFloor() -> Floor {
         var f = Floor()
@@ -112,13 +94,21 @@ struct Thread: DATA {
         
         var sortType: Network.NetworkGetThreadType
         var block = Thread.Category.all
+        var searchFor: String? = nil
         
         init(type: Network.NetworkGetThreadType) {
             sortType = type
         }
         
+        func search(text: String?) {
+            searchFor = text
+            data = []
+        }
+        
         override func networking(lastSeenID: String) -> [Thread] {
-            Network.getThreads(type: sortType, inBlock: block, lastSeenID: lastSeenID)
+            searchFor == nil
+                ? Network.getThreads(type: sortType, inBlock: block, lastSeenID: lastSeenID)
+                : Network.searchThreads(keyword: searchFor!, lastSeenID: lastSeenID)
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
@@ -169,8 +159,9 @@ struct Floor: DATA {
         override var count: Int {data.count + 1}
         
         override func networking(lastSeenID: String = "NULL") -> [Floor] {
-            (data, thread.hasLiked, thread.hasFavoured) = Network.getFloors(for: thread.id, lastSeenID: lastSeenID)
-            return data
+            var newData = [Floor]()
+            (newData, thread.hasLiked, thread.hasFavoured) = Network.getFloors(for: thread.id, lastSeenID: lastSeenID)
+            return newData
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
@@ -202,6 +193,7 @@ struct Message: DATA {
     
     init(json: Any) {
         let msg = json as! [String: Any]
+        print(msg)
         id = msg["ThreadID"] as! String
         title = msg["Title"] as! String
         content = msg["Summary"] as! String

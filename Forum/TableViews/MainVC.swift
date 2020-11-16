@@ -20,7 +20,7 @@ extension UIRefreshControl {
     }
 }
 
-class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate, DoubleTapEnabled {
+class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate, DoubleTappable {
     
     enum Scene: String {
         case main = "Threads", my = "My Threads", trends = "Trends", messages = "Messages", floors = "Thread#", favour = "Favoured"
@@ -38,6 +38,19 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var topCornerBtn: UIBarButtonItem!
     @IBOutlet weak var replyCountLabel: StateLabel!
     @IBOutlet weak var newThreadBtn: UIButton!
+    
+    lazy var searchControl: UIAlertController = {
+        let a = UIAlertController(title: "请输入搜索内容", message: "", preferredStyle: .alert)
+        a.addTextField()
+        a.addAction(.init(title: "取消", style: .cancel, handler: nil))
+        a.addAction(.init(title: "确认", style: .default, handler: search))
+        return a
+    }()
+    
+    func search(_ alert: UIAlertAction) {
+        (d as! Thread.Manager).search(text: searchControl.textFields?[0].text)
+        hasTappedAgain()
+    }
     
     static func new(_ scene: Scene, _ args: Any...) -> MainVC {
         let vc = *"MainVC" as! MainVC
@@ -65,33 +78,15 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-//        if tabBarController?.viewControllers?.count == 2 {
-//            let nav = UINavigationController(rootViewController: MainVC.new(.trends))
-//            nav.navigationBar.prefersLargeTitles = true
-//            tabBarController?.viewControllers?.insert(nav, at: 1)
-//            
-//            tabBarController?.tabBar.items?[0].image = UIImage(systemName: "house")
-//            tabBarController?.tabBar.items?[0].selectedImage = UIImage(systemName: "house.fill")
-//            tabBarController?.tabBar.items?[0].title = "首页"
-//            
-//            tabBarController?.tabBar.items?[1].image = UIImage(systemName: "crown")
-//            tabBarController?.tabBar.items?[1].selectedImage = UIImage(systemName: "crown.fill")
-//            tabBarController?.tabBar.items?[1].title = "趋势"
-//            
-//            tabBarController?.tabBar.items?[2].image = UIImage(systemName: "person")
-//            tabBarController?.tabBar.items?[2].selectedImage = UIImage(systemName: "person.fill")
-//            tabBarController?.tabBar.items?[2].title = "我"
-//        }
-        
         navigationItem.title = scene == .floors
             ? "#\((d as! Floor.Manager).thread.id)"
             : scene.rawValue
-//        navigationController?.navigationBar.isTranslucent = true
-//        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        
         navigationController?.navigationBar.barTintColor = .systemBackground
         navigationController?.navigationBar.shadowImage = UIImage()
         
         tableView.contentInsetAdjustmentBehavior = .always
+//        edgesForExtendedLayout = .all
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -136,6 +131,9 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         topCornerBtn.title = ""
         if scene == .main {
             topCornerBtn.image = UIImage(systemName: "magnifyingglass")
+            newThreadBtn.frame.origin = CGPoint(x: newThreadBtn.frame.minX, y: UIScreen.main.bounds.height - tabBarController!.tabBar.frame.height - 80)
+        } else {
+            newThreadBtn.isHidden = true
         }
         if scene == .floors {
             topCornerBtn.image = UIImage(systemName: "star")
@@ -143,17 +141,21 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        super.viewWillDisappear(animated)
-        if scene == .floors {
-//            tabBarController?.tabBar.isHidden = false
-        } else {
-            
-        }
-    }
-    
+    var isDoubleTapping = false
     func hasTappedAgain() {
-        print("tapped again!!")
+        if tableView.refreshControl!.isRefreshing {
+            return
+        }
+        
+        let top = self.tableView.adjustedContentInset.top
+        let y = self.tableView.refreshControl!.frame.maxY + top
+        self.tableView.setContentOffset(CGPoint(x: 0, y: -y-52), animated: true)
+        tableView.refreshControl?.beginRefreshing()
+        isDoubleTapping = true
+        DispatchQueue.global().async {
+            usleep(300000)
+            self.refresh()
+        }
     }
     
     // MARK: - Selector functions
@@ -170,12 +172,21 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         DispatchQueue.global().async {
             usleep(100000)
             let count = self.d.getInitialContent()
+            print("end refreshing")
+            
             DispatchQueue.main.async {
                 self.updateFavour()
                 self.footer.setTitle("点击或上拉以加载更多", for: .idle)
                 self.tableView.isScrollEnabled = true
+                
                 self.tableView.refreshControl?.endRefreshing()
+                
+                if self.isDoubleTapping {
+                    self.tableView.setContentOffset(CGPoint(x: 0, y: -170), animated: true)
+                    self.isDoubleTapping = false
+                }
                 self.tableView.reloadData()
+                
                 if count == G.numberPerFetch {
                     self.tableView.mj_footer?.resetNoMoreData()
                 } else {
@@ -197,6 +208,9 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                     for i in 1...count {
                         idx.append(IndexPath(row: self.d.count - i, section: 0))
                     }
+                    idx.reverse()
+                    print(count, self.d.count, idx)
+//                    self.tableView.insert
                     self.tableView.insertRows(at: idx, with: .automatic)
                 }
                 
@@ -210,20 +224,20 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         
         func changeBar(hide: Bool) {
-            let bar = self.tabBarController?.tabBar
-            let offset = UIScreen.main.bounds.height - (hide ? 0 : bar!.frame.height)
-            if offset == bar?.frame.origin.y { return }
-            UIView.animate(withDuration: 0.5) {
-                bar?.frame.origin.y = offset
+            if let bar = self.tabBarController?.tabBar {
+                let offset = UIScreen.main.bounds.height - (hide ? 0 : bar.frame.height)
+                if offset == bar.frame.origin.y { return }
+                UIView.animate(withDuration: 0.3) {
+                    self.newThreadBtn.frame.origin = CGPoint(x: self.newThreadBtn.frame.minX, y: offset - 80)
+                    bar.frame.origin.y = offset
+                }
             }
         }
         
         if scrollView.panGestureRecognizer.translation(in: scrollView).y < 0{
-            //scrolling down
             changeBar(hide: true)
         }
         else{
-            //scrolling up
             changeBar(hide: false)
         }
         
@@ -301,7 +315,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @IBAction func barBtnClicked(_ sender: Any) {
         if scene == .main {
-            self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
+            self << searchControl
         } else if scene == .floors {
             if ({
                 if (d as! Floor.Manager).thread.hasFavoured {
@@ -406,7 +420,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         d.didSelectedRow(self, index: indexPath.row)
-//        dropDown.show()
     }
 
 }
