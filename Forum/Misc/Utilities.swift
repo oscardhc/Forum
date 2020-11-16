@@ -90,3 +90,9 @@ class RandomGenerator {
     }
     
 }
+
+protocol DoubleTapEnabled {
+    
+    func hasTappedAgain()
+    
+}

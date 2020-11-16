@@ -20,7 +20,7 @@ extension UIRefreshControl {
     }
 }
 
-class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate {
+class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate, DoubleTapEnabled {
     
     enum Scene: String {
         case main = "Threads", my = "My Threads", trends = "Trends", messages = "Messages", floors = "Thread#", favour = "Favoured"
@@ -35,8 +35,9 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var bottomSpace: NSLayoutConstraint!
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet weak var textViewHeight: NSLayoutConstraint!
-    @IBOutlet weak var newThreadButton: UIBarButtonItem!
+    @IBOutlet weak var topCornerBtn: UIBarButtonItem!
     @IBOutlet weak var replyCountLabel: StateLabel!
+    @IBOutlet weak var newThreadBtn: UIButton!
     
     static func new(_ scene: Scene, _ args: Any...) -> MainVC {
         let vc = *"MainVC" as! MainVC
@@ -64,30 +65,32 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if tabBarController?.viewControllers?.count == 2 {
-            let nav = UINavigationController(rootViewController: MainVC.new(.trends))
-            nav.navigationBar.prefersLargeTitles = true
-            tabBarController?.viewControllers?.insert(nav, at: 1)
-            
-            tabBarController?.tabBar.items?[0].image = UIImage(systemName: "house")
-            tabBarController?.tabBar.items?[0].selectedImage = UIImage(systemName: "house.fill")
-            tabBarController?.tabBar.items?[0].title = "首页"
-            
-            tabBarController?.tabBar.items?[1].image = UIImage(systemName: "crown")
-            tabBarController?.tabBar.items?[1].selectedImage = UIImage(systemName: "crown.fill")
-            tabBarController?.tabBar.items?[1].title = "趋势"
-            
-            tabBarController?.tabBar.items?[2].image = UIImage(systemName: "person")
-            tabBarController?.tabBar.items?[2].selectedImage = UIImage(systemName: "person.fill")
-            tabBarController?.tabBar.items?[2].title = "我"
-        }
+//        if tabBarController?.viewControllers?.count == 2 {
+//            let nav = UINavigationController(rootViewController: MainVC.new(.trends))
+//            nav.navigationBar.prefersLargeTitles = true
+//            tabBarController?.viewControllers?.insert(nav, at: 1)
+//            
+//            tabBarController?.tabBar.items?[0].image = UIImage(systemName: "house")
+//            tabBarController?.tabBar.items?[0].selectedImage = UIImage(systemName: "house.fill")
+//            tabBarController?.tabBar.items?[0].title = "首页"
+//            
+//            tabBarController?.tabBar.items?[1].image = UIImage(systemName: "crown")
+//            tabBarController?.tabBar.items?[1].selectedImage = UIImage(systemName: "crown.fill")
+//            tabBarController?.tabBar.items?[1].title = "趋势"
+//            
+//            tabBarController?.tabBar.items?[2].image = UIImage(systemName: "person")
+//            tabBarController?.tabBar.items?[2].selectedImage = UIImage(systemName: "person.fill")
+//            tabBarController?.tabBar.items?[2].title = "我"
+//        }
         
         navigationItem.title = scene == .floors
             ? "#\((d as! Floor.Manager).thread.id)"
             : scene.rawValue
+//        navigationController?.navigationBar.isTranslucent = true
+//        navigationController?.navigationBar.setBackgroundImage(UIImage(), for: .default)
+        navigationController?.navigationBar.barTintColor = .systemBackground
+        navigationController?.navigationBar.shadowImage = UIImage()
         
-        
-//        navigationController?.navigationBar.prefersLargeTitles = true
         tableView.contentInsetAdjustmentBehavior = .always
         
         tableView.delegate = self
@@ -130,12 +133,13 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             tabBarController?.tabBar.isHidden = false
             bottomViewHeight.constant = 0
         }
-        if scene != .main {
-            newThreadButton.title = ""
+        topCornerBtn.title = ""
+        if scene == .main {
+            topCornerBtn.image = UIImage(systemName: "magnifyingglass")
         }
         if scene == .floors {
-            newThreadButton.image = UIImage(systemName: "star")
-            newThreadButton.isEnabled = false
+            topCornerBtn.image = UIImage(systemName: "star")
+            topCornerBtn.isEnabled = false
         }
     }
     
@@ -148,12 +152,16 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
+    func hasTappedAgain() {
+        print("tapped again!!")
+    }
+    
     // MARK: - Selector functions
     
     func updateFavour() {
         if scene == .floors {
-            newThreadButton.image = UIImage(systemName: (d as! Floor.Manager).thread.hasFavoured ? "star.fill" : "star")
-            newThreadButton.isEnabled = true
+            topCornerBtn.image = UIImage(systemName: (d as! Floor.Manager).thread.hasFavoured ? "star.fill" : "star")
+            topCornerBtn.isEnabled = true
         }
     }
     
@@ -197,6 +205,28 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                 }
             }
         }
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        func changeBar(hide: Bool) {
+            let bar = self.tabBarController?.tabBar
+            let offset = UIScreen.main.bounds.height - (hide ? 0 : bar!.frame.height)
+            if offset == bar?.frame.origin.y { return }
+            UIView.animate(withDuration: 0.5) {
+                bar?.frame.origin.y = offset
+            }
+        }
+        
+        if scrollView.panGestureRecognizer.translation(in: scrollView).y < 0{
+            //scrolling down
+            changeBar(hide: true)
+        }
+        else{
+            //scrolling up
+            changeBar(hide: false)
+        }
+        
     }
     
     var floor: String = "0" {
@@ -265,6 +295,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
+    @IBAction func newThread(_ sender: Any) {
+        self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
+    }
+    
     @IBAction func barBtnClicked(_ sender: Any) {
         if scene == .main {
             self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
@@ -307,9 +341,23 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let width = tableView.frame.width
-        let view = UIView(frame: CGRect(x: 0, y: 0, width: width, height: headerHeight))
+        let baseView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: headerHeight))
+        baseView.backgroundColor = .systemBackground
+        
+        let view = UIView(frame: CGRect(x: 0, y: 5, width: width, height: headerHeight - 5))
+        view.backgroundColor = .systemBackground
+        view.layer.shadowColor = UIColor.black.cgColor
+        view.layer.shadowOffset = CGSize(width: 0, height: 10);
+        view.layer.shadowOpacity = 0.03
+        baseView.addSubview(view)
+        
+        // hide top shaddow
+        let top = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 5))
+        top.backgroundColor = baseView.backgroundColor
+        baseView.addSubview(top)
+        baseView.clipsToBounds = false
+        
         if scene == .main {
-            view.backgroundColor = .systemBackground
             
             let lbl = UILabel(frame: CGRect(x: width/2, y: 0, width: width/4, height: headerHeight))
             lbl.text = "板块："
@@ -333,7 +381,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             
             view.addSubview(btn)
         }
-        return view
+        return baseView
     }
     
     @objc func chooseBlock(_ sender: Any) {

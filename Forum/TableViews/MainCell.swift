@@ -165,7 +165,7 @@ class MainCell: UITableViewCell {
         idHeight.constant = cons
         headWidth.constant = cons
         headLabel.text = String(ss.first!)
-        headLabel.layer.backgroundColor = UIColor.lightGray.cgColor
+        headLabel.layer.backgroundColor = UIColor.systemGray4.cgColor
         headLabel.layer.cornerRadius = cons / 2
         
         content = (isFirstFloor ? t.title : "", f.content)

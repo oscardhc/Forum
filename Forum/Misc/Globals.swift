@@ -62,7 +62,7 @@ extension String {
 
 extension UIView {
     func applyCardStyle() {
-        self.backgroundColor = .white
+        self.backgroundColor = .systemBackground
         self.layer.cornerRadius = 7
         self.layer.masksToBounds = false
         self.layer.shadowColor = UIColor.black.cgColor

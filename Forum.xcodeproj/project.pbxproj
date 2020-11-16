@@ -30,6 +30,7 @@
 		55AA469C2516750100AAF708 /* MainVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA469B2516750100AAF708 /* MainVC.swift */; };
 		55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46A5251799B000AAF708 /* DataTypes.swift */; };
 		55D748F7253EC35E00F44EF8 /* NewThreadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D748F6253EC35E00F44EF8 /* NewThreadVC.swift */; };
+		55DB189A256259C800FA8041 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DB1899256259C800FA8041 /* TabBarController.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -79,6 +80,7 @@
 		55AA469B2516750100AAF708 /* MainVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVC.swift; sourceTree = "<group>"; };
 		55AA46A5251799B000AAF708 /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
 		55D748F6253EC35E00F44EF8 /* NewThreadVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewThreadVC.swift; sourceTree = "<group>"; };
+		55DB1899256259C800FA8041 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		90429E9417EA95DFFB87AB0F /* Pods-Forum.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Forum.debug.xcconfig"; path = "Target Support Files/Pods-Forum/Pods-Forum.debug.xcconfig"; sourceTree = "<group>"; };
 		DEC1889DC33D6E5A3F703951 /* Pods-Forum.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Forum.release.xcconfig"; path = "Target Support Files/Pods-Forum/Pods-Forum.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -121,6 +123,7 @@
 		55370A1F253DF111008FB742 /* TableViews */ = {
 			isa = PBXGroup;
 			children = (
+				55DB1899256259C800FA8041 /* TabBarController.swift */,
 				55AA469B2516750100AAF708 /* MainVC.swift */,
 				55557CDC25232912002F17AC /* MainCell.swift */,
 				55557CE125232966002F17AC /* MainCell.xib */,
@@ -399,6 +402,7 @@
 				55AA469C2516750100AAF708 /* MainVC.swift in Sources */,
 				55557CF025237F12002F17AC /* Network.swift in Sources */,
 				559E64382557099800D33B0B /* GridView.swift in Sources */,
+				55DB189A256259C800FA8041 /* TabBarController.swift in Sources */,
 				55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */,
 				55AA465B2516739A00AAF708 /* AppDelegate.swift in Sources */,
 				55AA465D2516739A00AAF708 /* SceneDelegate.swift in Sources */,
@@ -586,7 +590,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = AEF5CS25ZL;
 				INFOPLIST_FILE = Forum/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -608,7 +612,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 3;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = AEF5CS25ZL;
 				INFOPLIST_FILE = Forum/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
