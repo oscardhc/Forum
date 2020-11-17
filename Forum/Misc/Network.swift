@@ -149,7 +149,7 @@ class Network {
         getData(op_code: "8_4", pa_1: threadID, done: {_ in true}) ?? false
     }
     
-    static func newThread(title: String, inBlock: Thread.Category, content: String, anonymousType: NameGenerator.Theme, seed: Int) -> Bool {
+    static func newThread(title: String, inBlock: Thread.Category, content: String, anonymousType: NameTheme, seed: Int) -> Bool {
         getData(op_code: "3", pa_1: title, pa_2: String(Thread.Category.allCases.firstIndex(of: inBlock)!), pa_3: content, pa_4: anonymousType.rawValue, pa_5: String(seed), done: {_ in true}) ?? false
     }
     

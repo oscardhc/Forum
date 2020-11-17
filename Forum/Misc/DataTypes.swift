@@ -56,7 +56,7 @@ struct Thread: DATA {
     var nLiked = 0, nRead = 0, nCommented = 0
     var hasLiked = false, hasFavoured = false
     var postTime = Date(), lastUpdateTime = Date()
-    var name: NameGenerator, color: ColorGenerator
+    var name: NameG, color: ColorG
     
     static var cnt = 1
     
@@ -70,10 +70,10 @@ struct Thread: DATA {
         nLiked = thread["Like"] as! Int
         title = thread["Title"] as! String
         
-        name = NameGenerator(
-            theme: NameGenerator.Theme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
+        name = NameG(
+            theme: NameTheme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
             seed: thread["RandomSeed"] as! Int)
-        color = ColorGenerator(Int(id)!)
+        color = ColorG(theme: .cold, seed: Int(id)!)
         
         lastUpdateTime = Util.stringToDate(thread["LastUpdateTime"] as! String)
         postTime = Util.stringToDate(thread["PostTime"] as! String)

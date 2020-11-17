@@ -64,8 +64,6 @@ class MainCell: UITableViewCell {
                         withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
                 for: .normal
             )
-//            likedBtn.tintColor = liked ? .systemBlue : .black
-//            likedBtn.setTitleColor(liked ? .systemBlue : .black, for: .normal)
         }
     }
     
@@ -83,6 +81,7 @@ class MainCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
+        mainView.layer.backgroundColor = UIColor.systemGray6.cgColor
     }
     
     @IBAction func like(_ sender: Any) {
@@ -169,7 +168,6 @@ class MainCell: UITableViewCell {
         idHeight.constant = cons
         headWidth.constant = cons
         headLabel.text = String(ss.first!)
-//        headLabel.layer.backgroundColor = UIColor.systemGray4.cgColor
         headLabel.layer.backgroundColor = color.cgColor
         headLabel.layer.cornerRadius = cons / 2
         

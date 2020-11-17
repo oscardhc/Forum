@@ -31,23 +31,19 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         dismiss(animated: true)
     }
     
-    var blockDropDown: DropDown = ({
-        let d = DropDown()
-        d.dataSource = Thread.Category.allCases.dropFirst().map {
+    var blockDropDown = Init(DropDown()) {
+        $0.dataSource = Thread.Category.allCases.dropFirst().map {
             $0.rawValue
         }
-        d.backgroundColor = .systemBackground
-        return d
-    })()
+        $0.backgroundColor = .systemBackground
+    }
     
-    var typeDropDown: DropDown = ({
-        let d = DropDown()
-        d.dataSource = NameGenerator.Theme.allCases.map {
+    var typeDropDown = Init(DropDown()) {
+        $0.dataSource = NameTheme.allCases.map {
             $0.rawValue
         }
-        d.backgroundColor = .systemBackground
-        return d
-    })()
+        $0.backgroundColor = .systemBackground
+    }
 
     
     override func viewDidLoad() {
@@ -117,29 +113,23 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         self.view.endEditing(false)
     }
     
-    var gridView: GridBtnView!
-    
     @IBAction func postBtnClicked(_ sender: Any) {
         if let postTitle = titleTextField.text, postTitle != "", let postContent = contentTextField.text, postContent != "" {
             if titleCountLabel.ok && contentCountLabel.ok {
                 if let block = Thread.Category(rawValue: blockDropDown.selectedItem ?? "") {
-                    if Network.newThread(title: postTitle, inBlock: block, content: postContent, anonymousType: NameGenerator.Theme(rawValue: typeDropDown.selectedItem!)!, seed: checkBtn.checked ? Int.random(in: 1..<1000000) : 0) {
-                        print("post thread success!")
-                        fatherVC.refresh()
-                        dismiss(animated: true)
-                    } else {
-                        print("...new thread post failed")
-                    }
-                } else {
-                    G.alert.message = "请选择一个分区"
-                }
-            } else {
-                G.alert.message = "请输入合适长度的内容"
-            }
-        } else {
-            G.alert.message = "请输入合适长度的内容"
-        }
-        self.present(G.alert, animated: true, completion: nil)
+                    if Network.newThread(
+                        title: postTitle, inBlock: block, content: postContent,
+                        anonymousType: NameTheme(rawValue: typeDropDown.selectedItem!)!,
+                        seed: checkBtn.checked ? Int.random(in: 1..<1000000) : 0
+                    ) {
+                        showAlert("发帖成功", style: .success) {
+                            self.fatherVC.refresh()
+                            self.dismiss(animated: true)
+                        }
+                    } else { showAlert("发帖失败", style: .failure) }
+                } else { showAlert("请选择一个分区", style: .warning) }
+            } else { showAlert("请输入合适长度的内容", style: .warning) }
+        } else { showAlert("请输入合适长度的内容", style: .warning) }
     }
     
     override func viewDidLayoutSubviews() {

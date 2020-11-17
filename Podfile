@@ -7,4 +7,5 @@ target 'Forum' do
     pod 'MJRefresh'
     pod 'UITextView+Placeholder'
     pod 'DropDown'
+    pod 'MBProgressHUD', '~> 1.2.0'
 end

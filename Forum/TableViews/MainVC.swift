@@ -39,13 +39,11 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var replyCountLabel: StateLabel!
     @IBOutlet weak var newThreadBtn: UIButton!
     
-    lazy var searchControl: UIAlertController = {
-        let a = UIAlertController(title: "请输入搜索内容", message: "", preferredStyle: .alert)
-        a.addTextField()
-        a.addAction(.init(title: "取消", style: .cancel, handler: nil))
-        a.addAction(.init(title: "确认", style: .default, handler: search))
-        return a
-    }()
+    lazy var searchControl = Init(UIAlertController(title: "请输入搜索内容", message: "", preferredStyle: .alert)) {
+        $0.addTextField()
+        $0.addAction(.init(title: "取消", style: .cancel, handler: nil))
+        $0.addAction(.init(title: "确认", style: .default, handler: search))
+    }
     
     func search(_ alert: UIAlertAction) {
         (d as! Thread.Manager).search(text: searchControl.textFields?[0].text)
@@ -257,36 +255,42 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     @objc func keyboardWillShow(_ sender: Notification) {
-        let height = (sender.userInfo![UIResponder.keyboardFrameEndUserInfoKey]! as! NSValue).cgRectValue.height
-        var time: TimeInterval = 0
-        (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
-        bottomViewHeight.constant = bottomExpandHeight
-        bottomSpace.constant = height
-        UIView.animate(withDuration: time) {
-            self.view.layoutIfNeeded()
+        if scene == .floors {
+            let height = (sender.userInfo![UIResponder.keyboardFrameEndUserInfoKey]! as! NSValue).cgRectValue.height
+            var time: TimeInterval = 0
+            (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
+            bottomViewHeight.constant = bottomExpandHeight
+            bottomSpace.constant = height
+            UIView.animate(withDuration: time) {
+                self.view.layoutIfNeeded()
+            }
         }
     }
     
     @objc func keyboardWillHide(_ sender: Notification) {
-        var time: TimeInterval = 0
-        (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
-        bottomViewHeight.constant = bottomInitialHeight
-        bottomSpace.constant = 0
-        UIView.animate(withDuration: time) {
-            self.view.layoutIfNeeded()
+        if scene == .floors {
+            var time: TimeInterval = 0
+            (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
+            bottomViewHeight.constant = bottomInitialHeight
+            bottomSpace.constant = 0
+            UIView.animate(withDuration: time) {
+                self.view.layoutIfNeeded()
+            }
         }
     }
     
     func textViewDidChange(_ textView: UITextView) {
-        if textView.text.count > 0 {
-            let height = max(min(textView.contentSize.height, 100), 36)
-            textViewHeight.constant = height
-            bottomViewHeight.constant = height + 16 + 10
-            UIView.animate(withDuration: 0.3) {
-                self.view.layoutIfNeeded()
+        if scene == .floors {
+            if textView.text.count > 0 {
+                let height = max(min(textView.contentSize.height, 100), 36)
+                textViewHeight.constant = height
+                bottomViewHeight.constant = height + 16 + 10
+                UIView.animate(withDuration: 0.3) {
+                    self.view.layoutIfNeeded()
+                }
             }
+            updateCountingLabel(label: replyCountLabel, text: textView.text, lineLimit: 20, charLimit: 817)
         }
-        updateCountingLabel(label: replyCountLabel, text: textView.text, lineLimit: 20, charLimit: 817)
     }
     
     @objc func viewTapped(_ sender: Any) {
@@ -301,11 +305,12 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             if Network.newReply(for: threadID, floor: floor, content: content) {
                 textView.text = ""
                 self.view.endEditing(false)
-                refresh()
+                showAlert("评论成功", style: .success) {
+                    self.refresh()
+                }
             }
         } else {
-            G.alert.message = "请输入合适长度的内容"
-            self.present(G.alert, animated: true, completion: nil)
+            showAlert("请输入合适长度的内容", style: .warning)
         }
     }
     
