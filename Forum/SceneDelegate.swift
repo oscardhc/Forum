@@ -20,6 +20,8 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         
         if !Network.verifyToken() {
             window?.rootViewController = *"LoginVC"
+        } else {
+            window?.rootViewController = *"InitTabVC"
         }
         
     }

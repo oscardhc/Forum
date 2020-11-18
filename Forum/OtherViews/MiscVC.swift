@@ -14,8 +14,6 @@ class MiscVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     lazy var content: [[(title: String, fun: () -> Void)]] = G.hasLoggedIn
         ? [
             [
-                ("头像", {}),
-                ("账号", {}),
                 ("通知", {self >> MainVC.new(.messages)}),
                 ("收藏", {self >> MainVC.new(.favour)})
             ],
@@ -33,10 +31,6 @@ class MiscVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
             ]
         ]
     
-    func isIconIndex(_ indexPath: IndexPath) -> Bool {
-        content[indexPath.section][indexPath.row].title == "头像"
-    }
-    
     func numberOfSections(in tableView: UITableView) -> Int {
         content.count
     }
@@ -52,16 +46,11 @@ class MiscVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "MiscCell", for: indexPath) as! MiscTableViewCell
         cell.textLabel?.text = content[indexPath.section][indexPath.row].title
-        if isIconIndex(indexPath) {
-            cell.icon.image = UIImage(named: "avator")
-        }
         return cell
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        isIconIndex(indexPath)
-            ? 100
-            : 50
+        50
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -99,5 +88,18 @@ class MiscVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
      // Pass the selected object to the new view controller.
      }
      */
+    
+}
+
+class TokenVC: UIViewController {
+    
+    @IBOutlet weak var tokenLabel: UILabel!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        tokenLabel.text = G.token
+        
+    }
     
 }

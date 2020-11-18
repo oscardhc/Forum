@@ -109,6 +109,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         textViewDidChange(textView)
         floor = "0"
         
+        newThreadBtn.layer.shadowColor = UIColor.black.cgColor
+        newThreadBtn.layer.shadowOffset = CGSize(width: 0, height: 2);
+        newThreadBtn.layer.shadowOpacity = 0.3
+        
         footer.setTitle("正在加载...", for: .idle)
         tableView.isScrollEnabled = false
         refresh()
@@ -303,6 +307,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         if let content = textView.text, content != "", replyCountLabel.ok {
             let threadID = (d as! Floor.Manager).thread.id
             if Network.newReply(for: threadID, floor: floor, content: content) {
+                textView.text = " "
+                self.textViewDidChange(textView)
                 textView.text = ""
                 self.view.endEditing(false)
                 showAlert("评论成功", style: .success) {

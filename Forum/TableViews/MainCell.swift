@@ -37,6 +37,7 @@ class MainCell: UITableViewCell {
     @IBOutlet weak var titleDist: NSLayoutConstraint!
     @IBOutlet weak var commentDist: NSLayoutConstraint!
     @IBOutlet weak var idHeight: NSLayoutConstraint!
+    @IBOutlet weak var headImageView: UIImageView!
     
     var content = (title: "", content: "") {
         didSet {
@@ -119,6 +120,8 @@ class MainCell: UITableViewCell {
         parentVC.tryToReplyTo(floor: floor.id)
     }
     
+    static let headColorGenerator = ColorG(theme: .cold, seed: 0)
+    
     // MARK: - Thread
     
     func setAs(thread t: Thread) -> Self {
@@ -130,12 +133,15 @@ class MainCell: UITableViewCell {
         likedBtn.setTitle("\(t.nLiked)", for: .normal)
         readBtn.setTitle("\(t.nRead)", for: .normal)
         commentBtn.setTitle("\(t.nCommented)", for: .normal)
-        cornerLabel.text = Util.dateToDeltaString(t.postTime)
+        cornerLabel.text = Util.dateToDeltaString(t.lastUpdateTime)
+        headImageView.backgroundColor = Self.headColorGenerator[Int(t.id)!]
+        headImageView.image = UIImage(named: "hat20")
+        headImageView.layer.cornerRadius = headImageView.frame.height / 2
         
         likedBtn.isEnabled = false
         commentBtn.isEnabled = false
         readBtn.isEnabled = false
-        headDistance.constant = -headWidth.constant
+//        headDistance.constant = -headWidth.constant
         
         return self
     }
