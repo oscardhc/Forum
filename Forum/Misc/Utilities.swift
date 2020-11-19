@@ -8,6 +8,8 @@
 import Foundation
 import UIKit
 import MBProgressHUD
+import Material
+import DropDown
 
 class Util {
     
@@ -37,6 +39,22 @@ class Util {
         formatter.date(from: string)!
     }
     
+    static func halt() {
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
+            UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                exit(0)
+            }
+        }
+    }
+    
+}
+
+class DarkSupportTextField: TextField {
+    override func prepare() {
+        super.prepare()
+        textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
+    }
 }
 
 public func Init<Type>(_ value: Type, _ block: (_ object: Type) -> Void) -> Type

@@ -31,18 +31,20 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         dismiss(animated: true)
     }
     
-    var blockDropDown = Init(DropDown()) {
+    lazy var blockDropDown = Init(DropDown()) {
         $0.dataSource = Thread.Category.allCases.dropFirst().map {
             $0.rawValue
         }
         $0.backgroundColor = .systemBackground
+        $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
     }
     
-    var typeDropDown = Init(DropDown()) {
+    lazy var typeDropDown = Init(DropDown()) {
         $0.dataSource = NameTheme.allCases.map {
             $0.rawValue
         }
         $0.backgroundColor = .systemBackground
+        $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
     }
 
     

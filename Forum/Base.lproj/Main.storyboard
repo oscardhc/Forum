@@ -125,7 +125,7 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="SJTU Email Addr" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="br5-ob-oiV" customClass="TextField" customModule="Material">
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="SJTU Email Addr" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="br5-ob-oiV" customClass="DarkSupportTextField" customModule="Forum" customModuleProvider="target">
                                 <rect key="frame" x="16" y="170" width="343" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="34" id="Wzd-Rn-1bV"/>
@@ -134,14 +134,14 @@
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" textContentType="email"/>
                             </textField>
-                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Verification Code" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="uvG-y6-G03" customClass="TextField" customModule="Material">
+                            <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Verification Code" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="uvG-y6-G03" customClass="DarkSupportTextField" customModule="Forum" customModuleProvider="target">
                                 <rect key="frame" x="16" y="240" width="164" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="34" id="9Q5-1C-PfJ"/>
                                     <constraint firstAttribute="width" constant="164" id="EaZ-ss-xFl"/>
                                 </constraints>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
-                                <textInputTraits key="textInputTraits"/>
+                                <textInputTraits key="textInputTraits" keyboardType="numberPad"/>
                             </textField>
                             <button opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="Cjm-Hu-UNr" customClass="Button" customModule="Material">
                                 <rect key="frame" x="188" y="242" width="171" height="30"/>
@@ -155,7 +155,7 @@
                                 </connections>
                             </button>
                             <navigationBar contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="DH8-6J-T4P">
-                                <rect key="frame" x="0.0" y="0.0" width="322" height="44"/>
+                                <rect key="frame" x="0.0" y="0.0" width="375" height="44"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="44" id="5XK-6A-fLK"/>
                                 </constraints>
@@ -394,6 +394,45 @@
                 <placeholder placeholderIdentifier="IBFirstResponder" id="uGx-NH-G0r" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
             <point key="canvasLocation" x="3260.8695652173915" y="423.88392857142856"/>
+        </scene>
+        <!--SettingVC-->
+        <scene sceneID="7Bd-iR-nxA">
+            <objects>
+                <viewController storyboardIdentifier="SettingVC" id="eKs-e0-x4i" customClass="SettingVC" customModule="Forum" customModuleProvider="target" sceneMemberID="viewController">
+                    <view key="view" contentMode="scaleToFill" id="Gtt-PP-IpN">
+                        <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <subviews>
+                            <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="slz-QT-vzU">
+                                <rect key="frame" x="0.0" y="44" width="375" height="734"/>
+                                <prototypes>
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SettingCell" id="1bf-Ll-wDj">
+                                        <rect key="frame" x="16" y="55.333332061767578" width="343" height="43.666667938232422"/>
+                                        <autoresizingMask key="autoresizingMask"/>
+                                        <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="1bf-Ll-wDj" id="jCf-92-9wl">
+                                            <rect key="frame" x="0.0" y="0.0" width="343" height="43.666667938232422"/>
+                                            <autoresizingMask key="autoresizingMask"/>
+                                        </tableViewCellContentView>
+                                    </tableViewCell>
+                                </prototypes>
+                            </tableView>
+                        </subviews>
+                        <viewLayoutGuide key="safeArea" id="uoE-7b-rDu"/>
+                        <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                        <constraints>
+                            <constraint firstItem="slz-QT-vzU" firstAttribute="leading" secondItem="uoE-7b-rDu" secondAttribute="leading" id="08v-Dp-Tig"/>
+                            <constraint firstItem="slz-QT-vzU" firstAttribute="top" secondItem="uoE-7b-rDu" secondAttribute="top" id="3y1-xU-Nh5"/>
+                            <constraint firstItem="slz-QT-vzU" firstAttribute="trailing" secondItem="uoE-7b-rDu" secondAttribute="trailing" id="7q8-91-HjX"/>
+                            <constraint firstItem="slz-QT-vzU" firstAttribute="bottom" secondItem="uoE-7b-rDu" secondAttribute="bottom" id="ESc-5F-nRx"/>
+                        </constraints>
+                    </view>
+                    <connections>
+                        <outlet property="tableView" destination="slz-QT-vzU" id="AgR-HZ-Zzs"/>
+                    </connections>
+                </viewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="eLo-mL-56f" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="4072.8000000000002" y="423.39901477832512"/>
         </scene>
         <!--Navigation Controller-->
         <scene sceneID="Nvd-Wc-E1l">

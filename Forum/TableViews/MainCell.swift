@@ -82,7 +82,7 @@ class MainCell: UITableViewCell {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
-        mainView.layer.backgroundColor = UIColor.systemGray6.cgColor
+//        mainView.layer.backgroundColor = UIColor.systemGray6.cgColor
     }
     
     @IBAction func like(_ sender: Any) {

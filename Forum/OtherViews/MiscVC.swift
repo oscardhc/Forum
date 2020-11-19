@@ -7,29 +7,15 @@
 
 import UIKit
 
-class MiscVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
+protocol ProvideContent {
+    var content: [[(title: String, fun: () -> Void)]] { get }
+}
+
+class BaseTableVC: UIViewController, UITableViewDataSource, UITableViewDelegate, ProvideContent {
     
-    @IBOutlet weak var tableView: UITableView!
-    
-    lazy var content: [[(title: String, fun: () -> Void)]] = G.hasLoggedIn
-        ? [
-            [
-                ("通知", {self >> MainVC.new(.messages)}),
-                ("收藏", {self >> MainVC.new(.favour)})
-            ],
-            [
-                ("我的帖子", {self >> MainVC.new(.my)})
-            ],
-            [
-                ("设置", {}),
-                ("关于", {self << (*"AboutVC" as! AboutVC).withFather(self)})
-            ]
-        ]
-        : [
-            [
-                ("请登录", {self << *"LoginVC"})
-            ]
-        ]
+    var _tableView: UITableView! { nil }
+    var content: [[(title: String, fun: () -> Void)]] { [] }
+    var cellName: String { "MiscCell" }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         content.count
@@ -44,7 +30,7 @@ class MiscVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "MiscCell", for: indexPath) as! MiscTableViewCell
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellName, for: indexPath)
         cell.textLabel?.text = content[indexPath.section][indexPath.row].title
         return cell
     }
@@ -61,16 +47,15 @@ class MiscVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         super.viewDidLoad()
         
         // Do any additional setup after loading the view.
-        tableView.delegate = self
-        tableView.dataSource = self
-        tableView.tableFooterView = UIView(frame: CGRect.zero)
-        tableView.contentInsetAdjustmentBehavior = .always
-        
+        _tableView.delegate = self
+        _tableView.dataSource = self
+        _tableView.tableFooterView = UIView(frame: CGRect.zero)
+        _tableView.contentInsetAdjustmentBehavior = .always
     }
     
     func deselect() {
-        if let selectionIndexPath = self.tableView.indexPathForSelectedRow {
-            self.tableView.deselectRow(at: selectionIndexPath, animated: true)
+        if let selectionIndexPath = self._tableView.indexPathForSelectedRow {
+            self._tableView.deselectRow(at: selectionIndexPath, animated: true)
         }
     }
     
@@ -79,15 +64,48 @@ class MiscVC: UIViewController, UITableViewDataSource, UITableViewDelegate {
         deselect()
     }
     
-    /*
-     // MARK: - Navigation
-     
-     // In a storyboard-based application, you will often want to do a little preparation before navigation
-     override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-     // Get the new view controller using segue.destination.
-     // Pass the selected object to the new view controller.
-     }
-     */
+}
+
+class MiscVC: BaseTableVC {
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+    lazy var misc_content: [[(title: String, fun: () -> Void)]] = [
+        [
+            ("通知", {self >> MainVC.new(.messages)}),
+            ("收藏", {self >> MainVC.new(.favour)})
+        ],
+        [
+            ("我的帖子", {self >> MainVC.new(.my)})
+        ],
+        [
+            ("设置", {self >> *"SettingVC"}),
+            ("关于", {self << (*"AboutVC" as! AboutVC).withFather(self)})
+        ]
+    ]
+    override var content: [[(title: String, fun: () -> Void)]] { misc_content }
+    override var cellName: String { "MiscCell" }
+    override var _tableView: UITableView! { tableView }
+    
+}
+
+class SettingVC: BaseTableVC {
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+    lazy var setting_content: [[(title: String, fun: () -> Void)]] = [
+        [
+            ("退出登录", {
+                G.token = ""
+                self.showAlert("成功退出登录，App即将关闭", style: .success) {
+                    Util.halt()
+                }
+            })
+        ]
+    ]
+    override var content: [[(title: String, fun: () -> Void)]] { setting_content }
+    override var cellName: String { "SettingCell" }
+    override var _tableView: UITableView! { tableView }
     
 }
 

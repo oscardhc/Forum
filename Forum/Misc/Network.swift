@@ -33,10 +33,12 @@ class Network {
                 return nil
             }
         }
-        for _ in 0..<3 {
+        for i in 1...10 {
             if let res = singleConnect() {
+                print("connect success with in \(i) time(s)")
                 return res
             }
+            usleep(10000)
         }
         return nil
     }
@@ -51,12 +53,7 @@ class Network {
         ]) {
             if needChecking, let x = result["login_flag"] as? String, x != "1" {
                 print("not Authorized", result)
-                DispatchQueue.main.asyncAfter(deadline: .now() + 1.0) {
-                    UIApplication.shared.perform(#selector(NSXPCConnection.suspend))
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
-                        exit(0)
-                    }
-                }
+                Util.halt()
                 return nil
             } else {
                 return done(result)

@@ -174,7 +174,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         DispatchQueue.global().async {
             usleep(100000)
             let count = self.d.getInitialContent()
-            print("end refreshing")
+//            print("end refreshing")
             
             DispatchQueue.main.async {
                 self.updateFavour()
@@ -355,14 +355,13 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         headerHeight
     }
     
-    var dropDown: DropDown = ({
-        let d = DropDown()
-        d.dataSource = Thread.Category.allCases.dropLast().map {
+    lazy var dropDown = Init(DropDown()) {
+        $0.dataSource = Thread.Category.allCases.dropLast().map {
             $0.rawValue
         }
-        d.backgroundColor = .systemBackground
-        return d
-    })()
+        $0.backgroundColor = .systemBackground
+        $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
+    }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
         let width = tableView.frame.width
