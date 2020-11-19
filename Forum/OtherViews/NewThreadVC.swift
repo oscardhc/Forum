@@ -36,14 +36,16 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
             $0.rawValue
         }
         $0.backgroundColor = .systemBackground
+        $0.cellHeight = 40
         $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
     }
     
     lazy var typeDropDown = Init(DropDown()) {
         $0.dataSource = NameTheme.allCases.map {
-            $0.rawValue
+            $0.displayText
         }
         $0.backgroundColor = .systemBackground
+        $0.cellHeight = 40
         $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
     }
 
@@ -121,7 +123,7 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
                 if let block = Thread.Category(rawValue: blockDropDown.selectedItem ?? "") {
                     if Network.newThread(
                         title: postTitle, inBlock: block, content: postContent,
-                        anonymousType: NameTheme(rawValue: typeDropDown.selectedItem!)!,
+                        anonymousType: NameTheme.allCases.first(where: {$0.rawValue == typeDropDown.selectedItem!})! ,
                         seed: checkBtn.checked ? Int.random(in: 1..<1000000) : 0
                     ) {
                         showAlert("发帖成功", style: .success) {

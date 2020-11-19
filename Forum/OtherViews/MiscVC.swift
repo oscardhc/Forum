@@ -15,7 +15,7 @@ class BaseTableVC: UIViewController, UITableViewDataSource, UITableViewDelegate,
     
     var _tableView: UITableView! { nil }
     var content: [[(title: String, fun: () -> Void)]] { [] }
-    var cellName: String { "MiscCell" }
+    var cellName: String { "" }
     
     func numberOfSections(in tableView: UITableView) -> Int {
         content.count
@@ -66,7 +66,7 @@ class BaseTableVC: UIViewController, UITableViewDataSource, UITableViewDelegate,
     
 }
 
-class MiscVC: BaseTableVC {
+class MiscVC: BaseTableVC, UIPopoverPresentationControllerDelegate {
     
     @IBOutlet weak var tableView: UITableView!
     
@@ -86,6 +86,10 @@ class MiscVC: BaseTableVC {
     override var content: [[(title: String, fun: () -> Void)]] { misc_content }
     override var cellName: String { "MiscCell" }
     override var _tableView: UITableView! { tableView }
+    
+    func adaptivePresentationStyle(for controller: UIPresentationController) -> UIModalPresentationStyle {
+        .none
+    }
     
 }
 

@@ -562,13 +562,24 @@
                         </constraints>
                     </view>
                     <navigationItem key="navigationItem" id="9cw-c9-bas">
-                        <barButtonItem key="rightBarButtonItem" title="Btn" id="rAJ-EU-CCN">
-                            <connections>
-                                <action selector="barBtnClicked:" destination="BH7-QK-pMN" id="eUW-RD-khN"/>
-                            </connections>
-                        </barButtonItem>
+                        <rightBarButtonItems>
+                            <barButtonItem image="star" catalog="system" id="rAJ-EU-CCN">
+                                <inset key="imageInsets" minX="-8" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <connections>
+                                    <action selector="barBtnClicked:" destination="BH7-QK-pMN" id="eUW-RD-khN"/>
+                                </connections>
+                            </barButtonItem>
+                            <barButtonItem title="Item" id="Lc3-LY-er3">
+                                <inset key="imageInsets" minX="30" minY="0.0" maxX="0.0" maxY="0.0"/>
+                                <inset key="largeContentSizeImageInsets" minX="0.0" minY="0.0" maxX="-1" maxY="0.0"/>
+                                <connections>
+                                    <action selector="secondBarBtnClicked:" destination="BH7-QK-pMN" id="IvD-g1-9ji"/>
+                                </connections>
+                            </barButtonItem>
+                        </rightBarButtonItems>
                     </navigationItem>
                     <connections>
+                        <outlet property="barSecondBtn" destination="Lc3-LY-er3" id="0hF-59-U05"/>
                         <outlet property="bottomSpace" destination="Nq5-Nn-XjH" id="0ba-pS-kjs"/>
                         <outlet property="bottomViewHeight" destination="zTw-Jh-o87" id="k52-px-2Cp"/>
                         <outlet property="newThreadBtn" destination="QOa-Cx-esn" id="3CU-Wf-zRd"/>
@@ -632,6 +643,7 @@
     <resources>
         <image name="paperplane" catalog="system" width="128" height="118"/>
         <image name="plus.circle.fill" catalog="system" width="128" height="121"/>
+        <image name="star" catalog="system" width="128" height="116"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>

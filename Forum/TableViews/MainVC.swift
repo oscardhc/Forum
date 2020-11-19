@@ -23,7 +23,7 @@ extension UIRefreshControl {
 class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate, DoubleTappable {
     
     enum Scene: String {
-        case main = "Threads", my = "My Threads", trends = "Trends", messages = "Messages", floors = "Thread#", favour = "Favoured"
+        case main = "首页", my = "My Threads", trends = "趋势", messages = "Messages", floors = "Thread#", favour = "我的收藏"
     }
     
     // This is the default value for MainThread(the enter interface), any other types must overwrite this two properties
@@ -38,6 +38,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var topCornerBtn: UIBarButtonItem!
     @IBOutlet weak var replyCountLabel: StateLabel!
     @IBOutlet weak var newThreadBtn: UIButton!
+    @IBOutlet weak var barSecondBtn: UIBarButtonItem!
     
     lazy var searchControl = Init(UIAlertController(title: "请输入搜索内容", message: "", preferredStyle: .alert)) {
         $0.addTextField()
@@ -77,7 +78,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         super.viewDidLoad()
         
         navigationItem.title = scene == .floors
-            ? "#\((d as! Floor.Manager).thread.id)"
+            ? "\((d as! Floor.Manager).thread.title)"
             : scene.rawValue
         
         navigationController?.navigationBar.barTintColor = .systemBackground
@@ -109,9 +110,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         textViewDidChange(textView)
         floor = "0"
         
-        newThreadBtn.layer.shadowColor = UIColor.black.cgColor
-        newThreadBtn.layer.shadowOffset = CGSize(width: 0, height: 2);
-        newThreadBtn.layer.shadowOpacity = 0.3
+        newThreadBtn.applyShadow(opaque: false, offset: 2, opacity: 0.3)
         
         footer.setTitle("正在加载...", for: .idle)
         tableView.isScrollEnabled = false
@@ -126,21 +125,28 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         if scene == .floors {
             tabBarController?.tabBar.isHidden = true
             bottomViewHeight.constant = bottomInitialHeight
+            navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]
         } else {
             tabBarController?.tabBar.isHidden = false
             bottomViewHeight.constant = 0
+            navigationController?.navigationBar.largeTitleTextAttributes = nil
         }
         topCornerBtn.title = ""
+        barSecondBtn.title = ""
         if scene == .main {
             topCornerBtn.image = UIImage(systemName: "magnifyingglass")
             newThreadBtn.frame.origin = CGPoint(x: newThreadBtn.frame.minX, y: UIScreen.main.bounds.height - tabBarController!.tabBar.frame.height - 80)
+            navigationController?.navigationBar.layer.shadowOpacity = 0
         } else {
             newThreadBtn.isHidden = true
+            navigationController?.navigationBar.applyShadow()
         }
         if scene == .floors {
             topCornerBtn.image = UIImage(systemName: "star")
             topCornerBtn.isEnabled = false
+            barSecondBtn.image = UIImage(systemName: "eye")
         }
+//        print("...", topCornerBtn.wi)
     }
     
     var isDoubleTapping = false
@@ -341,6 +347,12 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
+    var secondViewEnabled = false
+    @IBAction func secondBarBtnClicked(_ sender: Any) {
+        secondViewEnabled = !secondViewEnabled
+        barSecondBtn.image = UIImage(systemName: secondViewEnabled ? "eye" : "eye.slash")
+    }
+    
     // MARK: - Table view data source
 
     func numberOfSections(in tableView: UITableView) -> Int {
@@ -348,7 +360,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     var headerHeight: CGFloat {
-        scene == .main ? 50 : 10
+        scene == .main ? 35 : 0
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -360,6 +372,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             $0.rawValue
         }
         $0.backgroundColor = .systemBackground
+        $0.cellHeight = 40
         $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
     }
     
@@ -367,12 +380,12 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         let width = tableView.frame.width
         let baseView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: headerHeight))
         baseView.backgroundColor = .systemBackground
+        if headerHeight == 0 {
+            return baseView
+        }
         
         let view = UIView(frame: CGRect(x: 0, y: 5, width: width, height: headerHeight - 5))
-        view.backgroundColor = .systemBackground
-        view.layer.shadowColor = UIColor.black.cgColor
-        view.layer.shadowOffset = CGSize(width: 0, height: 10);
-        view.layer.shadowOpacity = 0.03
+        view.applyShadow()
         baseView.addSubview(view)
         
         // hide top shaddow
@@ -404,6 +417,12 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             }
             
             view.addSubview(btn)
+        } else if scene == .floors {
+            let lbl = Init(UILabel(frame: .init(x: 8, y: 0, width: width/2, height: headerHeight))) {
+                $0.text = (d as! Floor.Manager).thread.title
+                $0.fontSize = 15
+            }
+            view.addSubview(lbl)
         }
         return baseView
     }

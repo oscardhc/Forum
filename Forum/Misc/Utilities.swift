@@ -136,7 +136,7 @@ enum ColorTheme: ProvideList {
                 red: CGFloat(res >> 16 & 255)  / 255,
                 green: CGFloat(res >> 8 & 255) / 255,
                 blue: CGFloat(res & 255) / 255,
-                alpha: 0.25
+                alpha: 0.5
             )
         }
     }
@@ -193,6 +193,14 @@ extension UIView {
         self.layer.shadowOpacity = 0.2
         self.layer.borderWidth = 0.5
         self.layer.borderColor = UIColor.systemBackground.cgColor
+    }
+    func applyShadow(opaque: Bool = true, offset: Double = 10, opacity: Float = 0.03) {
+        if opaque {
+            self.backgroundColor = .systemBackground
+        }
+        self.layer.shadowColor = UIColor.black.cgColor
+        self.layer.shadowOffset = CGSize(width: 0, height: offset);
+        self.layer.shadowOpacity = opacity
     }
 }
 

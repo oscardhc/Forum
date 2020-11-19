@@ -30,8 +30,6 @@ class MainCell: UITableViewCell {
     @IBOutlet weak var commentBtn: UIButton!
     @IBOutlet weak var readBtn: UIButton!
     @IBOutlet weak var cornerLabel: UILabel!
-    @IBOutlet weak var topLabel: UILabel!
-    @IBOutlet weak var topDist: NSLayoutConstraint!
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet weak var titleDist: NSLayoutConstraint!
     @IBOutlet weak var commentDist: NSLayoutConstraint!
@@ -41,18 +39,10 @@ class MainCell: UITableViewCell {
     
     var content = (title: "", content: "") {
         didSet {
-            if scene != .floor || content.title == "" {
-                topLabel.isHidden = true
-                topDist.constant = -topLabel.frame.height
-            } else {
-                topLabel.isHidden = false
-                topDist.constant = 8
-            }
             if scene != .thread {
                 titleLabel.isHidden = true
                 titleDist.constant = -titleLabel.frame.height
             }
-            topLabel.text = content.title
             titleLabel.text = content.title
 //            contentLabel.text = content.content
             mainTextView.text = content.content
@@ -130,8 +120,6 @@ class MainCell: UITableViewCell {
         parentVC.tryToReplyTo(floor: floor.id)
     }
     
-    static let headColorGenerator = ColorG(theme: .cold, seed: 0)
-    
     // MARK: - Thread
     
     func setAs(thread t: Thread) -> Self {
@@ -144,8 +132,8 @@ class MainCell: UITableViewCell {
         readBtn.setTitle("\(t.nRead)", for: .normal)
         commentBtn.setTitle("\(t.nCommented)", for: .normal)
         cornerLabel.text = Util.dateToDeltaString(t.lastUpdateTime)
-        headImageView.backgroundColor = Self.headColorGenerator[Int(t.id)!]
-        headImageView.image = UIImage(named: "hat20")
+        headImageView.backgroundColor = t.color[0]
+        headImageView.image = UIImage(named: "hat40")
         headImageView.layer.cornerRadius = headImageView.frame.height / 2
         
         likedBtn.isEnabled = false
