@@ -95,8 +95,11 @@ class SettingVC: BaseTableVC {
     
     lazy var setting_content: [[(title: String, fun: () -> Void)]] = [
         [
+            ("Network Stat", {self >> *"TokenVC"})
+        ],
+        [
             ("退出登录", {
-                G.token = ""
+                G.token.content = ""
                 self.showAlert("成功退出登录，App即将关闭", style: .success) {
                     Util.halt()
                 }
@@ -116,7 +119,15 @@ class TokenVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        tokenLabel.text = G.token
+        let d = G.networkStat.content
+        var s = "Failed: \(d[0])\n", sm = 0, cnt = 0
+        for i in 1...100 where d[i] != 0 {
+            s += "\(i): \(d[i]) \n"
+            sm += d[i] * i
+            cnt += d[i]
+        }
+        s += "Average: \(Double(sm) / Double(cnt))"
+        tokenLabel.text = s
         
     }
     

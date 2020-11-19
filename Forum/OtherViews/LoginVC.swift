@@ -49,7 +49,7 @@ class LoginVC: UIViewController {
             let (success, token) = Network.performLogin(with: sentEmail, verificationCode: code)
             if success {
                 showAlert("验证成功", style: .success) {
-                    G.token = token
+                    G.token.content = token
                     print("Success! token = \(token)")
                     if self.isBase {
                         let vc = *"InitTabVC"

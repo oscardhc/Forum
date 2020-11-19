@@ -1,11 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17506" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.XIB" version="3.0" toolsVersion="17156" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" useSafeAreas="YES" colorMatched="YES">
     <device id="retina5_9" orientation="portrait" appearance="light"/>
     <dependencies>
         <deployment identifier="iOS"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17505"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="17126"/>
         <capability name="Image references" minToolsVersion="12.0"/>
         <capability name="Named colors" minToolsVersion="9.0"/>
+        <capability name="System colors in document resources" minToolsVersion="11.0"/>
         <capability name="documents saved in the Xcode 8 format" minToolsVersion="8.0"/>
     </dependencies>
     <objects>
@@ -21,12 +22,6 @@
                     <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="8Hc-IY-1NO">
                         <rect key="frame" x="20" y="4" width="408" height="250"/>
                         <subviews>
-                            <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="aaaaaaaaaaaaaaa" textAlignment="natural" lineBreakMode="tailTruncation" numberOfLines="0" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zry-Zh-Xdg">
-                                <rect key="frame" x="8" y="104" width="392" height="105"/>
-                                <fontDescription key="fontDescription" type="system" pointSize="12"/>
-                                <nil key="textColor"/>
-                                <nil key="highlightedColor"/>
-                            </label>
                             <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="right" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="cPC-WZ-J29">
                                 <rect key="frame" x="204" y="37" width="196" height="30"/>
                                 <constraints>
@@ -121,9 +116,17 @@
                             <imageView clipsSubviews="YES" userInteractionEnabled="NO" contentMode="scaleAspectFit" horizontalHuggingPriority="251" verticalHuggingPriority="251" translatesAutoresizingMaskIntoConstraints="NO" id="z9e-hx-R7a">
                                 <rect key="frame" x="8" y="37" width="30" height="30"/>
                             </imageView>
+                            <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" scrollEnabled="NO" editable="NO" text="Text" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="SBH-ln-GA6">
+                                <rect key="frame" x="8" y="104" width="392" height="105"/>
+                                <color key="backgroundColor" systemColor="systemBackgroundColor"/>
+                                <color key="textColor" systemColor="labelColor"/>
+                                <fontDescription key="fontDescription" type="system" pointSize="14"/>
+                                <textInputTraits key="textInputTraits" autocapitalizationType="sentences"/>
+                            </textView>
                         </subviews>
                         <constraints>
                             <constraint firstAttribute="trailing" secondItem="cPC-WZ-J29" secondAttribute="trailing" constant="8" id="14h-ba-FPW"/>
+                            <constraint firstItem="SBH-ln-GA6" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="5Rf-7C-Toh"/>
                             <constraint firstAttribute="trailing" secondItem="Qon-hB-WZn" secondAttribute="trailing" id="8mO-7d-L0J"/>
                             <constraint firstItem="Nsw-Jb-kVp" firstAttribute="top" secondItem="Qon-hB-WZn" secondAttribute="bottom" constant="8" symbolic="YES" id="8pu-s2-KKc"/>
                             <constraint firstItem="rQp-gg-1Cg" firstAttribute="top" secondItem="Qon-hB-WZn" secondAttribute="bottom" constant="8" symbolic="YES" id="BHC-Q7-oWs"/>
@@ -137,20 +140,19 @@
                             <constraint firstAttribute="bottom" secondItem="JcH-jd-QAf" secondAttribute="bottom" constant="8" id="PCu-EK-zWM"/>
                             <constraint firstItem="UT9-uR-gHU" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="QXx-1c-o1z"/>
                             <constraint firstItem="rQp-gg-1Cg" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="Rhz-Rr-D98"/>
-                            <constraint firstItem="zry-Zh-Xdg" firstAttribute="top" secondItem="UT9-uR-gHU" secondAttribute="bottom" constant="8" symbolic="YES" id="Rtj-FJ-myu"/>
                             <constraint firstAttribute="trailing" secondItem="UT9-uR-gHU" secondAttribute="trailing" constant="8" id="c4G-DR-XXW"/>
                             <constraint firstItem="MAi-70-Asr" firstAttribute="leading" secondItem="fyk-PJ-aSy" secondAttribute="trailing" constant="8" symbolic="YES" id="dyx-Jw-BZX"/>
-                            <constraint firstAttribute="trailing" secondItem="zry-Zh-Xdg" secondAttribute="trailing" constant="8" id="fM7-fg-0Xi"/>
+                            <constraint firstItem="SBH-ln-GA6" firstAttribute="top" secondItem="UT9-uR-gHU" secondAttribute="bottom" constant="8" symbolic="YES" id="eLu-aM-pCR"/>
                             <constraint firstAttribute="bottom" secondItem="fyk-PJ-aSy" secondAttribute="bottom" constant="8" id="hDe-oL-Yni"/>
                             <constraint firstItem="z9e-hx-R7a" firstAttribute="height" secondItem="rQp-gg-1Cg" secondAttribute="height" id="jfW-CZ-GHU"/>
                             <constraint firstAttribute="trailing" secondItem="JcH-jd-QAf" secondAttribute="trailing" constant="8" id="jgX-Am-HQN"/>
-                            <constraint firstItem="fyk-PJ-aSy" firstAttribute="top" secondItem="zry-Zh-Xdg" secondAttribute="bottom" constant="8" symbolic="YES" id="lPl-ZI-CVb"/>
+                            <constraint firstItem="fyk-PJ-aSy" firstAttribute="top" secondItem="SBH-ln-GA6" secondAttribute="bottom" constant="8" symbolic="YES" id="kyR-aN-5Ql"/>
                             <constraint firstItem="z9e-hx-R7a" firstAttribute="top" secondItem="rQp-gg-1Cg" secondAttribute="top" id="lYa-iS-un9"/>
                             <constraint firstItem="Qon-hB-WZn" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="mJ6-E1-21x"/>
                             <constraint firstItem="z9e-hx-R7a" firstAttribute="leading" secondItem="rQp-gg-1Cg" secondAttribute="leading" id="nbT-UY-C80"/>
+                            <constraint firstAttribute="trailing" secondItem="SBH-ln-GA6" secondAttribute="trailing" constant="8" id="q0a-x2-73v"/>
                             <constraint firstItem="JcH-jd-QAf" firstAttribute="leading" secondItem="MAi-70-Asr" secondAttribute="trailing" constant="8" symbolic="YES" id="sg9-WM-F7Q"/>
                             <constraint firstItem="Qon-hB-WZn" firstAttribute="top" secondItem="8Hc-IY-1NO" secondAttribute="top" constant="8" id="tQX-cH-dEM"/>
-                            <constraint firstItem="zry-Zh-Xdg" firstAttribute="leading" secondItem="8Hc-IY-1NO" secondAttribute="leading" constant="8" id="vsG-dX-7W3"/>
                             <constraint firstItem="cPC-WZ-J29" firstAttribute="top" secondItem="Qon-hB-WZn" secondAttribute="bottom" constant="8" symbolic="YES" id="wZr-u0-ReD"/>
                             <constraint firstItem="z9e-hx-R7a" firstAttribute="width" secondItem="rQp-gg-1Cg" secondAttribute="width" id="yVS-7s-ulc"/>
                         </constraints>
@@ -166,7 +168,6 @@
             <connections>
                 <outlet property="commentBtn" destination="MAi-70-Asr" id="Bzg-ZX-YS0"/>
                 <outlet property="commentDist" destination="sg9-WM-F7Q" id="olT-FO-UEi"/>
-                <outlet property="contentLabel" destination="zry-Zh-Xdg" id="1D2-RM-klS"/>
                 <outlet property="cornerLabel" destination="cPC-WZ-J29" id="nO5-Vs-0IS"/>
                 <outlet property="headDistance" destination="K20-sP-Ex8" id="EEB-YD-dxO"/>
                 <outlet property="headImageView" destination="z9e-hx-R7a" id="prc-Wk-93X"/>
@@ -175,9 +176,10 @@
                 <outlet property="idHeight" destination="GC1-i5-K61" id="wx1-dg-gdB"/>
                 <outlet property="idLabel" destination="Nsw-Jb-kVp" id="cHD-Ce-Iu3"/>
                 <outlet property="likedBtn" destination="fyk-PJ-aSy" id="fKn-HN-FMU"/>
+                <outlet property="mainTextView" destination="SBH-ln-GA6" id="lZQ-sZ-u0l"/>
                 <outlet property="mainView" destination="8Hc-IY-1NO" id="7Xo-tQ-eaB"/>
                 <outlet property="readBtn" destination="JcH-jd-QAf" id="Yos-Vx-DUX"/>
-                <outlet property="titleDist" destination="Rtj-FJ-myu" id="eqt-mA-rje"/>
+                <outlet property="titleDist" destination="eLu-aM-pCR" id="a6T-4l-VHI"/>
                 <outlet property="titleLabel" destination="UT9-uR-gHU" id="iog-Qd-5DK"/>
                 <outlet property="topDist" destination="tQX-cH-dEM" id="o3d-lV-pc8"/>
                 <outlet property="topLabel" destination="Qon-hB-WZn" id="3tP-kl-o8P"/>
@@ -192,5 +194,11 @@
         <namedColor name="AccentColor">
             <color red="0.0" green="0.4779999852180481" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
         </namedColor>
+        <systemColor name="labelColor">
+            <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
+        <systemColor name="systemBackgroundColor">
+            <color white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
+        </systemColor>
     </resources>
 </document>

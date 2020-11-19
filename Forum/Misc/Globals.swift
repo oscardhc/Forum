@@ -16,21 +16,38 @@ extension String {
     }
 }
 
-class G {
-    
-    static var token: String {
+class StoredObject<T> {
+    var id: String
+    var nothing: () -> T
+    init(_ i: String, _ n: @escaping () -> T) {
+        id = i
+        nothing = n
+    }
+    var content: T {
         get {
-            UserDefaults.standard.string(forKey: "ForumUserToken") ?? ""
+            (UserDefaults.standard.object(forKey: id) as? T) ?? nothing()
         }
         set(val) {
-            UserDefaults.standard.setValue(val, forKey: "ForumUserToken")
-            print("set to: ", val)
-            print(UserDefaults.standard.string(forKey: "ForumUserToken"))
+            UserDefaults.standard.setValue(val, forKey: id)
         }
+    }
+}
+
+class G {
+    
+    static let token = StoredObject<String>("ForumUserToken", { .init() })
+    static let networkStat = StoredObject<[Int]>("ForumNetworkStat", { .init() })
+    static func updateStat(_ i: Int) {
+        var d = G.networkStat.content
+        if d == [] {
+            d = Array(repeating: 0, count: 202)
+        }
+        d[i] += 1
+        G.networkStat.content = d
     }
     static let numberPerFetch = 8
     
-    static var hasLoggedIn: Bool {token != ""}
+    static var hasLoggedIn: Bool {token.content != ""}
 }
 
 

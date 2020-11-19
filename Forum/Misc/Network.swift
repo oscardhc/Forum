@@ -33,13 +33,15 @@ class Network {
                 return nil
             }
         }
-        for i in 1...10 {
+        for i in 1...100 {
             if let res = singleConnect() {
                 print("connect success with in \(i) time(s)")
+                G.updateStat(i)
                 return res
             }
             usleep(10000)
         }
+        G.updateStat(0)
         return nil
     }
     
@@ -49,7 +51,7 @@ class Network {
         done: (([String: Any]) -> T)
     ) -> T? {
         if let result = connect([
-            "op_code": op_code, "pa_1": pa_1, "pa_2": pa_2, "pa_3": pa_3, "pa_4": pa_4, "pa_5": pa_5, "Token": G.token
+            "op_code": op_code, "pa_1": pa_1, "pa_2": pa_2, "pa_3": pa_3, "pa_4": pa_4, "pa_5": pa_5, "Token": G.token.content
         ]) {
             if needChecking, let x = result["login_flag"] as? String, x != "1" {
                 print("not Authorized", result)

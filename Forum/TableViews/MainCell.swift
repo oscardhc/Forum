@@ -26,7 +26,6 @@ class MainCell: UITableViewCell {
     @IBOutlet weak var headLabel: UILabel!
     @IBOutlet weak var headDistance: NSLayoutConstraint!
     @IBOutlet weak var headWidth: NSLayoutConstraint!
-    @IBOutlet weak var contentLabel: UILabel!
     @IBOutlet weak var likedBtn: UIButton!
     @IBOutlet weak var commentBtn: UIButton!
     @IBOutlet weak var readBtn: UIButton!
@@ -38,6 +37,7 @@ class MainCell: UITableViewCell {
     @IBOutlet weak var commentDist: NSLayoutConstraint!
     @IBOutlet weak var idHeight: NSLayoutConstraint!
     @IBOutlet weak var headImageView: UIImageView!
+    @IBOutlet weak var mainTextView: UITextView!
     
     var content = (title: "", content: "") {
         didSet {
@@ -54,7 +54,8 @@ class MainCell: UITableViewCell {
             }
             topLabel.text = content.title
             titleLabel.text = content.title
-            contentLabel.text = content.content
+//            contentLabel.text = content.content
+            mainTextView.text = content.content
         }
     }
     
@@ -76,6 +77,15 @@ class MainCell: UITableViewCell {
         likedBtn.adjustsImageWhenDisabled = false
         commentBtn.adjustsImageWhenDisabled = false
         readBtn.adjustsImageWhenDisabled = false
+        
+        mainTextView.translatesAutoresizingMaskIntoConstraints = false
+        mainTextView.sizeToFit()
+        mainTextView.isScrollEnabled = false
+        mainTextView.contentInset = .zero
+        mainTextView.textContainer.lineFragmentPadding = 0
+        mainTextView.isEditable = false
+        mainTextView.isSelectable = false
+        mainTextView.isUserInteractionEnabled = false
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -186,6 +196,8 @@ class MainCell: UITableViewCell {
         
         commentDist.constant = -readBtn.frame.width
         readBtn.isHidden = true
+        mainTextView.isUserInteractionEnabled = true
+        mainTextView.isSelectable = true
         
         return self
     }
