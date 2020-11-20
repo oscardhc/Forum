@@ -22,17 +22,17 @@ class Util {
     }
     
     static let trans: [((DateComponents) -> Int?, String)] = [
-        ({$0.year}, "year"), ({$0.month}, "month"), ({$0.day}, "day"), ({$0.hour}, "hour"), ({$0.minute}, "minute")
+        ({$0.year}, "年"), ({$0.month}, "月"), ({$0.day}, "天"), ({$0.hour}, "小时"), ({$0.minute}, "分钟")
     ]
     
     static func dateToDeltaString(_ date: Date) -> String {
         let interval = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute], from: date, to: Date())
         for (f, s) in trans {
             if let n = f(interval), n > 0 {
-                return "\(n) \(s)\(n > 1 ? "s" : "") ago"
+                return "\(n)\(s)前"
             }
         }
-        return "just now"
+        return "刚刚"
     }
     
     static func stringToDate(_ string: String) -> Date {
@@ -127,6 +127,7 @@ enum NameTheme: String, CaseIterable, ProvideList {
 enum ColorTheme: ProvideList {
     case cold
     static let list: [ColorTheme : [UIColor]] = [
+//        .cold: ["c6d4a4", "cce088", "d6f7b4", "b4f4a1", "a5f1ac", "89e1ae", "8ad3bf", "8ec4ca", "8fb1cf"]
         .cold: ["89e1ae", "8ad3bf", "8ec4ca", "8fb1cf", "899dd1", "7f86d3", "7a75d3", "7c67d1", "6850d0"]
     ].mapValues {
         $0.map {

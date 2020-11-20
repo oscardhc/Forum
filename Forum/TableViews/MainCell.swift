@@ -23,8 +23,9 @@ class MainCell: UITableViewCell {
     
     @IBOutlet weak var mainView: UIView!
     @IBOutlet weak var idLabel: UILabel!
+    @IBOutlet weak var idLabelHeight: NSLayoutConstraint!
+    @IBOutlet weak var timeLabel: UILabel!
     @IBOutlet weak var headLabel: UILabel!
-    @IBOutlet weak var headDistance: NSLayoutConstraint!
     @IBOutlet weak var headWidth: NSLayoutConstraint!
     @IBOutlet weak var likedBtn: UIButton!
     @IBOutlet weak var commentBtn: UIButton!
@@ -36,6 +37,8 @@ class MainCell: UITableViewCell {
     @IBOutlet weak var idHeight: NSLayoutConstraint!
     @IBOutlet weak var headImageView: UIImageView!
     @IBOutlet weak var mainTextView: UITextView!
+    @IBOutlet weak var replyToName: UIButton!
+    @IBOutlet weak var replyToNameDist: NSLayoutConstraint!
     
     var content = (title: "", content: "") {
         didSet {
@@ -44,7 +47,6 @@ class MainCell: UITableViewCell {
                 titleDist.constant = -titleLabel.frame.height
             }
             titleLabel.text = content.title
-//            contentLabel.text = content.content
             mainTextView.text = content.content
         }
     }
@@ -67,6 +69,9 @@ class MainCell: UITableViewCell {
         likedBtn.adjustsImageWhenDisabled = false
         commentBtn.adjustsImageWhenDisabled = false
         readBtn.adjustsImageWhenDisabled = false
+        timeLabel.textColor = .gray
+        timeLabel.text = ""
+        replyToName.setTitle("", for: .normal)
         
         mainTextView.translatesAutoresizingMaskIntoConstraints = false
         mainTextView.sizeToFit()
@@ -127,7 +132,20 @@ class MainCell: UITableViewCell {
         scene = .thread
         
         idLabel.text = "#\(t.id)"
-        content = (t.title, t.content)
+        
+        var disp = "", limit = 4
+        _ = t.content.components(separatedBy: "\n").reduce(0) {
+            if $0 == limit {
+                disp += "..."
+            } else if $0 < limit {
+                disp += ($0 == 0 ? "" : "\n") + $1
+            }
+            return $0 + Int(($1 as NSString).boundingRect(with: .init(width: mainView.frame.width - 16, height: CGFloat.greatestFiniteMagnitude), options: .usesLineFragmentOrigin, attributes: [NSAttributedString.Key.font: mainTextView.font!], context: nil).height / mainTextView.font!.lineHeight)
+        }
+        mainTextView.textContainer.maximumNumberOfLines = limit
+        mainTextView.textContainer.lineBreakMode = .byTruncatingTail
+        content = (t.title, disp)
+        
         likedBtn.setTitle("\(t.nLiked)", for: .normal)
         readBtn.setTitle("\(t.nRead)", for: .normal)
         commentBtn.setTitle("\(t.nCommented)", for: .normal)
@@ -135,16 +153,20 @@ class MainCell: UITableViewCell {
         headImageView.backgroundColor = t.color[0]
         headImageView.image = UIImage(named: "hat40")
         headImageView.layer.cornerRadius = headImageView.frame.height / 2
+        idLabelHeight.constant = idHeight.constant
         
         likedBtn.isEnabled = false
         commentBtn.isEnabled = false
         readBtn.isEnabled = false
-//        headDistance.constant = -headWidth.constant
         
         return self
     }
     
     // MARK: - Floor
+    
+    @objc func moveTo(_ sender: Any) {
+        parentVC.tableView.scrollToRow(at: .init(row: floor.replyToFloor!, section: 0), at: .top, animated: true)
+    }
     
     func setAs(floor f: Floor, forThread t: Thread, firstFloor: Bool = false) -> Self {
         thread = t
@@ -154,24 +176,22 @@ class MainCell: UITableViewCell {
         
         let color = t.color[Int(f.name)!]
         
-        let ss = t.name[Int(f.name)!] +
+        idLabel.text = t.name[Int(f.name)!] +
             (((f.replyToFloor ?? 0) == 0)
                 ? ""
-                : " -> #\(f.replyToFloor!) \(t.name[Int(f.replyToName!)!])"
+                : " 回复 "
             )
-        let speaker = NSMutableAttributedString(string: ss + "\n", attributes: [:])
-        
-        let tt = Util.dateToDeltaString(f.time)
-        let time = NSAttributedString(string: tt, attributes: [NSAttributedString.Key.foregroundColor: UIColor.gray])
-        
-        speaker.append(time)
+        if (f.replyToFloor ?? 0) != 0 {
+            replyToNameDist.constant = (idLabel.text! as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13)]).width + 8
+            replyToName.setTitle("#\(f.replyToFloor!) \(t.name[Int(f.replyToName!)!])", for: .normal)
+            replyToName.addTarget(self, action: #selector(moveTo(_:)), for: .touchUpInside)
+        }
+        timeLabel.text = Util.dateToDeltaString(f.time)
         
         let cons: CGFloat = 30
-        
-        idLabel.attributedText = speaker
         idHeight.constant = cons
         headWidth.constant = cons
-        headLabel.text = String(ss.first!)
+        headLabel.text = String(idLabel.text!.first!)
         headLabel.layer.backgroundColor = color.cgColor
         headLabel.layer.cornerRadius = cons / 2
         
@@ -194,16 +214,9 @@ class MainCell: UITableViewCell {
     
     func setAs(message m: Message) -> Self {
         message = m
-        scene = .message
-        
-        idLabel.text = m.id
-        content = (m.title, m.content)
-        cornerLabel.text = Util.dateToDeltaString(m.time)
-        
-        likedBtn.isHidden = true
-        commentBtn.isHidden = true
-        readBtn.isHidden = true
-        
+        _ = setAs(thread: m.thread)
+        cornerLabel.text = m.judge == 0 ? "未读" : "已读"
+        content.content = m.ty == 0 ? "有人回复了你！" : "有\(m.ty)人赞了你！"
         return self
     }
     

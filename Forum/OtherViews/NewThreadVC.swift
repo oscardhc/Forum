@@ -123,7 +123,7 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
                 if let block = Thread.Category(rawValue: blockDropDown.selectedItem ?? "") {
                     if Network.newThread(
                         title: postTitle, inBlock: block, content: postContent,
-                        anonymousType: NameTheme.allCases.first(where: {$0.rawValue == typeDropDown.selectedItem!})! ,
+                        anonymousType: NameTheme.allCases.first(where: {$0.displayText == typeDropDown.selectedItem!})! ,
                         seed: checkBtn.checked ? Int.random(in: 1..<1000000) : 0
                     ) {
                         showAlert("发帖成功", style: .success) {

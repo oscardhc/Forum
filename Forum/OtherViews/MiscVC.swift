@@ -118,7 +118,7 @@ class SettingVC: BaseTableVC {
 
 class TokenVC: UIViewController {
     
-    @IBOutlet weak var tokenLabel: UILabel!
+    @IBOutlet weak var textView: UITextView!
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -131,7 +131,7 @@ class TokenVC: UIViewController {
             cnt += d[i]
         }
         s += "Average: \(Double(sm) / Double(cnt))"
-        tokenLabel.text = s
+        textView.text = s
         
     }
     

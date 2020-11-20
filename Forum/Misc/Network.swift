@@ -86,16 +86,14 @@ class Network {
         } ?? []
     }
     
-    static func getFloors(for threadID: String, lastSeenID: String = "NULL") -> (floors: [Floor], hasLiked: Bool, hasFavoured: Bool) {
+    static func getFloors(for threadID: String, lastSeenID: String = "NULL") -> (floors: [Floor], thread: Thread) {
         getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID) {
             (
                 ($0["floor_list"]! as! [Any]).map {
                     Floor(json: $0)
-                },
-                $0["WhetherLike"] as! Int == 1,
-                $0["WhetherFavour"] as! Int == 1
+                }, Thread(json: $0["this_thread"]!)
             )
-        } ?? ([], false, false)
+        } ?? ([], Thread(json: 1))
     }
     
     static func getMessages(lastSeenID: String = "NULL") -> [Message] {
@@ -149,7 +147,7 @@ class Network {
     }
     
     static func newThread(title: String, inBlock: Thread.Category, content: String, anonymousType: NameTheme, seed: Int) -> Bool {
-        getData(op_code: "3", pa_1: title, pa_2: String(Thread.Category.allCases.firstIndex(of: inBlock)!), pa_3: content, pa_4: anonymousType.rawValue, pa_5: String(seed), done: {_ in true}) ?? false
+        return getData(op_code: "3", pa_1: title, pa_2: String(Thread.Category.allCases.firstIndex(of: inBlock)!), pa_3: content, pa_4: anonymousType.rawValue, pa_5: String(seed), done: {_ in true}) ?? false
     }
     
     static func newReply(for threadID: String, floor: String, content: String) -> Bool {

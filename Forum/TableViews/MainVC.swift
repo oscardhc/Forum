@@ -29,6 +29,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     // This is the default value for MainThread(the enter interface), any other types must overwrite this two properties
     private var scene = Scene.main
     var d: BaseManager = Thread.Manager(type: .time)
+    var fatherThreadListView: MainVC?
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var textView: UITextView!
@@ -62,7 +63,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         case .favour:
             vc.d = Thread.Manager(type: .favoured)
         case .floors:
-            vc.d = Floor.Manager(for: args[0] as! Thread)
+            vc.d = Floor.Manager(args[0] as! Thread)
         case .messages:
             vc.d = Message.Manager()
         case .main:
@@ -117,15 +118,12 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         refresh()
     }
     
-    let bottomInitialHeight: CGFloat = 80
-    let bottomExpandHeight: CGFloat = 36 + 16 + 10
-    
     override func viewWillAppear(_ animated: Bool) {
         super.viewWillAppear(animated)
         if scene == .floors {
             tabBarController?.tabBar.isHidden = true
-            bottomViewHeight.constant = bottomInitialHeight
-            navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17)]
+            bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 20
+            navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .bold)]
         } else {
             tabBarController?.tabBar.isHidden = false
             bottomViewHeight.constant = 0
@@ -138,15 +136,23 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             newThreadBtn.frame.origin = CGPoint(x: newThreadBtn.frame.minX, y: UIScreen.main.bounds.height - tabBarController!.tabBar.frame.height - 80)
             navigationController?.navigationBar.layer.shadowOpacity = 0
         } else {
+            topCornerBtn.image = UIImage()
             newThreadBtn.isHidden = true
             navigationController?.navigationBar.applyShadow()
         }
         if scene == .floors {
             topCornerBtn.image = UIImage(systemName: "star")
             topCornerBtn.isEnabled = false
-            barSecondBtn.image = UIImage(systemName: "eye")
+            barSecondBtn.image = UIImage()
         }
-//        print("...", topCornerBtn.wi)
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        changeBar(hide: false)
+        if let fvc = fatherThreadListView {
+            
+        }
     }
     
     var isDoubleTapping = false
@@ -229,26 +235,23 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
-    func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        
-        func changeBar(hide: Bool) {
-            if let bar = self.tabBarController?.tabBar {
-                let offset = UIScreen.main.bounds.height - (hide ? 0 : bar.frame.height)
-                if offset == bar.frame.origin.y { return }
-                UIView.animate(withDuration: 0.3) {
-                    self.newThreadBtn.frame.origin = CGPoint(x: self.newThreadBtn.frame.minX, y: offset - 80)
-                    bar.frame.origin.y = offset
-                }
+    func changeBar(hide: Bool) {
+        if let bar = self.tabBarController?.tabBar {
+            let offset = UIScreen.main.bounds.height - (hide ? 0 : bar.frame.height)
+            if offset == bar.frame.origin.y { return }
+            UIView.animate(withDuration: 0.3) {
+                self.newThreadBtn.frame.origin = CGPoint(x: self.newThreadBtn.frame.minX, y: offset - 80)
+                bar.frame.origin.y = offset
             }
         }
-        
-        if scrollView.panGestureRecognizer.translation(in: scrollView).y < 0{
+    }
+    
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        if scrollView.panGestureRecognizer.translation(in: scrollView).y < 0 {
             changeBar(hide: true)
-        }
-        else{
+        } else {
             changeBar(hide: false)
         }
-        
     }
     
     var floor: String = "0" {
@@ -269,7 +272,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             let height = (sender.userInfo![UIResponder.keyboardFrameEndUserInfoKey]! as! NSValue).cgRectValue.height
             var time: TimeInterval = 0
             (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
-            bottomViewHeight.constant = bottomExpandHeight
+            bottomViewHeight.constant = textViewHeight.constant + 16 + 10
             bottomSpace.constant = height
             UIView.animate(withDuration: time) {
                 self.view.layoutIfNeeded()
@@ -281,26 +284,39 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         if scene == .floors {
             var time: TimeInterval = 0
             (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
-            bottomViewHeight.constant = bottomInitialHeight
+            bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 20
             bottomSpace.constant = 0
             UIView.animate(withDuration: time) {
                 self.view.layoutIfNeeded()
             }
         }
     }
-    
-    func textViewDidChange(_ textView: UITextView) {
+    func adjustTextView() {
         if scene == .floors {
             if textView.text.count > 0 {
                 let height = max(min(textView.contentSize.height, 100), 36)
+                print("adjust to >>>> ", height)
                 textViewHeight.constant = height
-                bottomViewHeight.constant = height + 16 + 10
+                bottomViewHeight.constant = textViewHeight.constant + 16 + 10
                 UIView.animate(withDuration: 0.3) {
                     self.view.layoutIfNeeded()
                 }
             }
             updateCountingLabel(label: replyCountLabel, text: textView.text, lineLimit: 20, charLimit: 817)
         }
+    }
+    
+    func textViewDidChange(_ textView: UITextView) {
+        adjustTextView()
+    }
+    func textViewDidEndEditing(_ textView: UITextView) {
+        adjustTextView()
+    }
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        adjustTextView()
+    }
+    func textViewDidChangeSelection(_ textView: UITextView) {
+        adjustTextView()
     }
     
     @objc func viewTapped(_ sender: Any) {
@@ -318,7 +334,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                 textView.text = ""
                 self.view.endEditing(false)
                 showAlert("评论成功", style: .success) {
-                    self.refresh()
+                    self.loadmore()
                 }
             }
         } else {
@@ -360,7 +376,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     var headerHeight: CGFloat {
-        scene == .main ? 35 : 0
+        scene == .main ? 35 : 5
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -380,7 +396,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         let width = tableView.frame.width
         let baseView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: headerHeight))
         baseView.backgroundColor = .systemBackground
-        if headerHeight == 0 {
+        if headerHeight == 5 {
             return baseView
         }
         

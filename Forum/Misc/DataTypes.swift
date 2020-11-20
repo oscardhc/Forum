@@ -10,7 +10,7 @@ import UIKit
 
 protocol DATA {
     var id: String {get}
-    var content: String {get}
+//    var content: String {get}
 }
 
 class BaseManager {
@@ -62,13 +62,14 @@ struct Thread: DATA {
     
     init(json: Any) {
         let thread  = json as! [String: Any]
-//        print("trying to init thread from json", thread)
         nCommented = thread["Comment"] as! Int
         id = thread["ThreadID"] as! String
         nRead = thread["Read"] as! Int
         content = thread["Summary"] as! String
         nLiked = thread["Like"] as! Int
         title = thread["Title"] as! String
+        hasLiked = (thread["WhetherLike"] as! Int) == 1
+        hasFavoured = (thread["WhetherFavour"] as? Int ?? 0) == 1
         
         name = NameG(
             theme: NameTheme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
@@ -112,11 +113,14 @@ struct Thread: DATA {
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAs(thread: data[index])
+            print("..........init cell", cell.frame, cell.mainTextView.frame, cell.mainTextView.contentSize)
+            return cell.setAs(thread: data[index])
         }
         
         override func didSelectedRow(_ vc: UIViewController, index: Int) {
-            vc >> MainVC.new(.floors, data[index])
+            let subVC = MainVC.new(.floors, data[index])
+            subVC.fatherThreadListView = (vc as! MainVC)
+            vc >> subVC
         }
         
     }
@@ -151,7 +155,7 @@ struct Floor: DATA {
         
         var thread: Thread
         
-        init(for t: Thread) {
+        init(_ t: Thread) {
             thread = t
             super.init()
         }
@@ -160,7 +164,7 @@ struct Floor: DATA {
         
         override func networking(lastSeenID: String = "NULL") -> [Floor] {
             var newData = [Floor]()
-            (newData, thread.hasLiked, thread.hasFavoured) = Network.getFloors(for: thread.id, lastSeenID: lastSeenID)
+            (newData, thread) = Network.getFloors(for: thread.id, lastSeenID: lastSeenID)
             return newData
         }
         
@@ -186,20 +190,24 @@ struct Message: DATA {
             Network.getMessages(lastSeenID: lastSeenID)
         }
         
+        override func didSelectedRow(_ vc: UIViewController, index: Int) {
+            let subVC = MainVC.new(.floors, data[index].thread)
+            subVC.fatherThreadListView = (vc as! MainVC)
+            vc >> subVC
+        }
+        
     }
     
-    var id = "", title = "", content = ""
-    var ty = 0, judge = 0, time = Date()
+    var thread: Thread
+    var ty = 0, judge = 0
+    var id: String { thread.id }
     
     init(json: Any) {
         let msg = json as! [String: Any]
         print(msg)
-        id = msg["ThreadID"] as! String
-        title = msg["Title"] as! String
-        content = msg["Summary"] as! String
+        thread = Thread(json: json)
         ty = msg["Type"] as! Int
         judge = msg["Judge"] as! Int
-        time = Util.stringToDate(msg["PostTime"] as! String)
     }
     
     
