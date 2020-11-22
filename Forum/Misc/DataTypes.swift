@@ -97,12 +97,27 @@ struct Thread: DATA {
         var block = Thread.Category.all
         var searchFor: String? = nil
         
+        var filtered = [Thread]()
+        
+        override var data: [Thread] {
+            didSet {
+                let li = G.blockedList.content
+                filtered = data.filter() {
+                    !li.contains($0.id)
+                }
+            }
+        }
+        
         init(type: Network.NetworkGetThreadType) {
             sortType = type
         }
         
         func search(text: String?) {
             searchFor = text
+            data = []
+        }
+        func resetSearch() {
+            searchFor = nil
             data = []
         }
         
@@ -112,13 +127,16 @@ struct Thread: DATA {
                 : Network.searchThreads(keyword: searchFor!, lastSeenID: lastSeenID)
         }
         
+        override var count: Int {
+            filtered.count
+        }
+        
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            print("..........init cell", cell.frame, cell.mainTextView.frame, cell.mainTextView.contentSize)
-            return cell.setAs(thread: data[index])
+            return cell.setAs(thread: filtered[index])
         }
         
         override func didSelectedRow(_ vc: UIViewController, index: Int) {
-            let subVC = MainVC.new(.floors, data[index])
+            let subVC = MainVC.new(.floors, filtered[index])
             subVC.fatherThreadListView = (vc as! MainVC)
             vc >> subVC
         }

@@ -46,6 +46,7 @@ class G {
         G.networkStat.content = d
     }
     static let numberPerFetch = 8
+    static let blockedList = StoredObject<[String]>("ForumBlockedList", { .init() })
     
     static var hasLoggedIn: Bool {token.content != ""}
 }

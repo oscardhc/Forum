@@ -19,7 +19,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let _ = (scene as? UIWindowScene) else { return }
         
         if !Network.verifyToken() {
-            window?.rootViewController = *"LoginVC"
+            window?.rootViewController = *"TermVC"
         } else {
             window?.rootViewController = *"InitTabVC"
         }

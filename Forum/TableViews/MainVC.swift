@@ -40,6 +40,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var replyCountLabel: StateLabel!
     @IBOutlet weak var newThreadBtn: UIButton!
     @IBOutlet weak var barSecondBtn: UIBarButtonItem!
+    @IBOutlet weak var topDist: NSLayoutConstraint!
     
     lazy var searchControl = Init(UIAlertController(title: "请输入搜索内容", message: "", preferredStyle: .alert)) {
         $0.addTextField()
@@ -47,8 +48,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         $0.addAction(.init(title: "确认", style: .default, handler: search))
     }
     
+    var inSearchMode = false
     func search(_ alert: UIAlertAction) {
         (d as! Thread.Manager).search(text: searchControl.textFields?[0].text)
+        inSearchMode = true
         hasTappedAgain()
     }
     
@@ -78,6 +81,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        if UIApplication.shared.windows[0].safeAreaInsets.top == 20 {
+            topDist.constant = 64
+        }
+        
         navigationItem.title = scene == .floors
             ? "\((d as! Floor.Manager).thread.title)"
             : scene.rawValue
@@ -94,6 +101,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         tableView.separatorStyle = .none
                 
         footer.setRefreshingTarget(self, refreshingAction: #selector(loadmore))
+        footer.heightPreset = .custom(85)
         tableView.mj_footer = footer
 
         let refreshControl = UIRefreshControl()
@@ -143,6 +151,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         if scene == .floors {
             topCornerBtn.image = UIImage(systemName: "star")
             topCornerBtn.isEnabled = false
+        } else {
             barSecondBtn.image = UIImage()
         }
     }
@@ -160,7 +169,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         if tableView.refreshControl!.isRefreshing {
             return
         }
-        
         let top = self.tableView.adjustedContentInset.top
         let y = self.tableView.refreshControl!.frame.maxY + top
         self.tableView.setContentOffset(CGPoint(x: 0, y: -y-52), animated: true)
@@ -185,6 +193,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
 //        print("refresh...")
         DispatchQueue.global().async {
             usleep(100000)
+            if !self.inSearchMode, let dm = self.d as? Thread.Manager, dm.searchFor != nil {
+                dm.resetSearch()
+            }
+            self.inSearchMode = false
             let count = self.d.getInitialContent()
 //            print("end refreshing")
             
@@ -213,18 +225,18 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @objc func loadmore() {
         DispatchQueue.global().async {
             usleep(100000)
+            let prev = self.d.count
             let count = self.d.getMoreContent()
             DispatchQueue.main.async {
                 self.tableView.mj_footer?.endRefreshing()
                 
-                if count > 0 {
+                let cc = self.d.count - prev
+                if cc > 0 {
                     var idx = [IndexPath]()
-                    for i in 1...count {
+                    for i in 1...cc {
                         idx.append(IndexPath(row: self.d.count - i, section: 0))
                     }
                     idx.reverse()
-                    print(count, self.d.count, idx)
-//                    self.tableView.insert
                     self.tableView.insertRows(at: idx, with: .automatic)
                 }
                 
@@ -295,7 +307,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         if scene == .floors {
             if textView.text.count > 0 {
                 let height = max(min(textView.contentSize.height, 100), 36)
-                print("adjust to >>>> ", height)
                 textViewHeight.constant = height
                 bottomViewHeight.constant = textViewHeight.constant + 16 + 10
                 UIView.animate(withDuration: 0.3) {
@@ -363,10 +374,33 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
-    var secondViewEnabled = false
+    func blockThread(_ msg: String) {
+        let id = (self.d as! Floor.Manager).thread.id
+        let li = G.blockedList.content
+        if !li.contains(id) {
+            G.blockedList.content = li + [id]
+        }
+        self.showAlert(msg, style: .success) {
+            let vc = (self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as! MainVC)
+            print(vc.d.count)
+            vc.hasTappedAgain()
+            print(vc.d.count)
+            let n = self.navigationController?.popViewController(animated: true)
+        }
+    }
+    
     @IBAction func secondBarBtnClicked(_ sender: Any) {
-        secondViewEnabled = !secondViewEnabled
-        barSecondBtn.image = UIImage(systemName: secondViewEnabled ? "eye" : "eye.slash")
+        let al = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+        al.addAction(.init(title: "屏蔽", style: .default, handler: { (a) in
+            self.blockThread("屏蔽成功")
+        }))
+        al.addAction(.init(title: "举报", style: .destructive, handler: { (a) in
+            self.blockThread("举报成功")
+        }))
+        al.addAction(.init(title: "取消", style: .cancel, handler: { (a) in
+            
+        }))
+        self << al
     }
     
     // MARK: - Table view data source

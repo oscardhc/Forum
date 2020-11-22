@@ -185,6 +185,9 @@ class MainCell: UITableViewCell {
             replyToNameDist.constant = (idLabel.text! as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13)]).width + 8
             replyToName.setTitle("#\(f.replyToFloor!) \(t.name[Int(f.replyToName!)!])", for: .normal)
             replyToName.addTarget(self, action: #selector(moveTo(_:)), for: .touchUpInside)
+        } else {
+            replyToName.setTitle("", for: .normal)
+            replyToName.removeTarget(self, action: #selector(moveTo(_:)), for: .touchUpInside)
         }
         timeLabel.text = Util.dateToDeltaString(f.time)
         

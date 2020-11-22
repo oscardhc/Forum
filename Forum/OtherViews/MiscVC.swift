@@ -80,6 +80,7 @@ class MiscVC: BaseTableVC, UIPopoverPresentationControllerDelegate {
         ],
         [
             ("设置", {self >> *"SettingVC"}),
+            ("反馈", {self >> *"ReportVC"}),
             ("关于", {self << (*"AboutVC" as! AboutVC).withFather(self)})
         ]
     ]
@@ -133,6 +134,51 @@ class TokenVC: UIViewController {
         s += "Average: \(Double(sm) / Double(cnt))"
         textView.text = s
         
+    }
+    
+}
+
+class ReportVC: UIViewController {
+    
+    @IBOutlet weak var threadID: DarkSupportTextField!
+    @IBOutlet weak var textView: UITextView!
+    
+    
+    @IBAction func report(_ sender: Any) {
+        if (threadID.text ?? "") != "", textView.text != "" {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.4) {
+                self.showAlert("反馈成功", style: .success)
+            }
+        } else {
+            showAlert("请输入反馈内容", style: .warning)
+        }
+    }
+    
+    
+}
+
+class TermVC: UIViewController {
+    
+    @IBOutlet weak var checker: CheckerButton!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        checker.setCheckBoxStyle(fontSize: 14)
+        checker.semanticContentAttribute = .forceLeftToRight
+        checker.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
+        checker.imageEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0)
+    }
+    
+    @IBAction func confirm(_ sender: Any) {
+        if checker.checked {
+            showAlert("欢迎来到无可奉告", style: .success) {
+                let vc = *"LoginVC"
+                vc.modalPresentationStyle = .fullScreen
+                self << vc
+            }
+        } else {
+            showAlert("请同意用户协议", style: .warning)
+        }
     }
     
 }
