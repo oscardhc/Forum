@@ -142,11 +142,9 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         if scene == .main {
             topCornerBtn.image = UIImage(systemName: "magnifyingglass")
             newThreadBtn.frame.origin = CGPoint(x: newThreadBtn.frame.minX, y: UIScreen.main.bounds.height - tabBarController!.tabBar.frame.height - 80)
-            navigationController?.navigationBar.layer.shadowOpacity = 0
         } else {
             topCornerBtn.image = UIImage()
             newThreadBtn.isHidden = true
-            navigationController?.navigationBar.applyShadow()
         }
         if scene == .floors {
             topCornerBtn.image = UIImage(systemName: "star")
@@ -192,7 +190,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @objc func refresh() {
 //        print("refresh...")
         DispatchQueue.global().async {
-            usleep(100000)
+            usleep(200000)
             if !self.inSearchMode, let dm = self.d as? Thread.Manager, dm.searchFor != nil {
                 dm.resetSearch()
             }
@@ -224,7 +222,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @objc func loadmore() {
         DispatchQueue.global().async {
-            usleep(100000)
+            usleep(200000)
             let prev = self.d.count
             let count = self.d.getMoreContent()
             DispatchQueue.main.async {
@@ -382,10 +380,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
         self.showAlert(msg, style: .success) {
             let vc = (self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as! MainVC)
-            print(vc.d.count)
-            vc.hasTappedAgain()
-            print(vc.d.count)
-            let n = self.navigationController?.popViewController(animated: true)
+            vc.refresh()
+            self.navigationController?.popViewController(animated: true)
         }
     }
     
@@ -410,7 +406,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     var headerHeight: CGFloat {
-        scene == .main ? 35 : 5
+        scene == .main ? 20 : 3
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
@@ -430,7 +426,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         let width = tableView.frame.width
         let baseView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: headerHeight))
         baseView.backgroundColor = .systemBackground
-        if headerHeight == 5 {
+        if headerHeight == 3 {
+            baseView.applyShadow()
             return baseView
         }
         
@@ -446,14 +443,14 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         
         if scene == .main {
             
-            let lbl = UILabel(frame: CGRect(x: width/2, y: 0, width: width/4, height: headerHeight))
+            let lbl = UILabel(frame: CGRect(x: width/2, y: -5, width: width/4, height: headerHeight))
             lbl.text = "板块："
             lbl.textColor = .black
             lbl.textAlignment = .right
             lbl.font = UIFont.systemFont(ofSize: 12)
             view.addSubview(lbl)
             
-            let btn = UIButton(frame: CGRect(x: width*3/4, y: 0, width: width/4 - 8, height: headerHeight))
+            let btn = UIButton(frame: CGRect(x: width*3/4, y: -5, width: width/4 - 8, height: headerHeight))
             btn.addTarget(self, action: #selector(chooseBlock(_:)), for: .touchUpInside)
             btn.setTitle((d as! Thread.Manager).block.rawValue, for: .normal)
             btn.setDropDownStyle()

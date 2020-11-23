@@ -130,7 +130,7 @@ enum ColorTheme: ProvideList {
     case cold
     static let list: [ColorTheme : [UIColor]] = [
 //        .cold: ["c6d4a4", "cce088", "d6f7b4", "b4f4a1", "a5f1ac", "89e1ae", "8ad3bf", "8ec4ca", "8fb1cf"]
-        .cold: ["89e1ae", "8ad3bf", "8ec4ca", "8fb1cf", "899dd1", "7f86d3", "7a75d3", "7c67d1", "6850d0"]
+        .cold: ["5ebd3e", "ffb900", "f78200", "e23838", "973999", "009cdf"]
     ].mapValues {
         $0.map {
             var s = Scanner(string: $0), res: UInt64 = 0
@@ -139,7 +139,7 @@ enum ColorTheme: ProvideList {
                 red: CGFloat(res >> 16 & 255)  / 255,
                 green: CGFloat(res >> 8 & 255) / 255,
                 blue: CGFloat(res & 255) / 255,
-                alpha: 0.5
+                alpha: 0.75
             )
         }
     }
@@ -197,7 +197,7 @@ extension UIView {
         self.layer.borderWidth = 0.5
         self.layer.borderColor = UIColor.systemBackground.cgColor
     }
-    func applyShadow(opaque: Bool = true, offset: Double = 10, opacity: Float = 0.03) {
+    func applyShadow(opaque: Bool = true, offset: Double = 4, opacity: Float = 0.1) {
         if opaque {
             self.layer.backgroundColor = UIColor.systemBackground.cgColor
         }

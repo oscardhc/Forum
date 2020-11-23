@@ -151,7 +151,7 @@ class MainCell: UITableViewCell {
         commentBtn.setTitle("\(t.nCommented)", for: .normal)
         cornerLabel.text = Util.dateToDeltaString(t.lastUpdateTime)
         headImageView.backgroundColor = t.color[0]
-        headImageView.image = UIImage(named: "hat40")
+        headImageView.image = UIImage(named: "hatw80")
         headImageView.layer.cornerRadius = headImageView.frame.height / 2
         idLabelHeight.constant = idHeight.constant
         
@@ -194,13 +194,17 @@ class MainCell: UITableViewCell {
         let cons: CGFloat = 30
         idHeight.constant = cons
         headWidth.constant = cons
-        headLabel.text = String(idLabel.text!.first!)
+        headLabel.text = String(t.name[Int(f.name)!].components(separatedBy: " ").last!.first!)
         headLabel.layer.backgroundColor = color.cgColor
         headLabel.layer.cornerRadius = cons / 2
+        headLabel.textColor = .white
+        headLabel.font = .systemFont(ofSize: 20, weight: .medium)
         
         content = (isFirstFloor ? t.title : "", f.content)
         likedBtn.setTitle("\(f.nLiked)", for: .normal)
-        cornerLabel.text = " #\(floor.id)"
+        cornerLabel.text = "#\(floor.id)"
+        cornerLabel.fontSize = 14
+        
         liked = f.hasLiked
         commentBtn.setTitle("回复", for: .normal)
         commentBtn.contentHorizontalAlignment = .right

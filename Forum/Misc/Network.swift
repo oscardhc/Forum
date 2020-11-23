@@ -21,13 +21,12 @@ class Network {
                 let s = try Socket.create()
                 try s.connect(to: ip, port: port)
                 try s.write(from: data)
-                
                 let rec = try JSONSerialization.jsonObject(
                     with: try s.readString()!.data(using: .utf8)!,
                     options: .allowFragments
                 )
-                
                 s.close()
+                
                 return rec as! [String: Any]
             } catch {
                 return nil
