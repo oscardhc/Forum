@@ -385,7 +385,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
-    @IBAction func secondBarBtnClicked(_ sender: Any) {
+    @IBAction func secondBarBtnClicked(_ sender: UIBarItem) {
         let al = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         al.addAction(.init(title: "屏蔽", style: .default, handler: { (a) in
             self.blockThread("屏蔽成功")
@@ -396,6 +396,12 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         al.addAction(.init(title: "取消", style: .cancel, handler: { (a) in
             
         }))
+        if let popoverPresentationController = al.popoverPresentationController {
+            popoverPresentationController.sourceView = self.view
+            let fr = self.navigationController!.navigationBar.frame
+            popoverPresentationController.sourceRect = .init(x: fr.maxX - 1.0, y: fr.minY, width: 1.0, height: fr.height)
+            popoverPresentationController.permittedArrowDirections = .init(rawValue: 0)
+        }
         self << al
     }
     
