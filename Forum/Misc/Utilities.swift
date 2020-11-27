@@ -168,10 +168,28 @@ protocol DoubleTappable {
 prefix operator *
 
 extension String {
+    
     static prefix func * (name: String) -> UIViewController {
         UIStoryboard(name: "Main", bundle: nil)
             .instantiateViewController(identifier: name)
     }
+    
+    var linebreaks: Int {
+        self.reduce(1) {
+            $0 + ($1 == "\n" ? 1 : 0)
+        }
+    }
+    
+    var generated: String {
+        count >= 20
+            ? {
+                let idx = index(startIndex, offsetBy: 15)
+                let s = self[..<idx], t = self[idx...]
+                return String(s) + "\n" + String(t)
+            }()
+            : self
+    }
+    
 }
 
 extension UIViewController {

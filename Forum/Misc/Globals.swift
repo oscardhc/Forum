@@ -8,14 +8,6 @@
 import Foundation
 import UIKit
 
-extension String {
-    var linebreaks: Int {
-        self.reduce(1) {
-            $0 + ($1 == "\n" ? 1 : 0)
-        }
-    }
-}
-
 class StoredObject<T> {
     var id: String
     var nothing: () -> T

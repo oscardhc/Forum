@@ -19,7 +19,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     var thread: Thread!
     var floor: Floor!
     var message: Message!
-    var isFirstFloor: Bool!
+    var isFirstFloor = false
     var parentVC: MainVC!
     
     @IBOutlet weak var mainView: UIView!
@@ -44,6 +44,10 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     @IBOutlet weak var cornerHeight: NSLayoutConstraint!
     @IBOutlet weak var orderBtn: UIButton!
     @IBOutlet weak var footerHeight: NSLayoutConstraint!
+    @IBOutlet weak var higherTitleLabel: UILabel!
+    @IBOutlet weak var higherTitleDist: NSLayoutConstraint!
+    @IBOutlet weak var allTopDIst: NSLayoutConstraint!
+    @IBOutlet weak var lessThanDIst: NSLayoutConstraint!
     
     let lbl = with(UILabel(frame: .init(x: 5, y: 5, width: 20, height: 20))) {
         $0.fontSize = 15
@@ -56,12 +60,24 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     
     var content = (title: "", content: "") {
         didSet {
+            titleLabel.text = content.title
+            higherTitleLabel.text = content.title
+            mainTextView.text = content.content
+            
             if scene != .thread {
                 titleLabel.isHidden = true
                 titleDist.constant = -titleLabel.frame.height
             }
-            titleLabel.text = content.title
-            mainTextView.text = content.content
+            if !isFirstFloor {
+                higherTitleLabel.isHidden = true
+                allTopDIst.constant = 0
+                lessThanDIst.constant = 0
+            } else {
+                higherTitleLabel.isHidden = false
+                allTopDIst.constant = 8
+                lessThanDIst.constant = 100
+            }
+            
         }
     }
     
@@ -298,6 +314,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     override func layoutSubviews() {
         super.layoutSubviews()
         mainView.applyCardStyle()
+        
     }
     
 }

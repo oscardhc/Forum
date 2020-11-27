@@ -89,11 +89,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             topDist.constant = 64
         }
         
-        navigationItem.title = scene == .floors
-            ? "\((d as! Floor.Manager).thread.title)"
-            : scene.rawValue
-        
-        
         let navBarAppearance = UINavigationBarAppearance()
         navBarAppearance.configureWithOpaqueBackground()
         navBarAppearance.shadowImage = nil
@@ -147,17 +142,18 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        super.viewWillAppear(animated)
+        
+        navigationItem.largeTitleDisplayMode = scene == .floors ? .never : .always
+        navigationItem.title = scene == .floors
+            ? "\((d as! Floor.Manager).thread.title)"
+            : scene.rawValue
+        
         if scene == .floors {
             tabBarController?.tabBar.isHidden = true
             bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 20
-            navigationController!.navigationBar.standardAppearance.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .bold), .foregroundColor: UIColor.label]
-            navigationController!.navigationBar.scrollEdgeAppearance!.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .bold), .foregroundColor: UIColor.label]
         } else {
             tabBarController?.tabBar.isHidden = false
             bottomViewHeight.constant = 0
-            navigationController!.navigationBar.standardAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
-            navigationController!.navigationBar.scrollEdgeAppearance!.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
         }
         topCornerBtn.title = ""
         barSecondBtn.title = ""
@@ -195,7 +191,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         let o = self.tableView.contentOffset.y
         print("...........", o, self.tableView.refreshControl!.frame.maxY, self.tableView.adjustedContentInset.top)
         
-        if o < -30 {
+        if o < -30 || self.scene == .floors {
             self.isDoubleTapping = true
             self.tableView.setContentOffset(CGPoint(x: 0, y: -y), animated: true)
             self.tableView.refreshControl?.beginRefreshing()
@@ -587,6 +583,9 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        if navigationItem.largeTitleDisplayMode == .always {
+            navigationItem.title = ""
+        }
         d.didSelectedRow(self, index: indexPath.row)
     }
 
