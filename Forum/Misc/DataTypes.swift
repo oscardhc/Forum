@@ -10,14 +10,13 @@ import UIKit
 
 protocol DATA {
     var id: String {get}
-//    var content: String {get}
 }
 
 class BaseManager {
     var count: Int { 0 }
     func initializeCell(_ cell: MainCell, index: Int) -> MainCell { cell }
-    func getInitialContent() -> Int { -1 }
-    func getMoreContent() -> Int { -1 }
+    func clear() -> Self { return self }
+    func getContent() -> Int { -1 }
     func didSelectedRow(_ vc: UIViewController, index: Int) {}
 }
 
@@ -25,22 +24,19 @@ class DataManager<T: DATA>: BaseManager {
     
     var data = [T]()
     override var count: Int { data.count }
+    var last = "NULL"
     
-    func networking(lastSeenID: String = "NULL") -> [T] { fatalError() }
-    
-    // return the number of data fetched
-    override func getInitialContent() -> Int {
-        let fetched = networking()
-        data = fetched
-        return fetched.count
+    func networking() -> ([T], String) { fatalError() }
+    override func clear() -> Self {
+        (data, last) = ([], "NULL")
+        return self
     }
-    override func getMoreContent() -> Int {
-        if let last = data.last?.id {
-            let fetched = networking(lastSeenID: last)
-            data += fetched
-            return fetched.count
-        }
-        return 0
+    override func getContent() -> Int {
+        with(networking()) {
+            data += $0.0
+            last = $0.1
+            print("get content", data.count, $0.0.count)
+        }.0.count
     }
     
 }
@@ -54,7 +50,7 @@ struct Thread: DATA {
     var id = "", title = "", content = ""
     var type: Category = .all
     var nLiked = 0, nRead = 0, nCommented = 0
-    var hasLiked = false, hasFavoured = false
+    var hasLiked = false, hasFavoured = false, isTop = false
     var postTime = Date(), lastUpdateTime = Date()
     var name: NameG, color: ColorG
     
@@ -62,14 +58,16 @@ struct Thread: DATA {
     
     init(json: Any) {
         let thread  = json as! [String: Any]
+        
         nCommented = thread["Comment"] as! Int
         id = thread["ThreadID"] as! String
         nRead = thread["Read"] as! Int
         content = thread["Summary"] as! String
         nLiked = thread["Like"] as! Int
         title = thread["Title"] as! String
-        hasLiked = (thread["WhetherLike"] as! Int) == 1
+        hasLiked = (thread["WhetherLike"] as? Int ?? 0) == 1
         hasFavoured = (thread["WhetherFavour"] as? Int ?? 0) == 1
+        isTop = (thread["WhetherTop"] as? Int) == 1
         
         name = NameG(
             theme: NameTheme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
@@ -78,6 +76,11 @@ struct Thread: DATA {
         
         lastUpdateTime = Util.stringToDate(thread["LastUpdateTime"] as! String)
         postTime = Util.stringToDate(thread["PostTime"] as! String)
+    }
+    
+    init() {
+        name = NameG(theme: .aliceAndBob, seed: 0)
+        color = ColorG(theme: .cold, seed: 0)
     }
     
     func generateFirstFloor() -> Floor {
@@ -99,12 +102,15 @@ struct Thread: DATA {
         
         var filtered = [Thread]()
         
+        
+        
         override var data: [Thread] {
             didSet {
                 let li = G.blockedList.content
                 filtered = data.filter() {
                     !li.contains($0.id)
                 }
+                print("data set!", data.count, filtered.count)
             }
         }
         
@@ -114,17 +120,16 @@ struct Thread: DATA {
         
         func search(text: String?) {
             searchFor = text
-            data = []
-        }
-        func resetSearch() {
-            searchFor = nil
-            data = []
         }
         
-        override func networking(lastSeenID: String) -> [Thread] {
-            searchFor == nil
-                ? Network.getThreads(type: sortType, inBlock: block, lastSeenID: lastSeenID)
-                : Network.searchThreads(keyword: searchFor!, lastSeenID: lastSeenID)
+        func resetSearch() {
+            searchFor = nil
+        }
+        
+        override func networking() -> ([Thread], String) {
+            return searchFor == nil
+                ? Network.getThreads(type: sortType, inBlock: block, lastSeenID: last)
+                : Network.searchThreads(keyword: searchFor!, lastSeenID: last)
         }
         
         override var count: Int {
@@ -132,7 +137,7 @@ struct Thread: DATA {
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            return cell.setAs(thread: filtered[index])
+            return cell.setAs(thread: index < self.count ? filtered[index] : Thread(), topTrend: (sortType == .trending && index < 3) ? index : nil)
         }
         
         override func didSelectedRow(_ vc: UIViewController, index: Int) {
@@ -148,8 +153,8 @@ struct Thread: DATA {
 struct Floor: DATA {
     
     var id = ""
-    var name = "", content = ""
-    var nLiked = 233
+    var name = "1", content = ""
+    var nLiked = 0
     var hasLiked = false
     var time = Date()
     
@@ -172,6 +177,7 @@ struct Floor: DATA {
     class Manager: DataManager<Floor> {
         
         var thread: Thread
+        var reverse = false
         
         init(_ t: Thread) {
             thread = t
@@ -180,16 +186,16 @@ struct Floor: DATA {
         
         override var count: Int {data.count + 1}
         
-        override func networking(lastSeenID: String = "NULL") -> [Floor] {
-            var newData = [Floor]()
-            (newData, thread) = Network.getFloors(for: thread.id, lastSeenID: lastSeenID)
-            return newData
+        override func networking() -> ([Floor], String) {
+            with(Network.getFloors(for: thread.id, lastSeenID: last, reverse: reverse)) {
+                thread = $0.1
+            }.0
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
             index == 0
                 ? cell.setAs(floor: thread.generateFirstFloor(), forThread: thread, firstFloor: true)
-                : cell.setAs(floor: data[index - 1], forThread: thread, firstFloor: false)
+                : cell.setAs(floor: index <= data.count ? data[index - 1] : Floor(), forThread: thread, firstFloor: false)
         }
         
     }
@@ -201,11 +207,11 @@ struct Message: DATA {
     class Manager: DataManager<Message> {
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAs(message: data[index])
+            cell.setAs(message: data[index % self.count])
         }
         
-        override func networking(lastSeenID: String = "NULL") -> [Message] {
-            Network.getMessages(lastSeenID: lastSeenID)
+        override func networking() -> ([Message], String) {
+            Network.getMessages(lastSeenID: last)
         }
         
         override func didSelectedRow(_ vc: UIViewController, index: Int) {

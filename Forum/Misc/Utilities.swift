@@ -13,7 +13,7 @@ import DropDown
 
 class Util {
     
-    static let formatter =  Init(DateFormatter()) {
+    static let formatter =  with(DateFormatter()) {
         $0.dateFormat = "yyyy-MM-dd HH:mm:ss"
     }
     
@@ -57,7 +57,7 @@ class DarkSupportTextField: TextField {
     }
 }
 
-public func Init<Type>(_ value: Type, _ block: (_ object: Type) -> Void) -> Type
+@discardableResult func with<T>(_ value: T, _ block: (_ object: T) -> Void) -> T
 {
     block(value)
     return value
@@ -191,17 +191,25 @@ extension UIView {
         self.backgroundColor = .systemBackground
         self.layer.cornerRadius = 7
         self.layer.masksToBounds = false
-        self.layer.shadowColor = UIColor.black.cgColor
-        self.layer.shadowOffset = CGSize(width: 0, height: 3);
-        self.layer.shadowOpacity = 0.2
-        self.layer.borderWidth = 0.5
-        self.layer.borderColor = UIColor.systemBackground.cgColor
+        self.layer.backgroundColor = UIColor.tertiarySystemBackground.cgColor
+        if traitCollection.userInterfaceStyle == .dark {
+//            self.layer.backgroundColor = UIColor.tertiarySystemBackground.cgColor
+        } else {
+            self.layer.shadowColor = UIColor.label.cgColor
+            self.layer.shadowOffset = CGSize(width: 0, height: 1);
+            self.layer.shadowOpacity = 0.1
+            self.layer.shadowRadius = 2
+            self.layer.borderColor = UIColor.systemBackground.cgColor
+        }
     }
-    func applyShadow(opaque: Bool = true, offset: Double = 4, opacity: Float = 0.1) {
+    func applyShadow(opaque: Bool = true, offset: Double = 4, opacity: Float = 0.05) {
+        if traitCollection.userInterfaceStyle == .dark {
+            return
+        }
         if opaque {
             self.layer.backgroundColor = UIColor.systemBackground.cgColor
         }
-        self.layer.shadowColor = UIColor.black.cgColor
+        self.layer.shadowColor = UIColor.label.cgColor
         self.layer.shadowOffset = CGSize(width: 0, height: offset);
         self.layer.shadowOpacity = opacity
     }

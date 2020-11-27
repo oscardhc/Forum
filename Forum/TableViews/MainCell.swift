@@ -6,8 +6,9 @@
 //
 
 import UIKit
+import DropDown
 
-class MainCell: UITableViewCell {
+class MainCell: UITableViewCell, UITextViewDelegate {
 
     enum Scene {
         case thread, floor, message
@@ -39,6 +40,19 @@ class MainCell: UITableViewCell {
     @IBOutlet weak var mainTextView: UITextView!
     @IBOutlet weak var replyToName: UIButton!
     @IBOutlet weak var replyToNameDist: NSLayoutConstraint!
+    @IBOutlet weak var cornerWidth: NSLayoutConstraint!
+    @IBOutlet weak var cornerHeight: NSLayoutConstraint!
+    @IBOutlet weak var orderBtn: UIButton!
+    @IBOutlet weak var footerHeight: NSLayoutConstraint!
+    
+    let lbl = with(UILabel(frame: .init(x: 5, y: 5, width: 20, height: 20))) {
+        $0.fontSize = 15
+        $0.textColor = .white
+        $0.textAlignment = .center
+        $0.layer.cornerRadius = 10
+        $0.layer.backgroundColor = UIColor.orange.cgColor
+        $0.isHidden = true
+    }
     
     var content = (title: "", content: "") {
         didSet {
@@ -72,6 +86,7 @@ class MainCell: UITableViewCell {
         timeLabel.textColor = .gray
         timeLabel.text = ""
         replyToName.setTitle("", for: .normal)
+        contentView.superview?.clipsToBounds = false
         
         mainTextView.translatesAutoresizingMaskIntoConstraints = false
         mainTextView.sizeToFit()
@@ -81,6 +96,13 @@ class MainCell: UITableViewCell {
         mainTextView.isEditable = false
         mainTextView.isSelectable = false
         mainTextView.isUserInteractionEnabled = false
+        mainTextView.delegate = self
+        mainTextView.backgroundColor = .tertiarySystemBackground
+        
+        cornerLabel.addSubview(lbl)
+        footerHeight.constant = 0
+        orderBtn.isHidden = true
+        orderBtn.addTarget(self, action: #selector(orderBtnClicked(_:)), for: .touchUpInside)
     }
 
     override func setSelected(_ selected: Bool, animated: Bool) {
@@ -88,6 +110,10 @@ class MainCell: UITableViewCell {
 
         // Configure the view for the selected state
 //        mainView.layer.backgroundColor = UIColor.systemGray6.cgColor
+    }
+    
+    func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
+        true
     }
     
     @IBAction func like(_ sender: Any) {
@@ -127,7 +153,7 @@ class MainCell: UITableViewCell {
     
     // MARK: - Thread
     
-    func setAs(thread t: Thread) -> Self {
+    func setAs(thread t: Thread, topTrend: Int? = nil) -> Self {
         thread = t
         scene = .thread
         
@@ -149,10 +175,32 @@ class MainCell: UITableViewCell {
         likedBtn.setTitle("\(t.nLiked)", for: .normal)
         readBtn.setTitle("\(t.nRead)", for: .normal)
         commentBtn.setTitle("\(t.nCommented)", for: .normal)
-        cornerLabel.text = Util.dateToDeltaString(t.lastUpdateTime)
-        headImageView.backgroundColor = t.color[0]
-        headImageView.image = UIImage(named: "hatw80")
-        headImageView.layer.cornerRadius = headImageView.frame.height / 2
+        
+        if let i = topTrend {
+            cornerWidth.constant = 30
+            lbl.text = "\(i + 1)"
+            lbl.isHidden = false
+            cornerLabel.text = ""
+        } else {
+            cornerWidth.constant = 60
+            lbl.isHidden = true
+            cornerLabel.text = Util.dateToDeltaString(t.lastUpdateTime)
+        }
+
+        
+        if thread.isTop {
+            headLabel.text = String("公告")
+            headLabel.layer.backgroundColor = t.color[0].cgColor
+            headLabel.layer.cornerRadius = 15
+            headLabel.textColor = .white
+            headLabel.font = .systemFont(ofSize: 12, weight: .medium)
+            headImageView.image = UIImage()
+            headImageView.backgroundColor = nil
+        } else {
+            headImageView.backgroundColor = t.color[0]
+            headImageView.image = UIImage(named: "hatw80")
+            headImageView.layer.cornerRadius = headImageView.frame.height / 2
+        }
         idLabelHeight.constant = idHeight.constant
         
         likedBtn.isEnabled = false
@@ -191,12 +239,9 @@ class MainCell: UITableViewCell {
         }
         timeLabel.text = Util.dateToDeltaString(f.time)
         
-        let cons: CGFloat = 30
-        idHeight.constant = cons
-        headWidth.constant = cons
         headLabel.text = String(t.name[Int(f.name)!].components(separatedBy: " ").last!.first!)
         headLabel.layer.backgroundColor = color.cgColor
-        headLabel.layer.cornerRadius = cons / 2
+        headLabel.layer.cornerRadius = 15
         headLabel.textColor = .white
         headLabel.font = .systemFont(ofSize: 20, weight: .medium)
         
@@ -214,7 +259,30 @@ class MainCell: UITableViewCell {
         mainTextView.isUserInteractionEnabled = true
         mainTextView.isSelectable = true
         
+        if isFirstFloor {
+            footerHeight.constant = 35
+            orderBtn.isHidden = false
+        } else {
+            footerHeight.constant = 0
+            orderBtn.isHidden = true
+        }
+        
         return self
+    }
+    
+    lazy var dropdown = with(DropDown(anchorView: orderBtn)) {
+        $0.dataSource = ["最早回复", "最新回复"]
+        $0.backgroundColor = .systemBackground
+        $0.cellHeight = 50
+        $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
+        $0.selectionAction = { (index: Int, item: String) in
+            self.orderBtn.setTitle(item, for: .normal)
+            self.parentVC.setReplyOrder(reverse: index == 1)
+        }
+    }
+    
+    @objc func orderBtnClicked(_ sender: Any) {
+        dropdown.show()
     }
     
     // MARK: - Message

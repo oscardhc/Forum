@@ -12,6 +12,7 @@ class LoginVC: UIViewController {
     @IBOutlet weak var emailTextField: UITextField!
     @IBOutlet weak var codeTextField: UITextField!
     @IBOutlet weak var navBar: UINavigationBar!
+    @IBOutlet weak var iconImage: UIImageView!
     
     var sentEmail = ""
     var isBase = false
@@ -24,6 +25,14 @@ class LoginVC: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         isBase = presentingViewController == nil
+        if traitCollection.userInterfaceStyle == .dark {
+            if let filter = CIFilter(name: "CIColorInvert") {
+                filter.setValue(CIImage(image: iconImage.image!), forKey: kCIInputImageKey)
+                let newImage = UIImage(ciImage: filter.outputImage!)
+                iconImage.image = newImage
+            }
+        }
+//        emailTextField.place
         if isBase {
             navBar.isHidden = true
         }

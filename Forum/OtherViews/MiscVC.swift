@@ -125,14 +125,7 @@ class TokenVC: UIViewController {
         super.viewDidLoad()
         
         let d = G.networkStat.content
-        var s = "Failed: \(d[0])\n", sm = 0, cnt = 0
-        for i in 1...100 where d[i] != 0 {
-            s += "\(i): \(d[i]) \n"
-            sm += d[i] * i
-            cnt += d[i]
-        }
-        s += "Average: \(Double(sm) / Double(cnt))"
-        textView.text = s
+        textView.text = "Failed: \(Int(d[4]))\n Average: \(d[0] / d[1])ms\n Min: \(d[2])ms\n Max: \(d[3])ms"
         
     }
     

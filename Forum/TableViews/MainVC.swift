@@ -20,7 +20,7 @@ extension UIRefreshControl {
     }
 }
 
-class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate, DoubleTappable {
+class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate, UISearchControllerDelegate, UISearchBarDelegate, DoubleTappable {
     
     enum Scene: String {
         case main = "首页", my = "My Threads", trends = "趋势", messages = "Messages", floors = "Thread#", favour = "我的收藏"
@@ -42,17 +42,16 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var barSecondBtn: UIBarButtonItem!
     @IBOutlet weak var topDist: NSLayoutConstraint!
     
-    lazy var searchControl = Init(UIAlertController(title: "请输入搜索内容", message: "", preferredStyle: .alert)) {
-        $0.addTextField()
-        $0.addAction(.init(title: "取消", style: .cancel, handler: nil))
-        $0.addAction(.init(title: "确认", style: .default, handler: search))
-    }
-    
     var inSearchMode = false
-    func search(_ alert: UIAlertAction) {
-        (d as! Thread.Manager).search(text: searchControl.textFields?[0].text)
-        inSearchMode = true
-        hasTappedAgain()
+    func search() {
+        if let tx = s.searchBar.text {
+            with((self.d as! Thread.Manager)) {
+                $0.searchFor = tx
+            }
+            inSearchMode = true
+            hasTappedAgain()
+//            self.refresh()
+        }
     }
     
     static func new(_ scene: Scene, _ args: Any...) -> MainVC {
@@ -78,6 +77,11 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     let footer = MJRefreshAutoNormalFooter()
     var originalOffset: CGFloat?
     
+    lazy var s = with(SearchBarContainerView(customSearchBar: UISearchBar())) {
+        $0.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44)
+        $0.searchBar.delegate = self
+    }
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -89,8 +93,21 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             ? "\((d as! Floor.Manager).thread.title)"
             : scene.rawValue
         
-        navigationController?.navigationBar.barTintColor = .systemBackground
-        navigationController?.navigationBar.shadowImage = UIImage()
+        
+        let navBarAppearance = UINavigationBarAppearance()
+        navBarAppearance.configureWithOpaqueBackground()
+        navBarAppearance.shadowImage = nil
+        navBarAppearance.shadowColor = nil
+        navBarAppearance.backgroundColor = .systemBackground
+        
+        navigationController?.navigationBar.standardAppearance = navBarAppearance
+        navigationController?.navigationBar.scrollEdgeAppearance = navBarAppearance
+        
+        self.extendedLayoutIncludesOpaqueBars = true
+            
+//        navigationItem.searchController = s
+//        s.searchBar.isHidden = true
+//        s.show
         
         tableView.contentInsetAdjustmentBehavior = .always
 //        edgesForExtendedLayout = .all
@@ -101,7 +118,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         tableView.separatorStyle = .none
                 
         footer.setRefreshingTarget(self, refreshingAction: #selector(loadmore))
-        footer.heightPreset = .custom(85)
+        footer.heightPreset = .custom(110)
+        footer.backgroundColor = .none
         tableView.mj_footer = footer
 
         let refreshControl = UIRefreshControl()
@@ -115,6 +133,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidHide(_:)), name: UIResponder.keyboardDidHideNotification, object: nil)
         textView.delegate = self
         textViewDidChange(textView)
         floor = "0"
@@ -131,50 +151,60 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         if scene == .floors {
             tabBarController?.tabBar.isHidden = true
             bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 20
-            navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .bold)]
+            navigationController!.navigationBar.standardAppearance.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .bold), .foregroundColor: UIColor.label]
+            navigationController!.navigationBar.scrollEdgeAppearance!.largeTitleTextAttributes = [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 17, weight: .bold), .foregroundColor: UIColor.label]
         } else {
             tabBarController?.tabBar.isHidden = false
             bottomViewHeight.constant = 0
-            navigationController?.navigationBar.largeTitleTextAttributes = nil
+            navigationController!.navigationBar.standardAppearance.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
+            navigationController!.navigationBar.scrollEdgeAppearance!.largeTitleTextAttributes = [.foregroundColor: UIColor.label]
         }
         topCornerBtn.title = ""
         barSecondBtn.title = ""
         if scene == .main {
-            topCornerBtn.image = UIImage(systemName: "magnifyingglass")
+            barSecondBtn.image = UIImage(systemName: "magnifyingglass")
             newThreadBtn.frame.origin = CGPoint(x: newThreadBtn.frame.minX, y: UIScreen.main.bounds.height - tabBarController!.tabBar.frame.height - 80)
+            navigationController?.navigationBar.layer.shadowOpacity = 0
         } else {
-            topCornerBtn.image = UIImage()
+            barSecondBtn.image = UIImage()
             newThreadBtn.isHidden = true
+            navigationController?.navigationBar.applyShadow()
         }
         if scene == .floors {
             topCornerBtn.image = UIImage(systemName: "star")
+            barSecondBtn.image = UIImage(systemName: "ellipsis")
             topCornerBtn.isEnabled = false
+            barSecondBtn.isEnabled = true
         } else {
-            barSecondBtn.image = UIImage()
+            topCornerBtn.isEnabled = false
+            topCornerBtn.image = UIImage()
         }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
         super.viewWillDisappear(animated)
         changeBar(hide: false)
-        if let fvc = fatherThreadListView {
-            
-        }
     }
     
-    var isDoubleTapping = false
+    var isDoubleTapping = false, tryDoubleTapping = false, firstLoading = true
     func hasTappedAgain() {
-        if tableView.refreshControl!.isRefreshing {
+        if tableView.refreshControl!.isRefreshing || tryDoubleTapping {
             return
         }
-        let top = self.tableView.adjustedContentInset.top
-        let y = self.tableView.refreshControl!.frame.maxY + top
-        self.tableView.setContentOffset(CGPoint(x: 0, y: -y-52), animated: true)
-        tableView.refreshControl?.beginRefreshing()
-        isDoubleTapping = true
-        DispatchQueue.global().async {
-            usleep(300000)
-            self.refresh()
+        let y = self.tableView.refreshControl!.frame.maxY + self.tableView.adjustedContentInset.top
+        let o = self.tableView.contentOffset.y
+        print("...........", o, self.tableView.refreshControl!.frame.maxY, self.tableView.adjustedContentInset.top)
+        
+        if o < -30 {
+            self.isDoubleTapping = true
+            self.tableView.setContentOffset(CGPoint(x: 0, y: -y), animated: true)
+            self.tableView.refreshControl?.beginRefreshing()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self.refresh()
+            }
+        } else {
+            self.tryDoubleTapping = true
+            self.tableView.setContentOffset(CGPoint(x: 0, y: -y), animated: true)
         }
     }
     
@@ -188,43 +218,58 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     @objc func refresh() {
-//        print("refresh...")
+        print("refresh...")
         DispatchQueue.global().async {
-            usleep(200000)
+            usleep(self.firstLoading ? 100000 : 300000)
             if !self.inSearchMode, let dm = self.d as? Thread.Manager, dm.searchFor != nil {
                 dm.resetSearch()
             }
             self.inSearchMode = false
-            let count = self.d.getInitialContent()
-//            print("end refreshing")
+            
+            let count = self.d.clear().getContent()
             
             DispatchQueue.main.async {
-                self.updateFavour()
-                self.footer.setTitle("点击或上拉以加载更多", for: .idle)
-                self.tableView.isScrollEnabled = true
                 
+                self.updateFavour()
                 self.tableView.refreshControl?.endRefreshing()
                 
-                if self.isDoubleTapping {
-                    self.tableView.setContentOffset(CGPoint(x: 0, y: -170), animated: true)
-                    self.isDoubleTapping = false
-                }
-                self.tableView.reloadData()
-                
-                if count == G.numberPerFetch {
-                    self.tableView.mj_footer?.resetNoMoreData()
-                } else {
-                    self.tableView.mj_footer?.endRefreshingWithNoMoreData()
+                DispatchQueue.main.asyncAfter(deadline: .now() + (self.firstLoading ? 0 : 0.25)) {
+                    
+                    self.footer.setTitle("点击或上拉以加载更多", for: .idle)
+                    self.tableView.isScrollEnabled = true
+                    
+                    if self.isDoubleTapping {
+                        let y = self.tableView.refreshControl!.frame.maxY + self.tableView.adjustedContentInset.top
+                        self.tableView.setContentOffset(CGPoint(x: 0, y: -y), animated: true)
+                        self.isDoubleTapping = false
+                    }
+                    
+                    self.tableView.reloadData()
+                    if count > 3 && self.firstLoading {
+                        print("start scrolling!", self.tableView.contentOffset)
+                        
+                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+//                            self.tableView.setContentOffset(.init(x: 0, y: -60), animated: true)
+                        }
+                    }
+                    self.firstLoading = false
+                    
+                    if count >= G.numberPerFetch {
+                        self.tableView.mj_footer?.resetNoMoreData()
+                    } else {
+                        self.tableView.mj_footer?.endRefreshingWithNoMoreData()
+                    }
                 }
             }
         }
     }
     
     @objc func loadmore() {
+        self.tableView.isScrollEnabled = false
         DispatchQueue.global().async {
-            usleep(200000)
+            usleep(100000)
             let prev = self.d.count
-            let count = self.d.getMoreContent()
+            let count = self.d.getContent()
             DispatchQueue.main.async {
                 self.tableView.mj_footer?.endRefreshing()
                 
@@ -241,6 +286,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                 if count != G.numberPerFetch {
                     self.tableView.mj_footer?.endRefreshingWithNoMoreData()
                 }
+                
+                self.tableView.isScrollEnabled = true
             }
         }
     }
@@ -261,6 +308,15 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             changeBar(hide: true)
         } else {
             changeBar(hide: false)
+        }
+    }
+    
+    func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
+        if self.tryDoubleTapping {
+            self.tryDoubleTapping = false
+//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                self.hasTappedAgain()
+//            }
         }
     }
     
@@ -300,6 +356,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                 self.view.layoutIfNeeded()
             }
         }
+        self.navigationItem.titleView = nil
     }
     func adjustTextView() {
         if scene == .floors {
@@ -313,6 +370,9 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             }
             updateCountingLabel(label: replyCountLabel, text: textView.text, lineLimit: 20, charLimit: 817)
         }
+    }
+    
+    @objc func keyboardDidHide(_ sender: Notification) {
     }
     
     func textViewDidChange(_ textView: UITextView) {
@@ -343,7 +403,11 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                 textView.text = ""
                 self.view.endEditing(false)
                 showAlert("评论成功", style: .success) {
-                    self.loadmore()
+                    if self.d.count > 1 {
+                        self.loadmore()
+                    } else {
+                        self.refresh()
+                    }
                 }
             }
         } else {
@@ -355,10 +419,18 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
     }
     
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        searchBarCancelButtonClicked(searchBar)
+        search()
+    }
+    
+    func searchBarCancelButtonClicked(_ searchBar: UISearchBar) {
+        self.view.endEditing(false)
+        self.navigationItem.titleView = nil
+    }
+    
     @IBAction func barBtnClicked(_ sender: Any) {
-        if scene == .main {
-            self << searchControl
-        } else if scene == .floors {
+        if scene == .floors {
             if ({
                 if (d as! Floor.Manager).thread.hasFavoured {
                     return Network.cancelFavourThread(for: (d as! Floor.Manager).thread.id)
@@ -386,23 +458,28 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     @IBAction func secondBarBtnClicked(_ sender: UIBarItem) {
-        let al = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-        al.addAction(.init(title: "屏蔽", style: .default, handler: { (a) in
-            self.blockThread("屏蔽成功")
-        }))
-        al.addAction(.init(title: "举报", style: .destructive, handler: { (a) in
-            self.blockThread("举报成功")
-        }))
-        al.addAction(.init(title: "取消", style: .cancel, handler: { (a) in
-            
-        }))
-        if let popoverPresentationController = al.popoverPresentationController {
-            popoverPresentationController.sourceView = self.view
-            let fr = self.navigationController!.navigationBar.frame
-            popoverPresentationController.sourceRect = .init(x: fr.maxX - 1.0, y: fr.minY, width: 1.0, height: fr.height)
-            popoverPresentationController.permittedArrowDirections = .init(rawValue: 0)
+        if scene == .floors {
+            let al = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            al.addAction(.init(title: "屏蔽", style: .default, handler: { (a) in
+                self.blockThread("屏蔽成功")
+            }))
+            al.addAction(.init(title: "举报", style: .destructive, handler: { (a) in
+                self.blockThread("举报成功")
+            }))
+            al.addAction(.init(title: "取消", style: .cancel, handler: { (a) in
+                
+            }))
+            if let popoverPresentationController = al.popoverPresentationController {
+                popoverPresentationController.sourceView = self.view
+                let fr = self.navigationController!.navigationBar.frame
+                popoverPresentationController.sourceRect = .init(x: fr.maxX - 1.0, y: fr.minY, width: 1.0, height: fr.height)
+                popoverPresentationController.permittedArrowDirections = .init(rawValue: 0)
+            }
+            self << al
+        } else {
+            self.navigationItem.titleView = s
+            s.searchBar.becomeFirstResponder()
         }
-        self << al
     }
     
     // MARK: - Table view data source
@@ -412,14 +489,14 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     var headerHeight: CGFloat {
-        scene == .main ? 20 : 3
+        scene == .main ? 20 : 5
     }
     
     func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
         headerHeight
     }
     
-    lazy var dropDown = Init(DropDown()) {
+    lazy var dropDown = with(DropDown()) {
         $0.dataSource = Thread.Category.allCases.dropLast().map {
             $0.rawValue
         }
@@ -429,34 +506,34 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     func tableView(_ tableView: UITableView, viewForHeaderInSection section: Int) -> UIView? {
+        if scene != .main {
+            return UIView()
+        }
         let width = tableView.frame.width
         let baseView = UIView(frame: CGRect(x: 0, y: 0, width: width, height: headerHeight))
         baseView.backgroundColor = .systemBackground
-        if headerHeight == 3 {
-            baseView.applyShadow()
-            return baseView
-        }
-        
-        let view = UIView(frame: CGRect(x: 0, y: 5, width: width, height: headerHeight - 5))
-        view.applyShadow()
-        baseView.addSubview(view)
         
         // hide top shaddow
-        let top = UIView(frame: CGRect(x: 0, y: 0, width: width, height: 5))
-        top.backgroundColor = baseView.backgroundColor
-        baseView.addSubview(top)
+        let bot = UIView(frame: CGRect(x: 0, y: headerHeight - 5, width: width, height: 5))
+        bot.backgroundColor = .systemBackground
+        bot.applyShadow()
+        baseView.addSubview(bot)
         baseView.clipsToBounds = false
+        
+        let view = UIView(frame: CGRect(x: 0, y: -20, width: width, height: headerHeight + 20))
+        view.backgroundColor = .systemBackground
+        baseView.addSubview(view)
         
         if scene == .main {
             
-            let lbl = UILabel(frame: CGRect(x: width/2, y: -5, width: width/4, height: headerHeight))
+            let lbl = UILabel(frame: CGRect(x: width/2, y: 17, width: width/4, height: headerHeight))
             lbl.text = "板块："
-            lbl.textColor = .black
+            lbl.textColor = .label
             lbl.textAlignment = .right
             lbl.font = UIFont.systemFont(ofSize: 12)
             view.addSubview(lbl)
             
-            let btn = UIButton(frame: CGRect(x: width*3/4, y: -5, width: width/4 - 8, height: headerHeight))
+            let btn = UIButton(frame: CGRect(x: width*3/4, y: 17, width: width/4 - 8, height: headerHeight))
             btn.addTarget(self, action: #selector(chooseBlock(_:)), for: .touchUpInside)
             btn.setTitle((d as! Thread.Manager).block.rawValue, for: .normal)
             btn.setDropDownStyle()
@@ -471,7 +548,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             
             view.addSubview(btn)
         } else if scene == .floors {
-            let lbl = Init(UILabel(frame: .init(x: 8, y: 0, width: width/2, height: headerHeight))) {
+            let lbl = with(UILabel(frame: .init(x: 8, y: 0, width: width/2, height: headerHeight))) {
                 $0.text = (d as! Floor.Manager).thread.title
                 $0.fontSize = 15
             }
@@ -482,6 +559,15 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @objc func chooseBlock(_ sender: Any) {
         dropDown.show()
+    }
+    
+    func setReplyOrder(reverse: Bool) {
+        with(d as! Floor.Manager) {
+            if $0.reverse != reverse {
+                $0.reverse = reverse
+                hasTappedAgain()
+            }
+        }
     }
 
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
@@ -504,4 +590,35 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         d.didSelectedRow(self, index: indexPath.row)
     }
 
+}
+
+class SearchBarContainerView: UIView {
+
+    let searchBar: UISearchBar
+
+    init(customSearchBar: UISearchBar) {
+        searchBar = customSearchBar
+        super.init(frame: CGRect.zero)
+        
+        searchBar.placeholder = "Search"
+        searchBar.barTintColor = UIColor.white
+        searchBar.searchBarStyle = .minimal
+        searchBar.returnKeyType = .done
+        searchBar.showsCancelButton = true
+        addSubview(searchBar)
+    }
+    
+    override convenience init(frame: CGRect) {
+        self.init(customSearchBar: UISearchBar())
+        self.frame = frame
+    }
+
+    required init?(coder aDecoder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        searchBar.frame = bounds
+    }
 }

@@ -11,18 +11,26 @@ import UIKit
 
 class Network {
     
-    static let e = JSONEncoder(), ip = "172.81.215.104", port: Int32 = 8080
+    static let e = JSONEncoder(), ip = "182.254.145.254", port: Int32 = 8080
     
-    static private func connect<T: Encodable>(_ data: T) -> [String: Any]? {
+    static private func connect<T: Encodable>(_ d: T) -> [String: Any]? {
         func singleConnect() -> [String: Any]? {
             do {
-                let data = try e.encode(data)
+                let data = try e.encode(d)
                 
                 let s = try Socket.create()
-                try s.connect(to: ip, port: port)
+                try s.connect(to: ip, port: port, timeout: 10000)
+//                print("data:", d)
                 try s.write(from: data)
+                try s.setReadTimeout(value: 10000)
+                var dt = Data()
+                
+                while try s.read(into: &dt) > 0 {
+                    
+                }
+                
                 let rec = try JSONSerialization.jsonObject(
-                    with: try s.readString()!.data(using: .utf8)!,
+                    with: dt,
                     options: .allowFragments
                 )
                 s.close()
@@ -32,15 +40,16 @@ class Network {
                 return nil
             }
         }
-        for i in 1...100 {
+        let before = Date().timeIntervalSince1970
+        for i in 1...5 {
             if let res = singleConnect() {
                 print("connect success with in \(i) time(s)")
-                G.updateStat(i)
+                G.updateStat((Date().timeIntervalSince1970 - before) * 1000)
                 return res
             }
             usleep(10000)
         }
-        G.updateStat(0)
+        G.updateStat(-1)
         return nil
     }
     
@@ -69,38 +78,49 @@ class Network {
         case time = "1", favoured = "6", my = "7", trending = "d"
     }
     
-    static func getThreads(type: NetworkGetThreadType, inBlock: Thread.Category, lastSeenID: String = "NULL") -> [Thread] {
+    static func getThreads(type: NetworkGetThreadType, inBlock: Thread.Category, lastSeenID: String) -> ([Thread], String) {
         getData(op_code: type.rawValue, pa_1: lastSeenID, pa_2: String(Thread.Category.allCases.firstIndex(of: inBlock)!)) {
-            ($0["thread_list"]! as! [Any]).map {
-                Thread(json: $0)
-            }
-        } ?? []
-    }
-    
-    static func searchThreads(keyword: String, lastSeenID: String = "NULL") -> [Thread] {
-        getData(op_code: "b", pa_1: keyword, pa_2: lastSeenID) {
-            ($0["thread_list"]! as! [Any]).map {
-                Thread(json: $0)
-            }
-        } ?? []
-    }
-    
-    static func getFloors(for threadID: String, lastSeenID: String = "NULL") -> (floors: [Floor], thread: Thread) {
-        getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID) {
             (
-                ($0["floor_list"]! as! [Any]).map {
-                    Floor(json: $0)
-                }, Thread(json: $0["this_thread"]!)
+                ($0["thread_list"]! as! [Any]).map {
+                    Thread(json: $0)
+                },
+                $0[$0.keys.first(where: {$0.hasPrefix("LastSeen")})!] as! String
             )
-        } ?? ([], Thread(json: 1))
+        } ?? ([], "")
     }
     
-    static func getMessages(lastSeenID: String = "NULL") -> [Message] {
+    static func searchThreads(keyword: String, lastSeenID: String) -> ([Thread], String) {
+        getData(op_code: "b", pa_1: keyword, pa_2: lastSeenID) {
+            (
+                ($0["thread_list"]! as! [Any]).map {
+                    Thread(json: $0)
+                },
+                $0[$0.keys.first(where: {$0.hasPrefix("LastSeen")})!] as! String
+            )
+        } ?? ([], "")
+    }
+    
+    static func getFloors(for threadID: String, lastSeenID: String, reverse: Bool) -> (([Floor], String), Thread) {
+        getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID, pa_3: reverse ? "1" : "0") {
+            (
+                (
+                    ($0["floor_list"]! as! [Any]).map {Floor(json: $0)},
+                    $0[$0.keys.first(where: {$0.hasPrefix("LastSeen")})!] as! String
+                ),
+                Thread(json: $0["this_thread"]!)
+            )
+        } ?? (([], ""), Thread(json: 0))
+    }
+    
+    static func getMessages(lastSeenID: String) -> ([Message], String) {
         getData(op_code: "a", pa_1: lastSeenID) {
-            ($0["message_list"]! as! [Any]).map {
-                Message(json: $0)
-            }
-        } ?? []
+            (
+                ($0["message_list"]! as! [Any]).map {
+                    Message(json: $0)
+                },
+                $0[$0.keys.first(where: {$0.hasPrefix("LastSeen")})!] as! String
+            )
+        } ?? ([], "")
     }
     
     static func verifyToken() -> Bool {
