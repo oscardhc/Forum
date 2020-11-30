@@ -18,13 +18,38 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         // This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
         guard let _ = (scene as? UIWindowScene) else { return }
         
-        
-        if !Network.verifyToken() {
-            window?.rootViewController = *"TermVC"
-        } else {
-            window?.rootViewController = *"InitTabVC"
+        if let urlContext = connectionOptions.urlContexts.first {
+            G.openThreadID = dealWithURLContext(urlContext)
         }
         
+        if let success = Network.verifyToken() {
+            if !success {
+                window?.rootViewController = *"TermVC"
+            } else {
+                window?.rootViewController = *"InitTabVC"
+            }
+        } else {
+            window?.rootViewController = (*"TermVC" as! TermVC).noNetwork()
+        }
+        
+    }
+    
+    func scene(_ scene: UIScene, openURLContexts URLContexts: Set<UIOpenURLContext>) {
+        if let urlContext = URLContexts.first {
+            if let mvc = window?.rootViewController?.topMostViewController() {
+                if mvc is LoginVC || mvc is TermVC {
+                    mvc.showAlert("请先登录", style: .failure, duration: 2)
+                } else {
+                    G.openThreadID = dealWithURLContext(urlContext)
+                    if let id = G.openThreadID {
+                        G.openThreadID = nil
+                        Thread.Manager.openCertainThread(mvc, id: id)
+                    } else {
+                        mvc.showAlert("链接格式错误", style: .warning, duration: 2)
+                    }
+                }
+            }
+        }
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {
@@ -60,4 +85,3 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
 
 }
-

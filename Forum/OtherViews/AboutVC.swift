@@ -21,8 +21,15 @@ class AboutVC: UIViewController {
         return self
     }
     
+    override func viewWillDisappear(_ animated: Bool) {
+        super.viewWillDisappear(animated)
+        if isBeingDismissed {
+            fatherVC.deselect()
+        }
+    }
+    
     @IBAction func dismissClicked(_ sender: Any) {
-        fatherVC.deselect()
+//        fatherVC.deselect()
         dismiss(animated: true, completion: nil)
     }
     

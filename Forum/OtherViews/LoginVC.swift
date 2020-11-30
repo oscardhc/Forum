@@ -32,20 +32,15 @@ class LoginVC: UIViewController {
                 iconImage.image = newImage
             }
         }
-//        emailTextField.place
-        if isBase {
-            navBar.isHidden = true
-        }
+        isBase => navBar.isHidden = true
     }
     
     @IBAction func sendVerificationCode(_ sender: Any) {
         if let email = emailTextField.text, email.hasSuffix("@sjtu.edu.cn") {
             sentEmail = email
-            if !Network.requestLogin(with: email) {
-                showAlert("验证码发送失败", style: .failure)
-            } else {
-                showAlert("验证码发送成功", style: .success)
-            }
+            !Network.requestLogin(with: email)
+                ?< self.showAlert("验证码发送失败", style: .failure)
+                ?> self.showAlert("验证码发送成功", style: .success)
         } else { showAlert("请填写正确的交大邮箱", style: .warning) }
     }
     

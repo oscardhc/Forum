@@ -13,7 +13,6 @@ class TabBarController: UITabBarController {
         super.viewDidLoad()
 
         // Do any additional setup after loading the view.
-        print("loading tab bar...")
         let nav = UINavigationController(rootViewController: MainVC.new(.trends))
         nav.navigationBar.prefersLargeTitles = true
         viewControllers?.insert(nav, at: 1)

@@ -13,7 +13,7 @@ import DropDown
 
 class Util {
     
-    static let formatter =  with(DateFormatter()) {
+    static let formatter = DateFormatter()..{
         $0.dateFormat = "yyyy-MM-dd HH:mm:ss"
     }
     
@@ -57,10 +57,61 @@ class DarkSupportTextField: TextField {
     }
 }
 
-@discardableResult func with<T>(_ value: T, _ block: (_ object: T) -> Void) -> T
+@discardableResult func with<T>(_ value: T, _ block: (T) -> Void) -> T
 {
     block(value)
     return value
+}
+
+precedencegroup LowestPrecedence {
+    associativity: left
+    lowerThan: AssignmentPrecedence
+}
+infix operator ..: LowestPrecedence
+
+@discardableResult func .. <T>(_ lhs: T, _ rhs: (T) -> Void) -> T {
+    rhs(lhs)
+    return lhs
+}
+@discardableResult func .. <T, K>(_ lhs: (T, K), _ rhs: (T, K) -> Void) -> (T, K) {
+    rhs(lhs.0, lhs.1)
+    return lhs
+}
+func .. <T, K>(_ lhs: T, _ rhs: KeyPath<T, K>) -> K {
+    return lhs[keyPath: rhs]
+}
+
+infix operator => : LowestPrecedence
+func => (_ lhs: @autoclosure () -> Bool, _ rhs: @autoclosure () -> Void) {
+    if lhs() { rhs() }
+}
+func => (_ lhs: @autoclosure () -> Bool, _ rhs: () -> Void) {
+    if lhs() { rhs() }
+}
+func => (_ lhs: () -> Bool, _ rhs: () -> Void) {
+    if lhs() { rhs() }
+}
+
+precedencegroup SecondaryTernaryPrecedence {
+    associativity: right
+    higherThan: TernaryPrecedence
+    lowerThan: LogicalDisjunctionPrecedence
+}
+
+infix operator ?< : SecondaryTernaryPrecedence
+
+func ?< <T>(lhs: @autoclosure () -> Bool, rhs: @escaping @autoclosure () -> T) -> (Bool, () -> T) {
+    return (lhs(), rhs)
+}
+
+infix operator ?> : TernaryPrecedence
+
+@discardableResult func ?> <T>(lhs: (Bool, () -> T), rhs: @escaping @autoclosure () -> T) -> T {
+    if lhs.0 {
+        return lhs.1()
+    } else {
+        return rhs()
+    }
 }
 
 // MARK: - Generator
@@ -199,6 +250,34 @@ extension UIViewController {
     
     static func << (_ vc: UIViewController, _ to: UIViewController) {
         vc.present(to, animated: true, completion: nil)
+    }
+    
+    func topMostViewController() -> UIViewController {
+        
+        if let presented = self.presentedViewController {
+            return presented.topMostViewController()
+        }
+        
+        if let navigation = self as? UINavigationController {
+            return navigation.visibleViewController?.topMostViewController() ?? navigation
+        }
+        
+        if let tab = self as? UITabBarController {
+            return tab.selectedViewController?.topMostViewController() ?? tab
+        }
+        
+        return self
+    }
+}
+
+func dealWithURLContext(_ urlContext: UIOpenURLContext) -> String? {
+    let url = urlContext.url.absoluteString.replacingOccurrences(of: "wkfg://", with: "")
+    print("url = \(url)")
+    
+    if let i = Int(url), i >= 1, i < 1000000 {
+        return url
+    } else {
+        return nil
     }
 }
 

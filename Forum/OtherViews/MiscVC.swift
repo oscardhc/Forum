@@ -50,7 +50,7 @@ class BaseTableVC: UIViewController, UITableViewDataSource, UITableViewDelegate,
         _tableView.delegate = self
         _tableView.dataSource = self
         _tableView.tableFooterView = UIView(frame: CGRect.zero)
-        _tableView.contentInsetAdjustmentBehavior = .always
+        _tableView.contentInsetAdjustmentBehavior = .never
     }
     
     func deselect() {
@@ -153,6 +153,7 @@ class ReportVC: UIViewController {
 class TermVC: UIViewController {
     
     @IBOutlet weak var checker: CheckerButton!
+    var toHalt = false
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -160,6 +161,16 @@ class TermVC: UIViewController {
         checker.semanticContentAttribute = .forceLeftToRight
         checker.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
         checker.imageEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0)
+        if toHalt {
+            self.showAlert("无网络连接", style: .failure) {
+                Util.halt()
+            }
+        }
+    }
+    
+    func noNetwork() -> Self {
+        toHalt = true
+        return self
     }
     
     @IBAction func confirm(_ sender: Any) {
@@ -175,3 +186,5 @@ class TermVC: UIViewController {
     }
     
 }
+
+//class AboutVC

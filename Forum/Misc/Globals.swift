@@ -49,6 +49,8 @@ class G {
     
     static var hasLoggedIn: Bool {token.content != ""}
     
+    static var openThreadID: String? = nil
+    
 }
 
 

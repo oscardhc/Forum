@@ -49,7 +49,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     @IBOutlet weak var allTopDIst: NSLayoutConstraint!
     @IBOutlet weak var lessThanDIst: NSLayoutConstraint!
     
-    let lbl = with(UILabel(frame: .init(x: 5, y: 5, width: 20, height: 20))) {
+    let lbl = UILabel(frame: .init(x: 5, y: 5, width: 20, height: 20))..{
         $0.fontSize = 15
         $0.textColor = .white
         $0.textAlignment = .center
@@ -213,6 +213,8 @@ class MainCell: UITableViewCell, UITextViewDelegate {
             headImageView.image = UIImage()
             headImageView.backgroundColor = nil
         } else {
+            headLabel.text = ""
+            headLabel.layer.backgroundColor = .none
             headImageView.backgroundColor = t.color[0]
             headImageView.image = UIImage(named: "hatw80")
             headImageView.layer.cornerRadius = headImageView.frame.height / 2
@@ -229,14 +231,22 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     // MARK: - Floor
     
     @objc func moveTo(_ sender: Any) {
-        parentVC.tableView.scrollToRow(at: .init(row: floor.replyToFloor!, section: 0), at: .top, animated: true)
+        (parentVC.d as! Floor.Manager, String(floor.replyToFloor!))..{ (dd, to) in
+            if floor.replyToFloor! > 0,  let idx = dd.data.firstIndex(where: {$0.id == to}) {
+                parentVC.tableView.scrollToRow(at: .init(row: idx + 1, section: 0), at: dd.reverse ? .bottom : .top, animated: true)
+            }
+        }
+//        if let  floor.replyToFloor!
+//        parentVC.tableView.scrollToRow(at: .init(row: floor.replyToFloor!, section: 0), at: .top, animated: true)
     }
     
-    func setAs(floor f: Floor, forThread t: Thread, firstFloor: Bool = false) -> Self {
+    func setAs(floor f: Floor, forThread t: Thread, firstFloor: Bool = false, reversed: Bool = false) -> Self {
         thread = t
         floor = f
         isFirstFloor = firstFloor
         scene = .floor
+        orderReversed = reversed
+        updateOrder()
         
         let color = t.color[Int(f.name)!]
         
@@ -286,19 +296,38 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         return self
     }
     
-    lazy var dropdown = with(DropDown(anchorView: orderBtn)) {
-        $0.dataSource = ["最早回复", "最新回复"]
-        $0.backgroundColor = .systemBackground
-        $0.cellHeight = 50
-        $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
-        $0.selectionAction = { (index: Int, item: String) in
-            self.orderBtn.setTitle(item, for: .normal)
-            self.parentVC.setReplyOrder(reverse: index == 1)
-        }
-    }
+//    lazy var dropdown = DropDown(anchorView: orderBtn)..{
+//        $0.dataSource = ["最早回复", "最新回复"]
+//        $0.backgroundColor = .systemBackground
+//        $0.cellHeight = 50
+//        $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
+//        $0.selectionAction = { (index: Int, item: String) in
+//            self.orderBtn.setTitle(item, for: .normal)
+//            self.orderBtn.setImage(
+//                UIImage(systemName: index == 1 ? "arrowtriangle.down.circle" : "arrowtriangle.up.circle",
+//                        withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
+//                for: .normal
+//            )
+//            self.parentVC.setReplyOrder(reverse: index == 1)
+//        }
+//    }
     
+    var orderReversed = false
+    func updateOrder() {
+        self.orderBtn.setTitle(orderReversed ? "最新回复" : "最早回复", for: .normal)
+        self.orderBtn.setImage(
+            UIImage(systemName: orderReversed ? "arrowtriangle.down.circle" : "arrowtriangle.up.circle",
+                    withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
+            for: .normal
+        )
+    }
     @objc func orderBtnClicked(_ sender: Any) {
-        dropdown.show()
+//        dropdown.show()
+        orderReversed = !orderReversed
+        updateOrder()
+        self.orderBtn.isEnabled = false
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {self.orderBtn.isEnabled = true})
+        self.parentVC.setReplyOrder(reverse: orderReversed)
     }
     
     // MARK: - Message
@@ -307,6 +336,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         message = m
         _ = setAs(thread: m.thread)
         cornerLabel.text = m.judge == 0 ? "未读" : "已读"
+        cornerLabel.textColor = m.judge == 0 ? .systemBlue : .label
         content.content = m.ty == 0 ? "有人回复了你！" : "有\(m.ty)人赞了你！"
         return self
     }

@@ -17,7 +17,7 @@ class BaseManager {
     func initializeCell(_ cell: MainCell, index: Int) -> MainCell { cell }
     func clear() -> Self { return self }
     func getContent() -> Int { -1 }
-    func didSelectedRow(_ vc: UIViewController, index: Int) {}
+    @discardableResult func didSelectedRow(_ vc: UIViewController, index: Int, commit: Bool = true) -> UIViewController? { return nil }
 }
 
 class DataManager<T: DATA>: BaseManager {
@@ -32,11 +32,10 @@ class DataManager<T: DATA>: BaseManager {
         return self
     }
     override func getContent() -> Int {
-        with(networking()) {
+        networking()..{
             data += $0.0
             last = $0.1
-            print("get content", data.count, $0.0.count)
-        }.0.count
+        }..\.0.count
     }
     
 }
@@ -78,9 +77,10 @@ struct Thread: DATA {
         postTime = Util.stringToDate(thread["PostTime"] as! String)
     }
     
-    init() {
+    init(_ s: String? = nil) {
         name = NameG(theme: .aliceAndBob, seed: 0)
         color = ColorG(theme: .cold, seed: 0)
+        id = s ?? ""
     }
     
     func generateFirstFloor() -> Floor {
@@ -102,15 +102,12 @@ struct Thread: DATA {
         
         var filtered = [Thread]()
         
-        
-        
         override var data: [Thread] {
             didSet {
                 let li = G.blockedList.content
                 filtered = data.filter() {
                     !li.contains($0.id)
                 }
-                print("data set!", data.count, filtered.count)
             }
         }
         
@@ -137,13 +134,21 @@ struct Thread: DATA {
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            return cell.setAs(thread: index < self.count ? filtered[index] : Thread(), topTrend: (sortType == .trending && index < 3) ? index : nil)
+//            cell.setAs(thread: filtered[index], topTrend: (sortType == .trending && index < 3) ? index : nil)
+            cell.setAs(thread: index < self.count ? filtered[index] : Thread(), topTrend: (sortType == .trending && index < 3) ? index : nil)
         }
         
-        override func didSelectedRow(_ vc: UIViewController, index: Int) {
-            let subVC = MainVC.new(.floors, filtered[index])
-            subVC.fatherThreadListView = (vc as! MainVC)
-            vc >> subVC
+        override func didSelectedRow(_ vc: UIViewController, index: Int, commit: Bool = true) -> UIViewController? {
+            MainVC.new(.floors, filtered[index])..{
+                commit => vc >> $0
+            }
+        }
+        
+        static func openCertainThread(_ vc: UIViewController, id: String) {
+            MainVC.new(.floors, Thread(id))..{
+                $0.inPreview = true
+                vc << $0
+            }
         }
         
     }
@@ -187,15 +192,21 @@ struct Floor: DATA {
         override var count: Int {data.count + 1}
         
         override func networking() -> ([Floor], String) {
-            with(Network.getFloors(for: thread.id, lastSeenID: last, reverse: reverse)) {
-                thread = $0.1
-            }.0
+            Network.getFloors(for: thread.id, lastSeenID: last, reverse: reverse)..{
+                if let t = $0.1 { thread = t }
+            }..\.0
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
             index == 0
-                ? cell.setAs(floor: thread.generateFirstFloor(), forThread: thread, firstFloor: true)
+                ? cell.setAs(floor: thread.generateFirstFloor(), forThread: thread, firstFloor: true, reversed: reverse)
                 : cell.setAs(floor: index <= data.count ? data[index - 1] : Floor(), forThread: thread, firstFloor: false)
+        }
+        
+        func displayNameFor(_ i: Int) -> String {
+            thread.name[Int((i == 0
+                ? thread.generateFirstFloor()
+                : data[i - 1]).name)!]
         }
         
     }
@@ -214,10 +225,10 @@ struct Message: DATA {
             Network.getMessages(lastSeenID: last)
         }
         
-        override func didSelectedRow(_ vc: UIViewController, index: Int) {
-            let subVC = MainVC.new(.floors, data[index].thread)
-            subVC.fatherThreadListView = (vc as! MainVC)
-            vc >> subVC
+        override func didSelectedRow(_ vc: UIViewController, index: Int, commit: Bool = true) -> UIViewController? {
+            MainVC.new(.floors, data[index].thread)..{
+                commit => vc >> $0
+            }
         }
         
     }

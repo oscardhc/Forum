@@ -100,7 +100,7 @@ class Network {
         } ?? ([], "")
     }
     
-    static func getFloors(for threadID: String, lastSeenID: String, reverse: Bool) -> (([Floor], String), Thread) {
+    static func getFloors(for threadID: String, lastSeenID: String, reverse: Bool) -> (([Floor], String), Thread?) {
         getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID, pa_3: reverse ? "1" : "0") {
             (
                 (
@@ -109,7 +109,7 @@ class Network {
                 ),
                 Thread(json: $0["this_thread"]!)
             )
-        } ?? (([], ""), Thread(json: 0))
+        } ?? (([], ""), nil)
     }
     
     static func getMessages(lastSeenID: String) -> ([Message], String) {
@@ -123,10 +123,10 @@ class Network {
         } ?? ([], "")
     }
     
-    static func verifyToken() -> Bool {
+    static func verifyToken() -> Bool? {
         getData(op_code: "-1", needChecking: false) {
             $0["login_flag"]! as! String == "1"
-        } ?? false
+        }
     }
     
     static func requestLogin(with email: String) -> Bool {

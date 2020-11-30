@@ -22,14 +22,14 @@ extension UIRefreshControl {
 
 class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITextViewDelegate, UIScrollViewDelegate, UISearchControllerDelegate, UISearchBarDelegate, DoubleTappable {
     
+    
     enum Scene: String {
-        case main = "首页", my = "My Threads", trends = "趋势", messages = "Messages", floors = "Thread#", favour = "我的收藏"
+        case main = "首页", my = "我的帖子", trends = "趋势", messages = "通知", floors = "Thread#", favour = "我的收藏"
     }
     
     // This is the default value for MainThread(the enter interface), any other types must overwrite this two properties
     private var scene = Scene.main
     var d: BaseManager = Thread.Manager(type: .time)
-    var fatherThreadListView: MainVC?
     
     @IBOutlet weak var tableView: UITableView!
     @IBOutlet weak var textView: UITextView!
@@ -38,19 +38,20 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     @IBOutlet weak var textViewHeight: NSLayoutConstraint!
     @IBOutlet weak var topCornerBtn: UIBarButtonItem!
     @IBOutlet weak var replyCountLabel: StateLabel!
+    @IBOutlet weak var replyToLabel: UILabel!
     @IBOutlet weak var newThreadBtn: UIButton!
     @IBOutlet weak var barSecondBtn: UIBarButtonItem!
     @IBOutlet weak var topDist: NSLayoutConstraint!
+    @IBOutlet weak var tableBottomSpace: NSLayoutConstraint!
     
     var inSearchMode = false
     func search() {
         if let tx = s.searchBar.text {
-            with((self.d as! Thread.Manager)) {
+            (self.d as! Thread.Manager)..{
                 $0.searchFor = tx
             }
             inSearchMode = true
-            hasTappedAgain()
-//            self.refresh()
+            clearAll()
         }
     }
     
@@ -77,35 +78,39 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     let footer = MJRefreshAutoNormalFooter()
     var originalOffset: CGFloat?
     
-    lazy var s = with(SearchBarContainerView(customSearchBar: UISearchBar())) {
+    lazy var s = SearchBarContainerView(customSearchBar: UISearchBar())..{
         $0.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: 44)
         $0.searchBar.delegate = self
+    }
+    
+    var inPreview = false
+    var _topDist: CGFloat {
+        inPreview
+            ? 0
+            : (UIApplication.shared.windows[0].safeAreaInsets.top == 20 ? 64 : 88)
+    }
+    
+    lazy var refreshControl = UIRefreshControl()..{
+        $0.addTarget(self, action: #selector(refresh), for: .valueChanged)
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        if UIApplication.shared.windows[0].safeAreaInsets.top == 20 {
-            topDist.constant = 64
+        topDist.constant = _topDist
+        
+        UINavigationBarAppearance()..{
+            $0.configureWithOpaqueBackground()
+            $0.shadowImage = nil
+            $0.shadowColor = nil
+            $0.backgroundColor = .systemBackground
+            navigationController?.navigationBar.standardAppearance = $0
+            navigationController?.navigationBar.scrollEdgeAppearance = $0
         }
         
-        let navBarAppearance = UINavigationBarAppearance()
-        navBarAppearance.configureWithOpaqueBackground()
-        navBarAppearance.shadowImage = nil
-        navBarAppearance.shadowColor = nil
-        navBarAppearance.backgroundColor = .systemBackground
-        
-        navigationController?.navigationBar.standardAppearance = navBarAppearance
-        navigationController?.navigationBar.scrollEdgeAppearance = navBarAppearance
-        
         self.extendedLayoutIncludesOpaqueBars = true
-            
-//        navigationItem.searchController = s
-//        s.searchBar.isHidden = true
-//        s.show
         
         tableView.contentInsetAdjustmentBehavior = .always
-//        edgesForExtendedLayout = .all
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -117,24 +122,20 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         footer.backgroundColor = .none
         tableView.mj_footer = footer
 
-        let refreshControl = UIRefreshControl()
-        refreshControl.addTarget(self, action: #selector(refresh), for: .valueChanged)
-        tableView.refreshControl = refreshControl
+        if !inPreview { tableView.refreshControl = refreshControl }
         
-        let gesture = UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(_:)))
-        gesture.numberOfTouchesRequired = 1
-        gesture.cancelsTouchesInView = false
-        tableView.addGestureRecognizer(gesture)
+        tableView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(self.viewTapped(_:)))..{
+            $0.numberOfTouchesRequired = 1
+            $0.cancelsTouchesInView = false
+        })
         
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
-        
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidHide(_:)), name: UIResponder.keyboardDidHideNotification, object: nil)
+        
         textView.delegate = self
         textViewDidChange(textView)
-        floor = "0"
-        
-        newThreadBtn.applyShadow(opaque: false, offset: 2, opacity: 0.3)
+        replyToLabel.text = "To #0"
         
         footer.setTitle("正在加载...", for: .idle)
         tableView.isScrollEnabled = false
@@ -142,7 +143,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        
+        newThreadBtn.applyShadow(opaque: false, offset: 2, opacity: 0.3)
         navigationItem.largeTitleDisplayMode = scene == .floors ? .never : .always
         navigationItem.title = scene == .floors
             ? "\((d as! Floor.Manager).thread.title)"
@@ -170,10 +171,18 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             topCornerBtn.image = UIImage(systemName: "star")
             barSecondBtn.image = UIImage(systemName: "ellipsis")
             topCornerBtn.isEnabled = false
+            !firstLoading => updateFavour()
             barSecondBtn.isEnabled = true
         } else {
             topCornerBtn.isEnabled = false
             topCornerBtn.image = UIImage()
+        }
+        
+        if let id = G.openThreadID {
+            G.openThreadID = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                Thread.Manager.openCertainThread(self, id: id)
+            }
         }
     }
     
@@ -189,7 +198,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
         let y = self.tableView.refreshControl!.frame.maxY + self.tableView.adjustedContentInset.top
         let o = self.tableView.contentOffset.y
-        print("...........", o, self.tableView.refreshControl!.frame.maxY, self.tableView.adjustedContentInset.top)
         
         if o < -30 || self.scene == .floors {
             self.isDoubleTapping = true
@@ -213,8 +221,22 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         }
     }
     
+    func clearAll(thenRefresh: Bool = true) {
+        let prev = self.d.count
+        self.d.clear()
+        footer.setTitle("正在加载...", for: .idle)
+        tableView.beginUpdates()
+        if prev > self.d.count {
+            tableView.deleteRows(at: (self.d.count..<prev).map{IndexPath(row: $0, section: 0)}, with: .top)
+        }
+        tableView.endUpdates()
+        if thenRefresh {
+            refresh()
+        }
+    }
+    
     @objc func refresh() {
-        print("refresh...")
+        print("refresh... topdist = ", topDist.constant)
         DispatchQueue.global().async {
             usleep(self.firstLoading ? 100000 : 300000)
             if !self.inSearchMode, let dm = self.d as? Thread.Manager, dm.searchFor != nil {
@@ -222,11 +244,13 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             }
             self.inSearchMode = false
             
-            let count = self.d.clear().getContent()
+            let prev = self.d.count
+            self.d.clear()
+            let count = self.d.getContent()
             
             DispatchQueue.main.async {
-                
                 self.updateFavour()
+                self.scene == .floors => self.replyToLabel.text = "To #\(self.floor) \((self.d as! Floor.Manager).displayNameFor(Int(self.floor)!)):"
                 self.tableView.refreshControl?.endRefreshing()
                 
                 DispatchQueue.main.asyncAfter(deadline: .now() + (self.firstLoading ? 0 : 0.25)) {
@@ -240,13 +264,16 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                         self.isDoubleTapping = false
                     }
                     
-                    self.tableView.reloadData()
-                    if count > 3 && self.firstLoading {
-                        print("start scrolling!", self.tableView.contentOffset)
-                        
-                        DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
-//                            self.tableView.setContentOffset(.init(x: 0, y: -60), animated: true)
+                    if prev > (self.scene == .floors ? 1 : 0) {
+                        print("RELOADING!!!")
+                        self.tableView.reloadData()
+                    } else {
+                        self.tableView.beginUpdates()
+                        self.tableView.insertRows(at: (prev..<self.d.count).map{IndexPath(row: $0, section: 0)}, with: .top)
+                        if self.scene == .floors {
+                            self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .automatic)
                         }
+                        self.tableView.endUpdates()
                     }
                     self.firstLoading = false
                     
@@ -269,17 +296,11 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             DispatchQueue.main.async {
                 self.tableView.mj_footer?.endRefreshing()
                 
-                let cc = self.d.count - prev
-                if cc > 0 {
-                    var idx = [IndexPath]()
-                    for i in 1...cc {
-                        idx.append(IndexPath(row: self.d.count - i, section: 0))
-                    }
-                    idx.reverse()
-                    self.tableView.insertRows(at: idx, with: .automatic)
+                if self.d.count > prev {
+                    self.tableView.insertRows(at: (prev..<self.d.count).map {IndexPath(row: $0, section: 0)}, with: .automatic)
                 }
                 
-                if count != G.numberPerFetch {
+                if count < G.numberPerFetch {
                     self.tableView.mj_footer?.endRefreshingWithNoMoreData()
                 }
                 
@@ -300,33 +321,38 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
-        if scrollView.panGestureRecognizer.translation(in: scrollView).y < 0 {
-            changeBar(hide: true)
-        } else {
-            changeBar(hide: false)
+        (scrollView.panGestureRecognizer.translation(in: scrollView).y < 0)
+            ?< self.changeBar(hide: true)
+            ?> self.changeBar(hide: false)
+        
+        if scene == .floors {
+            let ntitle = scrollView.contentOffset.y > 30
+                ? "\((d as! Floor.Manager).thread.title)"
+                : "#\((d as! Floor.Manager).thread.id)"
+            if ntitle != navigationItem.title {
+                navigationController?.navigationBar.layer.add(
+                    CATransition()..{
+                        $0.duration = 0.2
+                        $0.type = .fade
+                    }, forKey: "fadeText")
+                navigationItem.title = ntitle
+            }
         }
     }
     
     func scrollViewDidEndScrollingAnimation(_ scrollView: UIScrollView) {
         if self.tryDoubleTapping {
             self.tryDoubleTapping = false
-//            DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
-                self.hasTappedAgain()
-//            }
+            self.hasTappedAgain()
         }
     }
     
-    var floor: String = "0" {
-        didSet {
-            textView.placeholder = "Replying to Floor #\(floor)"
-        }
-    }
-    
+    var floor: String = "0"
     func tryToReplyTo(floor f: String) {
         floor = f
         textView.becomeFirstResponder()
         textView.text = ""
-        textView.placeholder = "Replying to Floor #\(floor)"
+        replyToLabel.text = "To #\(floor) \((d as! Floor.Manager).displayNameFor(Int(floor)!)):"
     }
     
     @objc func keyboardWillShow(_ sender: Notification) {
@@ -334,9 +360,14 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             let height = (sender.userInfo![UIResponder.keyboardFrameEndUserInfoKey]! as! NSValue).cgRectValue.height
             var time: TimeInterval = 0
             (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
-            bottomViewHeight.constant = textViewHeight.constant + 16 + 10
+            bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 16
             bottomSpace.constant = height
+            let delta = bottomSpace.constant
+            tableBottomSpace.constant = -bottomSpace.constant
             UIView.animate(withDuration: time) {
+                self.tableView.contentOffset..{
+                    self.tableView.setContentOffset(.init(x: 0, y: $0.y + delta), animated: false)
+                }
                 self.view.layoutIfNeeded()
             }
         }
@@ -346,9 +377,14 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         if scene == .floors {
             var time: TimeInterval = 0
             (sender.userInfo![UIResponder.keyboardAnimationDurationUserInfoKey]! as! NSValue).getValue(&time)
-            bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 20
+            bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 20 + 16
+            let delta = bottomSpace.constant
             bottomSpace.constant = 0
+            tableBottomSpace.constant = -bottomSpace.constant
             UIView.animate(withDuration: time) {
+                self.tableView.contentOffset..{
+                    self.tableView.setContentOffset(.init(x: 0, y: $0.y - delta), animated: false)
+                }
                 self.view.layoutIfNeeded()
             }
         }
@@ -359,7 +395,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
             if textView.text.count > 0 {
                 let height = max(min(textView.contentSize.height, 100), 36)
                 textViewHeight.constant = height
-                bottomViewHeight.constant = textViewHeight.constant + 16 + 10
+                bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 16
                 UIView.animate(withDuration: 0.3) {
                     self.view.layoutIfNeeded()
                 }
@@ -399,11 +435,9 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                 textView.text = ""
                 self.view.endEditing(false)
                 showAlert("评论成功", style: .success) {
-                    if self.d.count > 1 {
-                        self.loadmore()
-                    } else {
-                        self.refresh()
-                    }
+                    self.d.count > 1
+                        ?< self.loadmore()
+                        ?> self.refresh()
                 }
             }
         } else {
@@ -427,28 +461,34 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     
     @IBAction func barBtnClicked(_ sender: Any) {
         if scene == .floors {
-            if ({
-                if (d as! Floor.Manager).thread.hasFavoured {
-                    return Network.cancelFavourThread(for: (d as! Floor.Manager).thread.id)
-                } else {
-                    return Network.favourThread(for: (d as! Floor.Manager).thread.id)
+            (d as! Floor.Manager)..{ dd in
+                dd.thread.hasFavoured
+                    ? Network.cancelFavourThread(for: dd.thread.id)
+                    : Network.favourThread(for: dd.thread.id)
+                => {
+                    dd.thread.hasFavoured = !dd.thread.hasFavoured
+                    self.updateFavour()
                 }
-            }()) {
-                (d as! Floor.Manager).thread.hasFavoured = !(d as! Floor.Manager).thread.hasFavoured
-                updateFavour()
             }
+//            if ({
+//                if (d as! Floor.Manager).thread.hasFavoured {
+//                    return Network.cancelFavourThread(for: (d as! Floor.Manager).thread.id)
+//                } else {
+//                    return Network.favourThread(for: (d as! Floor.Manager).thread.id)
+//                }
+//            }()) {
+//                (d as! Floor.Manager).thread.hasFavoured = !(d as! Floor.Manager).thread.hasFavoured
+//                updateFavour()
+//            }
         }
     }
     
     func blockThread(_ msg: String) {
         let id = (self.d as! Floor.Manager).thread.id
         let li = G.blockedList.content
-        if !li.contains(id) {
-            G.blockedList.content = li + [id]
-        }
+        !li.contains(id) => G.blockedList.content = li + [id]
         self.showAlert(msg, style: .success) {
-            let vc = (self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as! MainVC)
-            vc.refresh()
+            (self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as! MainVC).refresh()
             self.navigationController?.popViewController(animated: true)
         }
     }
@@ -492,7 +532,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         headerHeight
     }
     
-    lazy var dropDown = with(DropDown()) {
+    lazy var dropDown = DropDown()..{
         $0.dataSource = Thread.Category.allCases.dropLast().map {
             $0.rawValue
         }
@@ -521,7 +561,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
         baseView.addSubview(view)
         
         if scene == .main {
-            
             let lbl = UILabel(frame: CGRect(x: width/2, y: 17, width: width/4, height: headerHeight))
             lbl.text = "板块："
             lbl.textColor = .label
@@ -539,12 +578,13 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
                 print("Selected item: \(item) at index: \(index)")
                 btn.setTitle(item, for: .normal)
                 (self.d as! Thread.Manager).block = Thread.Category.init(rawValue: item)!
-                self.refresh()
+//                self.refresh()
+                self.clearAll()
             }
             
             view.addSubview(btn)
         } else if scene == .floors {
-            let lbl = with(UILabel(frame: .init(x: 8, y: 0, width: width/2, height: headerHeight))) {
+            let lbl = UILabel(frame: .init(x: 8, y: 0, width: width/2, height: headerHeight))..{
                 $0.text = (d as! Floor.Manager).thread.title
                 $0.fontSize = 15
             }
@@ -558,10 +598,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     }
     
     func setReplyOrder(reverse: Bool) {
-        with(d as! Floor.Manager) {
+        (d as! Floor.Manager)..{
             if $0.reverse != reverse {
                 $0.reverse = reverse
-                hasTappedAgain()
+                clearAll()
             }
         }
     }
@@ -581,6 +621,32 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, UITe
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         UITableView.automaticDimension
     }
+    
+    // MARK: - Context Menu
+    
+    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
+        scene == .floors ? nil :
+        UIContextMenuConfiguration(identifier: nil, previewProvider: {
+            (self.d.didSelectedRow(self, index: indexPath.row, commit: false) as! MainVC)..{
+                $0.inPreview = true
+            }
+        } , actionProvider: nil)
+    }
+    
+    func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
+        if let dest = animator.previewViewController {
+            animator.addAnimations {
+                self.show(dest, sender: self)
+                with ((dest as! MainVC)) {
+                    $0.inPreview = false
+                    $0.topDist.constant = $0._topDist
+                    $0.updateFavour()
+                    $0.tableView.refreshControl = $0.refreshControl
+                }
+            }
+        }
+    }
+    
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         if navigationItem.largeTitleDisplayMode == .always {
