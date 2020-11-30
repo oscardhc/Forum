@@ -38,33 +38,38 @@ class LoginVC: UIViewController {
     @IBAction func sendVerificationCode(_ sender: Any) {
         if let email = emailTextField.text, email.hasSuffix("@sjtu.edu.cn") {
             sentEmail = email
-            !Network.requestLogin(with: email)
-                ?< self.showAlert("验证码发送失败", style: .failure)
-                ?> self.showAlert("验证码发送成功", style: .success)
+            showProgress()..{ bar in
+                DispatchQueue.global().async {
+                    Network.requestLogin(with: email)
+                        ?> self.setAndHideAlert(bar, "验证码发送成功", style: .success)
+                        ?< self.setAndHideAlert(bar, "验证码发送失败", style: .failure)
+                }
+            }
         } else { showAlert("请填写正确的交大邮箱", style: .warning) }
     }
     
     @IBAction func loginBtnClicked(_ sender: Any) {
-        guard let code = codeTextField.text, code != "" else {
-            showAlert("请填写验证码", style: .warning)
-            return
-        }
-        if sentEmail != "" {
-            let (success, token) = Network.performLogin(with: sentEmail, verificationCode: code)
-            if success {
-                showAlert("验证成功", style: .success) {
-                    G.token.content = token
-                    print("Success! token = \(token)")
-                    if self.isBase {
-                        let vc = *"InitTabVC"
-                        vc.modalPresentationStyle = .fullScreen
-                        self.present(vc, animated: true, completion: nil)
-                    } else {
-                        self.dismiss(animated: true, completion: nil)
-                    }
+        if let code = codeTextField.text, code != "" {
+            if sentEmail != "" {
+                let bar = showProgress()
+                DispatchQueue.global().async {
+                    let (success, token) = Network.performLogin(with: self.sentEmail, verificationCode: code)
+                    if success {
+                        self.setAndHideAlert(bar, "验证成功", style: .success) {
+                            G.token.content = token
+                            print("Success! token = \(token)")
+                            if self.isBase {
+                                let vc = *"InitTabVC"
+                                vc.modalPresentationStyle = .fullScreen
+                                self.present(vc, animated: true, completion: nil)
+                            } else {
+                                self.dismiss(animated: true, completion: nil)
+                            }
+                        }
+                    } else { self.setAndHideAlert(bar, "验证失败", style: .failure) }
                 }
-            } else { showAlert("验证失败", style: .failure) }
-        } else { showAlert("请先发送验证码", style: .warning) }
+            } else { showAlert("请先发送验证码", style: .warning) }
+        } else { showAlert("请填写验证码", style: .warning) }
     }
     /*
     // MARK: - Navigation

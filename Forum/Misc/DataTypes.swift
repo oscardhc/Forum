@@ -26,16 +26,17 @@ class DataManager<T: DATA>: BaseManager {
     override var count: Int { data.count }
     var last = "NULL"
     
-    func networking() -> ([T], String) { fatalError() }
+    func networking() -> ([T], String)? { fatalError() }
     override func clear() -> Self {
         (data, last) = ([], "NULL")
         return self
     }
     override func getContent() -> Int {
-        networking()..{
-            data += $0.0
-            last = $0.1
-        }..\.0.count
+        if let net = networking() {
+            data += net.0
+            last = net.1
+            return net.0.count
+        } else { return -1 }
     }
     
 }
@@ -49,13 +50,13 @@ struct Thread: DATA {
     var id = "", title = "", content = ""
     var type: Category = .all
     var nLiked = 0, nRead = 0, nCommented = 0
-    var hasLiked = false, hasFavoured = false, isTop = false
+    var hasLiked = false, hasFavoured = false, isTop = false, isFromFloorList = false
     var postTime = Date(), lastUpdateTime = Date()
     var name: NameG, color: ColorG
     
     static var cnt = 1
     
-    init(json: Any) {
+    init(json: Any, isfromFloorList li: Bool = false) {
         let thread  = json as! [String: Any]
         
         nCommented = thread["Comment"] as! Int
@@ -67,6 +68,7 @@ struct Thread: DATA {
         hasLiked = (thread["WhetherLike"] as? Int ?? 0) == 1
         hasFavoured = (thread["WhetherFavour"] as? Int ?? 0) == 1
         isTop = (thread["WhetherTop"] as? Int) == 1
+        isFromFloorList = li
         
         name = NameG(
             theme: NameTheme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
@@ -123,7 +125,7 @@ struct Thread: DATA {
             searchFor = nil
         }
         
-        override func networking() -> ([Thread], String) {
+        override func networking() -> ([Thread], String)? {
             return searchFor == nil
                 ? Network.getThreads(type: sortType, inBlock: block, lastSeenID: last)
                 : Network.searchThreads(keyword: searchFor!, lastSeenID: last)
@@ -191,7 +193,7 @@ struct Floor: DATA {
         
         override var count: Int {data.count + 1}
         
-        override func networking() -> ([Floor], String) {
+        override func networking() -> ([Floor], String)? {
             Network.getFloors(for: thread.id, lastSeenID: last, reverse: reverse)..{
                 if let t = $0.1 { thread = t }
             }..\.0
@@ -206,7 +208,7 @@ struct Floor: DATA {
         func displayNameFor(_ i: Int) -> String {
             thread.name[Int((i == 0
                 ? thread.generateFirstFloor()
-                : data[i - 1]).name)!]
+                                : data.first(where: {$0.id == "\(i)"}))!.name)!]
         }
         
     }
@@ -221,7 +223,7 @@ struct Message: DATA {
             cell.setAs(message: data[index % self.count])
         }
         
-        override func networking() -> ([Message], String) {
+        override func networking() -> ([Message], String)? {
             Network.getMessages(lastSeenID: last)
         }
         

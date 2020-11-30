@@ -121,16 +121,20 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         if let postTitle = titleTextField.text, postTitle != "", let postContent = contentTextField.text, postContent != "" {
             if titleCountLabel.ok && contentCountLabel.ok {
                 if let block = Thread.Category(rawValue: blockDropDown.selectedItem ?? "") {
-                    if Network.newThread(
-                        title: postTitle, inBlock: block, content: postContent,
-                        anonymousType: NameTheme.allCases.first(where: {$0.displayText == typeDropDown.selectedItem!})! ,
-                        seed: checkBtn.checked ? Int.random(in: 1..<1000000) : 0
-                    ) {
-                        showAlert("发帖成功", style: .success) {
-                            self.fatherVC.refresh()
-                            self.dismiss(animated: true)
+                    (showProgress(), self.typeDropDown.selectedItem!)..{ bar, theme in
+                        DispatchQueue.global().async {
+                            if Network.newThread(
+                                title: postTitle, inBlock: block, content: postContent,
+                                anonymousType: NameTheme.allCases.first(where: {$0.displayText == theme})! ,
+                                seed: self.checkBtn.checked ? Int.random(in: 1..<1000000) : 0
+                            ) {
+                                self.setAndHideAlert(bar, "发帖成功", style: .success) {
+                                    self.fatherVC.refresh()
+                                    self.dismiss(animated: true)
+                                }
+                            } else { self.setAndHideAlert(bar, "发帖失败", style: .failure) }
                         }
-                    } else { showAlert("发帖失败", style: .failure) }
+                    }
                 } else { showAlert("请选择一个分区", style: .warning) }
             } else { showAlert("请输入合适长度的内容", style: .warning) }
         } else { showAlert("请输入合适长度的内容", style: .warning) }

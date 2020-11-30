@@ -16,6 +16,10 @@
 		556CA2FA252A36C000246DA0 /* Globals.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556CA2F9252A36C000246DA0 /* Globals.swift */; };
 		556CA307252A46B500246DA0 /* MiscVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556CA306252A46B500246DA0 /* MiscVC.swift */; };
 		556CA30C252A4A5C00246DA0 /* LoginVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 556CA30B252A4A5C00246DA0 /* LoginVC.swift */; };
+		558B532B257502C700C6E775 /* MainVCRefresh.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558B532A257502C700C6E775 /* MainVCRefresh.swift */; };
+		558B53302575033F00C6E775 /* MainVCSearch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558B532F2575033F00C6E775 /* MainVCSearch.swift */; };
+		558B5335257503F000C6E775 /* MainVCText.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558B5334257503F000C6E775 /* MainVCText.swift */; };
+		558B533A257505E600C6E775 /* MainVCScroll.swift in Sources */ = {isa = PBXBuildFile; fileRef = 558B5339257505E600C6E775 /* MainVCScroll.swift */; };
 		55A59D44254D4CDD002E18F7 /* MiscTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55A59D43254D4CDD002E18F7 /* MiscTableViewCell.swift */; };
 		55AA465B2516739A00AAF708 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA465A2516739A00AAF708 /* AppDelegate.swift */; };
 		55AA465D2516739A00AAF708 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA465C2516739A00AAF708 /* SceneDelegate.swift */; };
@@ -58,6 +62,10 @@
 		556CA2F9252A36C000246DA0 /* Globals.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Globals.swift; sourceTree = "<group>"; };
 		556CA306252A46B500246DA0 /* MiscVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiscVC.swift; sourceTree = "<group>"; };
 		556CA30B252A4A5C00246DA0 /* LoginVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LoginVC.swift; sourceTree = "<group>"; };
+		558B532A257502C700C6E775 /* MainVCRefresh.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCRefresh.swift; sourceTree = "<group>"; };
+		558B532F2575033F00C6E775 /* MainVCSearch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCSearch.swift; sourceTree = "<group>"; };
+		558B5334257503F000C6E775 /* MainVCText.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCText.swift; sourceTree = "<group>"; };
+		558B5339257505E600C6E775 /* MainVCScroll.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCScroll.swift; sourceTree = "<group>"; };
 		55A59D43254D4CDD002E18F7 /* MiscTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MiscTableViewCell.swift; sourceTree = "<group>"; };
 		55AA46572516739A00AAF708 /* Forum.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Forum.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		55AA465A2516739A00AAF708 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -121,6 +129,10 @@
 			children = (
 				55DB1899256259C800FA8041 /* TabBarController.swift */,
 				55AA469B2516750100AAF708 /* MainVC.swift */,
+				558B5339257505E600C6E775 /* MainVCScroll.swift */,
+				558B532A257502C700C6E775 /* MainVCRefresh.swift */,
+				558B5334257503F000C6E775 /* MainVCText.swift */,
+				558B532F2575033F00C6E775 /* MainVCSearch.swift */,
 				55557CDC25232912002F17AC /* MainCell.swift */,
 				55557CE125232966002F17AC /* MainCell.xib */,
 			);
@@ -414,11 +426,15 @@
 				55557CF025237F12002F17AC /* Network.swift in Sources */,
 				55DB189A256259C800FA8041 /* TabBarController.swift in Sources */,
 				55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */,
+				558B53302575033F00C6E775 /* MainVCSearch.swift in Sources */,
 				55AA465B2516739A00AAF708 /* AppDelegate.swift in Sources */,
+				558B533A257505E600C6E775 /* MainVCScroll.swift in Sources */,
+				558B5335257503F000C6E775 /* MainVCText.swift in Sources */,
 				55AA465D2516739A00AAF708 /* SceneDelegate.swift in Sources */,
 				55370A2D253DF213008FB742 /* Utilities.swift in Sources */,
 				55AA46652516739A00AAF708 /* Forum.xcdatamodeld in Sources */,
 				55557CDD25232912002F17AC /* MainCell.swift in Sources */,
+				558B532B257502C700C6E775 /* MainVCRefresh.swift in Sources */,
 				556CA307252A46B500246DA0 /* MiscVC.swift in Sources */,
 				556CA2FA252A36C000246DA0 /* Globals.swift in Sources */,
 				552AAFB025597320000F9480 /* AboutVC.swift in Sources */,

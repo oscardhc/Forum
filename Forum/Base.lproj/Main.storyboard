@@ -230,7 +230,7 @@
                                 <textInputTraits key="textInputTraits" autocorrectionType="no" textContentType="email"/>
                             </textField>
                             <textField opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" placeholder="Verification Code" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="uvG-y6-G03" customClass="DarkSupportTextField" customModule="Forum" customModuleProvider="target">
-                                <rect key="frame" x="16" y="268" width="191" height="34"/>
+                                <rect key="frame" x="16" y="268" width="207" height="34"/>
                                 <constraints>
                                     <constraint firstAttribute="height" constant="34" id="9Q5-1C-PfJ"/>
                                 </constraints>
@@ -298,7 +298,7 @@
                             <constraint firstItem="uvG-y6-G03" firstAttribute="leading" secondItem="br5-ob-oiV" secondAttribute="leading" id="nF6-wy-YXh"/>
                             <constraint firstItem="Mp1-E6-U6S" firstAttribute="top" secondItem="DH8-6J-T4P" secondAttribute="bottom" constant="40" id="pW5-dj-igh"/>
                             <constraint firstItem="Cjm-Hu-UNr" firstAttribute="top" secondItem="uvG-y6-G03" secondAttribute="top" id="ubQ-ro-wmX"/>
-                            <constraint firstItem="Cjm-Hu-UNr" firstAttribute="leading" secondItem="uvG-y6-G03" secondAttribute="trailing" constant="32" id="zyJ-ys-cpD"/>
+                            <constraint firstItem="Cjm-Hu-UNr" firstAttribute="leading" secondItem="uvG-y6-G03" secondAttribute="trailing" constant="16" id="zyJ-ys-cpD"/>
                         </constraints>
                     </view>
                     <connections>
@@ -584,7 +584,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <tableView contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" translatesAutoresizingMaskIntoConstraints="NO" id="Wa6-wE-ev8">
-                                <rect key="frame" x="0.0" y="88" width="375" height="724"/>
+                                <rect key="frame" x="0.0" y="88" width="375" height="469"/>
                                 <color key="backgroundColor" systemColor="systemGroupedBackgroundColor"/>
                                 <prototypes>
                                     <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="HeadCell" rowHeight="103" id="reJ-fI-4i4" customClass="HeaderCell" customModule="Forum" customModuleProvider="target">
@@ -641,7 +641,7 @@
                                         <nil key="highlightedColor"/>
                                     </label>
                                     <label opaque="NO" userInteractionEnabled="NO" contentMode="left" horizontalHuggingPriority="251" verticalHuggingPriority="251" text="Label" textAlignment="natural" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" translatesAutoresizingMaskIntoConstraints="NO" id="jJ1-cs-gqd">
-                                        <rect key="frame" x="35" y="0.0" width="246" height="14"/>
+                                        <rect key="frame" x="35" y="2" width="246" height="14"/>
                                         <constraints>
                                             <constraint firstAttribute="height" constant="14" id="3J7-X1-YMc"/>
                                         </constraints>
@@ -656,9 +656,9 @@
                                     <constraint firstItem="E5U-ji-gjv" firstAttribute="top" secondItem="YaK-0y-yVB" secondAttribute="top" constant="15" id="AK1-fI-PBG"/>
                                     <constraint firstItem="E5U-ji-gjv" firstAttribute="leading" secondItem="TL7-aM-57h" secondAttribute="trailing" constant="18" id="DPK-sW-oeK"/>
                                     <constraint firstItem="Zfe-eL-UoY" firstAttribute="trailing" secondItem="TL7-aM-57h" secondAttribute="trailing" id="J8k-Lv-LbM"/>
-                                    <constraint firstItem="TL7-aM-57h" firstAttribute="top" secondItem="jJ1-cs-gqd" secondAttribute="bottom" constant="2" id="JV7-44-wob"/>
+                                    <constraint firstItem="TL7-aM-57h" firstAttribute="top" secondItem="jJ1-cs-gqd" secondAttribute="bottom" id="JV7-44-wob"/>
                                     <constraint firstItem="Zfe-eL-UoY" firstAttribute="top" secondItem="TL7-aM-57h" secondAttribute="bottom" constant="2" id="QzX-2n-rxq"/>
-                                    <constraint firstItem="jJ1-cs-gqd" firstAttribute="top" secondItem="YaK-0y-yVB" secondAttribute="top" id="TG2-9o-SBi"/>
+                                    <constraint firstItem="jJ1-cs-gqd" firstAttribute="top" secondItem="YaK-0y-yVB" secondAttribute="top" constant="2" id="TG2-9o-SBi"/>
                                     <constraint firstAttribute="trailing" secondItem="jJ1-cs-gqd" secondAttribute="trailing" constant="94" id="Zm6-9z-a2I"/>
                                     <constraint firstItem="jJ1-cs-gqd" firstAttribute="leading" secondItem="YaK-0y-yVB" secondAttribute="leading" constant="35" id="eJ1-3l-cYU"/>
                                     <constraint firstItem="TL7-aM-57h" firstAttribute="leading" secondItem="YaK-0y-yVB" secondAttribute="leading" constant="35" id="udl-DB-fAd"/>
@@ -670,12 +670,12 @@
                         <viewLayoutGuide key="safeArea" id="1Ee-hQ-JT1"/>
                         <color key="backgroundColor" systemColor="systemGroupedBackgroundColor"/>
                         <constraints>
-                            <constraint firstItem="Wa6-wE-ev8" firstAttribute="bottom" secondItem="nri-P3-JWk" secondAttribute="bottom" id="Iaj-4I-N4u"/>
+                            <constraint firstItem="Wa6-wE-ev8" firstAttribute="width" secondItem="1Ee-hQ-JT1" secondAttribute="width" id="1EA-6D-xnr"/>
                             <constraint firstAttribute="bottom" secondItem="YaK-0y-yVB" secondAttribute="bottom" id="Nq5-Nn-XjH"/>
                             <constraint firstItem="YaK-0y-yVB" firstAttribute="leading" secondItem="1Ee-hQ-JT1" secondAttribute="leading" id="TCS-hH-LI4"/>
                             <constraint firstItem="Wa6-wE-ev8" firstAttribute="top" secondItem="nri-P3-JWk" secondAttribute="top" constant="88" id="Wp9-Cd-wtO"/>
                             <constraint firstItem="YaK-0y-yVB" firstAttribute="trailing" secondItem="1Ee-hQ-JT1" secondAttribute="trailing" id="mEb-xk-qk9"/>
-                            <constraint firstItem="Wa6-wE-ev8" firstAttribute="leading" secondItem="1Ee-hQ-JT1" secondAttribute="leading" id="vKh-8U-UI7"/>
+                            <constraint firstItem="YaK-0y-yVB" firstAttribute="top" secondItem="Wa6-wE-ev8" secondAttribute="bottom" id="qvY-Pm-3Ob"/>
                             <constraint firstItem="Wa6-wE-ev8" firstAttribute="centerX" secondItem="nri-P3-JWk" secondAttribute="centerX" id="zvP-yt-qYK"/>
                         </constraints>
                     </view>
@@ -703,7 +703,6 @@
                         <outlet property="newThreadBtn" destination="QOa-Cx-esn" id="3CU-Wf-zRd"/>
                         <outlet property="replyCountLabel" destination="Zfe-eL-UoY" id="5ZT-rs-MtL"/>
                         <outlet property="replyToLabel" destination="jJ1-cs-gqd" id="ddL-Wi-n2y"/>
-                        <outlet property="tableBottomSpace" destination="Iaj-4I-N4u" id="xob-gu-a8w"/>
                         <outlet property="tableView" destination="Wa6-wE-ev8" id="w1E-FL-uLb"/>
                         <outlet property="textView" destination="TL7-aM-57h" id="5pL-dA-gmp"/>
                         <outlet property="textViewHeight" destination="Dfh-iK-9OU" id="f52-G0-VeK"/>

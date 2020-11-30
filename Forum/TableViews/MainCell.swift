@@ -81,21 +81,12 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         }
     }
     
-    var liked = false {
-        didSet {
-            likedBtn.setImage(
-                UIImage(systemName: liked ? "hand.thumbsup.fill" : "hand.thumbsup",
-                        withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
-                for: .normal
-            )
-        }
-    }
-    
     override func awakeFromNib() {
         super.awakeFromNib()
         
         // Initialization code
         selectionStyle = .none
+        likedBtn.adjustsImageWhenHighlighted = true
         likedBtn.adjustsImageWhenDisabled = false
         commentBtn.adjustsImageWhenDisabled = false
         readBtn.adjustsImageWhenDisabled = false
@@ -132,29 +123,43 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         true
     }
     
+    var liked = false {
+        didSet {
+            likedBtn.setImage(
+                UIImage(systemName: liked ? "hand.thumbsup.fill" : "hand.thumbsup",
+                        withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
+                for: .normal
+            )
+        }
+    }
+    
     @IBAction func like(_ sender: Any) {
-        if ({
-            if liked {
-                if floor.id == "0" {
-                    return Network.cancelLikeThread(for: thread.id)
+        self.likedBtn.isEnabled = false
+        DispatchQueue.global().async {
+            {() -> Bool in
+                if self.liked {
+                    return self.floor.id == "0"
+                        ? Network.cancelLikeThread(for: self.thread.id)
+                        : Network.cancelLikeFloor(for: self.thread.id, floor: self.floor.id)
                 } else {
-                    return Network.cancelLikeFloor(for: thread.id, floor: floor.id)
+                    return self.floor.id == "0"
+                        ? Network.likeThread(for: self.thread.id)
+                        : Network.likeFloor(for: self.thread.id, floor: self.floor.id)
                 }
-            } else {
-                if floor.id == "0" {
-                    return Network.likeThread(for: thread.id)
-                } else {
-                    return Network.likeFloor(for: thread.id, floor: floor.id)
+            }()..{ success in
+                DispatchQueue.main.async {
+                    self.likedBtn.isEnabled = true
+                    if success {
+                        if self.liked {
+                            self.floor.nLiked -= 1
+                        } else {
+                            self.floor.nLiked += 1
+                        }
+                        self.likedBtn.setTitle("\(self.floor.nLiked)", for: .normal)
+                        self.liked = !self.liked
+                    } else { self.parentVC.showAlert("网络错误", style: .failure) }
                 }
             }
-        }()) {
-            if liked {
-                floor.nLiked -= 1
-            } else {
-                floor.nLiked += 1
-            }
-            likedBtn.setTitle("\(floor.nLiked)", for: .normal)
-            liked = !liked
         }
     }
     
@@ -236,8 +241,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
                 parentVC.tableView.scrollToRow(at: .init(row: idx + 1, section: 0), at: dd.reverse ? .bottom : .top, animated: true)
             }
         }
-//        if let  floor.replyToFloor!
-//        parentVC.tableView.scrollToRow(at: .init(row: floor.replyToFloor!, section: 0), at: .top, animated: true)
     }
     
     func setAs(floor f: Floor, forThread t: Thread, firstFloor: Bool = false, reversed: Bool = false) -> Self {
@@ -247,8 +250,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         scene = .floor
         orderReversed = reversed
         updateOrder()
-        
-        let color = t.color[Int(f.name)!]
         
         idLabel.text = t.name[Int(f.name)!] +
             (((f.replyToFloor ?? 0) == 0)
@@ -266,7 +267,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         timeLabel.text = Util.dateToDeltaString(f.time)
         
         headLabel.text = String(t.name[Int(f.name)!].components(separatedBy: " ").last!.first!)
-        headLabel.layer.backgroundColor = color.cgColor
+        headLabel.layer.backgroundColor = t.color[Int(f.name)!].cgColor
         headLabel.layer.cornerRadius = 15
         headLabel.textColor = .white
         headLabel.font = .systemFont(ofSize: 20, weight: .medium)
@@ -285,13 +286,11 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         mainTextView.isUserInteractionEnabled = true
         mainTextView.isSelectable = true
         
-        if isFirstFloor {
-            footerHeight.constant = 35
-            orderBtn.isHidden = false
-        } else {
-            footerHeight.constant = 0
-            orderBtn.isHidden = true
-        }
+        
+        likedBtn.adjustsImageWhenDisabled = true
+        likedBtn.isHidden = isFirstFloor && !t.isFromFloorList
+        orderBtn.isHidden = !isFirstFloor
+        footerHeight.constant = isFirstFloor ? 35 : 0
         
         return self
     }

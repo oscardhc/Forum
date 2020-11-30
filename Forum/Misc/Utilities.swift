@@ -63,11 +63,17 @@ class DarkSupportTextField: TextField {
     return value
 }
 
+final class Action {
+    private let _action: () -> ()
+    init(_ action: @escaping () -> ()) { _action = action; }
+    @objc func action() { _action() }
+}
+
 precedencegroup LowestPrecedence {
     associativity: left
     lowerThan: AssignmentPrecedence
 }
-infix operator ..: LowestPrecedence
+infix operator ..: MultiplicationPrecedence
 
 @discardableResult func .. <T>(_ lhs: T, _ rhs: (T) -> Void) -> T {
     rhs(lhs)
@@ -77,7 +83,7 @@ infix operator ..: LowestPrecedence
     rhs(lhs.0, lhs.1)
     return lhs
 }
-func .. <T, K>(_ lhs: T, _ rhs: KeyPath<T, K>) -> K {
+@discardableResult func .. <T, K>(_ lhs: T, _ rhs: KeyPath<T, K>) -> K {
     return lhs[keyPath: rhs]
 }
 
@@ -91,28 +97,27 @@ func => (_ lhs: @autoclosure () -> Bool, _ rhs: () -> Void) {
 func => (_ lhs: () -> Bool, _ rhs: () -> Void) {
     if lhs() { rhs() }
 }
+func += (_ lhs: UIView, _ rhs: UIView) {
+    lhs.addSubview(rhs)
+}
+
+prefix operator *
+prefix func * (block: @escaping () -> ()) -> Selector {
+    #selector(Action(block).action)
+}
 
 precedencegroup SecondaryTernaryPrecedence {
     associativity: right
     higherThan: TernaryPrecedence
     lowerThan: LogicalDisjunctionPrecedence
 }
+infix operator ?> : SecondaryTernaryPrecedence
+infix operator ?< : TernaryPrecedence
 
-infix operator ?< : SecondaryTernaryPrecedence
-
-func ?< <T>(lhs: @autoclosure () -> Bool, rhs: @escaping @autoclosure () -> T) -> (Bool, () -> T) {
-    return (lhs(), rhs)
-}
-
-infix operator ?> : TernaryPrecedence
-
-@discardableResult func ?> <T>(lhs: (Bool, () -> T), rhs: @escaping @autoclosure () -> T) -> T {
-    if lhs.0 {
-        return lhs.1()
-    } else {
-        return rhs()
-    }
-}
+func ?> <T>(lhs: @autoclosure () -> Bool, rhs: @escaping @autoclosure () -> T) -> (Bool, () -> T) { return (lhs(), rhs) }
+func ?> <T>(lhs: () -> Bool, rhs: @escaping () -> T) -> (Bool, () -> T) { return (lhs(), rhs) }
+@discardableResult func ?< <T>(lhs: (Bool, () -> T), rhs: @escaping @autoclosure () -> T) -> T { lhs.0 ? lhs.1() : rhs() }
+@discardableResult func ?< <T>(lhs: (Bool, () -> T), rhs: @escaping () -> T) -> T { lhs.0 ? lhs.1() : rhs() }
 
 // MARK: - Generator
 
@@ -216,10 +221,7 @@ protocol DoubleTappable {
     func hasTappedAgain()
 }
 
-prefix operator *
-
 extension String {
-    
     static prefix func * (name: String) -> UIViewController {
         UIStoryboard(name: "Main", bundle: nil)
             .instantiateViewController(identifier: name)
@@ -230,17 +232,6 @@ extension String {
             $0 + ($1 == "\n" ? 1 : 0)
         }
     }
-    
-    var generated: String {
-        count >= 20
-            ? {
-                let idx = index(startIndex, offsetBy: 15)
-                let s = self[..<idx], t = self[idx...]
-                return String(s) + "\n" + String(t)
-            }()
-            : self
-    }
-    
 }
 
 extension UIViewController {
@@ -289,9 +280,7 @@ extension UIView {
         self.layer.cornerRadius = 7
         self.layer.masksToBounds = false
         self.layer.backgroundColor = UIColor.tertiarySystemBackground.cgColor
-        if traitCollection.userInterfaceStyle == .dark {
-//            self.layer.backgroundColor = UIColor.tertiarySystemBackground.cgColor
-        } else {
+        if traitCollection.userInterfaceStyle != .dark {
             self.layer.shadowColor = UIColor.label.cgColor
             self.layer.shadowOffset = CGSize(width: 0, height: 1);
             self.layer.shadowOpacity = 0.1
@@ -303,9 +292,7 @@ extension UIView {
         if traitCollection.userInterfaceStyle == .dark {
             return
         }
-        if opaque {
-            self.layer.backgroundColor = UIColor.systemBackground.cgColor
-        }
+        opaque => self.layer.backgroundColor = UIColor.systemBackground.cgColor
         self.layer.shadowColor = UIColor.label.cgColor
         self.layer.shadowOffset = CGSize(width: 0, height: offset);
         self.layer.shadowOpacity = opacity
@@ -337,7 +324,6 @@ func updateCountingLabel(label: StateLabel, text: String, lineLimit: Int, charLi
 
 
 class CheckerButton: UIButton {
-    
     var checked = false {
         didSet {
             self.setImage(UIImage(systemName: checked ? "checkmark.square" : "squareshape", withConfiguration: UIImage.SymbolConfiguration(scale: .small)), for: .normal)
@@ -358,7 +344,6 @@ class CheckerButton: UIButton {
     @objc func checked(_ sender: UIButton) {
         checked = !checked
     }
-    
 }
 
 class StateLabel: UILabel {
@@ -375,13 +360,21 @@ extension UIViewController {
     enum AlertStyle: String {
         case success = "checkmark.circle", failure = "xmark.octagon", warning = "exclamationmark.triangle"
     }
-    func showAlert(_ message: String, style: AlertStyle, duration: TimeInterval = 1.0, completion: @escaping () -> Void = {}) {
-        let mark = MBProgressHUD.showAdded(to: self.view, animated: true)
-//        mark.isUserInteractionEnabled = false
-        mark.mode = .customView
-        mark.customView = BiggerImageView(image: UIImage(systemName: style.rawValue, withConfiguration: UIImage.SymbolConfiguration(scale: .large)))
-        mark.label.text = message
-        mark.hide(animated: true, afterDelay: duration)
-        mark.completionBlock = completion
+    func setAndHideAlert(_ bar: MBProgressHUD, _ message: String, style: AlertStyle, duration: TimeInterval = 0.8, completion: @escaping () -> Void = {}) {
+        DispatchQueue.main.async {
+            bar.mode = .customView
+            bar.customView = BiggerImageView(image: UIImage(systemName: style.rawValue, withConfiguration: UIImage.SymbolConfiguration(scale: .large)))
+            bar.label.text = message
+            bar.completionBlock = completion
+            bar.hide(animated: true, afterDelay: duration)
+        }
+    }
+    func showAlert(_ message: String, style: AlertStyle, duration: TimeInterval = 0.8, completion: @escaping () -> Void = {}) {
+        setAndHideAlert(MBProgressHUD.showAdded(to: self.view, animated: true), message, style: style, duration: duration, completion: completion)
+    }
+    func showProgress() -> MBProgressHUD {
+        MBProgressHUD.showAdded(to: self.view, animated: true)..{
+            $0.mode = .indeterminate
+        }
     }
 }

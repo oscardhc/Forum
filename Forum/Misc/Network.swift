@@ -20,13 +20,11 @@ class Network {
                 
                 let s = try Socket.create()
                 try s.connect(to: ip, port: port, timeout: 10000)
-//                print("data:", d)
                 try s.write(from: data)
                 try s.setReadTimeout(value: 10000)
                 var dt = Data()
                 
                 while try s.read(into: &dt) > 0 {
-                    
                 }
                 
                 let rec = try JSONSerialization.jsonObject(
@@ -78,7 +76,7 @@ class Network {
         case time = "1", favoured = "6", my = "7", trending = "d"
     }
     
-    static func getThreads(type: NetworkGetThreadType, inBlock: Thread.Category, lastSeenID: String) -> ([Thread], String) {
+    static func getThreads(type: NetworkGetThreadType, inBlock: Thread.Category, lastSeenID: String) -> ([Thread], String)? {
         getData(op_code: type.rawValue, pa_1: lastSeenID, pa_2: String(Thread.Category.allCases.firstIndex(of: inBlock)!)) {
             (
                 ($0["thread_list"]! as! [Any]).map {
@@ -86,10 +84,10 @@ class Network {
                 },
                 $0[$0.keys.first(where: {$0.hasPrefix("LastSeen")})!] as! String
             )
-        } ?? ([], "")
+        }
     }
     
-    static func searchThreads(keyword: String, lastSeenID: String) -> ([Thread], String) {
+    static func searchThreads(keyword: String, lastSeenID: String) -> ([Thread], String)? {
         getData(op_code: "b", pa_1: keyword, pa_2: lastSeenID) {
             (
                 ($0["thread_list"]! as! [Any]).map {
@@ -97,22 +95,22 @@ class Network {
                 },
                 $0[$0.keys.first(where: {$0.hasPrefix("LastSeen")})!] as! String
             )
-        } ?? ([], "")
+        }
     }
     
-    static func getFloors(for threadID: String, lastSeenID: String, reverse: Bool) -> (([Floor], String), Thread?) {
+    static func getFloors(for threadID: String, lastSeenID: String, reverse: Bool) -> (([Floor], String)?, Thread?) {
         getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID, pa_3: reverse ? "1" : "0") {
             (
                 (
                     ($0["floor_list"]! as! [Any]).map {Floor(json: $0)},
                     $0[$0.keys.first(where: {$0.hasPrefix("LastSeen")})!] as! String
                 ),
-                Thread(json: $0["this_thread"]!)
+                Thread(json: $0["this_thread"]!, isfromFloorList: true)
             )
-        } ?? (([], ""), nil)
+        } ?? (nil, nil)
     }
     
-    static func getMessages(lastSeenID: String) -> ([Message], String) {
+    static func getMessages(lastSeenID: String) -> ([Message], String)? {
         getData(op_code: "a", pa_1: lastSeenID) {
             (
                 ($0["message_list"]! as! [Any]).map {
@@ -120,7 +118,7 @@ class Network {
                 },
                 $0[$0.keys.first(where: {$0.hasPrefix("LastSeen")})!] as! String
             )
-        } ?? ([], "")
+        }
     }
     
     static func verifyToken() -> Bool? {

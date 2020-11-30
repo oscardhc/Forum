@@ -45,7 +45,7 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                         G.openThreadID = nil
                         Thread.Manager.openCertainThread(mvc, id: id)
                     } else {
-                        mvc.showAlert("链接格式错误", style: .warning, duration: 2)
+                        mvc.showAlert("链接格式错误", style: .warning, duration: 1.5)
                     }
                 }
             }
