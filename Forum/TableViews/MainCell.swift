@@ -244,6 +244,9 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     }
     
     func setAs(floor f: Floor, forThread t: Thread, firstFloor: Bool = false, reversed: Bool = false) -> Self {
+        if f.fake {
+            return self
+        }
         thread = t
         floor = f
         isFirstFloor = firstFloor
@@ -259,6 +262,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         if (f.replyToFloor ?? 0) != 0 {
             replyToNameDist.constant = (idLabel.text! as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13)]).width + 8
             replyToName.setTitle("#\(f.replyToFloor!) \(t.name[Int(f.replyToName!)!])", for: .normal)
+            replyToName.setTitleColor(t.color[Int(f.replyToName!)!], for: .normal)
             replyToName.addTarget(self, action: #selector(moveTo(_:)), for: .touchUpInside)
         } else {
             replyToName.setTitle("", for: .normal)

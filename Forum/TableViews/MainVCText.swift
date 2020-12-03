@@ -36,7 +36,7 @@ extension MainVC: UITextViewDelegate {
             bottomSpace.constant = 0
             UIView.animate(withDuration: time) {
                 self.tableView.contentOffset..{
-                    self.tableView.setContentOffset(.init(x: 0, y: min($0.y - delta, self.tableView.contentSize.height)), animated: false)
+                    self.tableView.setContentOffset(.init(x: 0, y: max(min($0.y - delta, self.tableView.contentSize.height), 0)), animated: false)
                 }
                 self.view.layoutIfNeeded()
             }

@@ -90,6 +90,7 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         checkBtn.setCheckBoxStyle(fontSize: 14)
         checkBtn.setTitle("人名随机排序", for: .normal)
         
+        addKeyCommand(.init(input: UIKeyCommand.inputEscape, modifierFlags: [], action: #selector(esc)))
     }
     
     @objc func chooseBlock(_ sender: UIButton) {

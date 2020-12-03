@@ -167,8 +167,9 @@ struct Floor: DATA {
     
     var replyToName: String?
     var replyToFloor: Int?
+    var fake = false
     
-    init() {}
+    init(fake: Bool = false) {self.fake = fake}
     init(json: Any) {
         let floor = json as! [String: Any]
         id = floor["FloorID"] as! String
@@ -202,13 +203,11 @@ struct Floor: DATA {
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
             index == 0
                 ? cell.setAs(floor: thread.generateFirstFloor(), forThread: thread, firstFloor: true, reversed: reverse)
-                : cell.setAs(floor: index <= data.count ? data[index - 1] : Floor(), forThread: thread, firstFloor: false)
+                : cell.setAs(floor: index <= data.count ? data[index - 1] : Floor(fake: true), forThread: thread, firstFloor: false)
         }
         
         func displayNameFor(_ i: Int) -> String {
-            thread.name[Int((i == 0
-                ? thread.generateFirstFloor()
-                                : data.first(where: {$0.id == "\(i)"}))!.name)!]
+            thread.name[Int((i == 0 ? thread.generateFirstFloor() : data.first(where: {$0.id == "\(i)"}) ?? thread.generateFirstFloor()).name)!]
         }
         
     }

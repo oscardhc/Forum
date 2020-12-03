@@ -37,12 +37,12 @@ class LoginVC: UIViewController {
     
     @IBAction func sendVerificationCode(_ sender: Any) {
         if let email = emailTextField.text, email.hasSuffix("@sjtu.edu.cn") {
-            sentEmail = email
             showProgress()..{ bar in
                 DispatchQueue.global().async {
-                    Network.requestLogin(with: email)
-                        ?> self.setAndHideAlert(bar, "验证码发送成功", style: .success)
-                        ?< self.setAndHideAlert(bar, "验证码发送失败", style: .failure)
+                    if Network.requestLogin(with: email) {
+                        self.setAndHideAlert(bar, "验证码发送成功", style: .success);
+                        self.sentEmail = email
+                    } else { self.setAndHideAlert(bar, "验证码发送失败", style: .failure) }
                 }
             }
         } else { showAlert("请填写正确的交大邮箱", style: .warning) }
@@ -53,7 +53,9 @@ class LoginVC: UIViewController {
             if sentEmail != "" {
                 let bar = showProgress()
                 DispatchQueue.global().async {
+                    print("try........................................")
                     let (success, token) = Network.performLogin(with: self.sentEmail, verificationCode: code)
+                    print("end........................................", success, token)
                     if success {
                         self.setAndHideAlert(bar, "验证成功", style: .success) {
                             G.token.content = token

@@ -9,10 +9,8 @@ import UIKit
 
 extension MainVC: UISearchBarDelegate {
     func commitSearch() {
-        if let tx = search.searchBar.text {
-            (self.d as! Thread.Manager)..{
-                $0.searchFor = tx
-            }
+        if let tx = search.searchBar.text, let dd = d as? Thread.Manager {
+            dd.searchFor = tx
             inSearchMode = true
             clearAll()
         }

@@ -8,15 +8,16 @@
 import UIKit
 
 class AboutVC: UIViewController {
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
-
+        
         // Do any additional setup after loading the view.
+        addKeyCommand(.init(input: UIKeyCommand.inputEscape, modifierFlags: [], action: #selector(esc)))
     }
     
-    private var fatherVC: MiscVC!
-    func withFather(_ vc: MiscVC) -> Self {
+    private var fatherVC: BaseTableVC!
+    func withFather(_ vc: BaseTableVC) -> Self {
         fatherVC = vc
         return self
     }

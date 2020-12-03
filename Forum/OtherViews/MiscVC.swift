@@ -80,8 +80,7 @@ class MiscVC: BaseTableVC, UIPopoverPresentationControllerDelegate {
         ],
         [
             ("设置", {self >> *"SettingVC"}),
-            ("反馈", {self >> *"ReportVC"}),
-            ("关于", {self << (*"AboutVC" as! AboutVC).withFather(self)})
+            ("反馈", {self >> *"ReportVC"})
         ]
     ]
     override var content: [[(title: String, fun: () -> Void)]] { misc_content }
@@ -100,9 +99,10 @@ class SettingVC: BaseTableVC {
     
     lazy var setting_content: [[(title: String, fun: () -> Void)]] = [
         [
-            ("Network Stat", {self >> *"TokenVC"})
+            ("网络统计", {self >> *"TokenVC"})
         ],
         [
+            ("关于", {self >> *"AboutMenuVC"}),
             ("退出登录", {
                 G.token.content = ""
                 self.showAlert("成功退出登录，App即将关闭", style: .success) {
@@ -117,6 +117,23 @@ class SettingVC: BaseTableVC {
     
 }
 
+class AboutMenuVC: BaseTableVC {
+    
+    @IBOutlet weak var tableView: UITableView!
+    
+    lazy var setting_content: [[(title: String, fun: () -> Void)]] = [
+        [
+            ("主页", {UIApplication.shared.open(URL(string: "http://wukefenggao.cn")!)}),
+            ("社区规范", {UIApplication.shared.open(URL(string: "http://wukefenggao.cn/code")!)}),
+            ("无可奉告之禅", {self << (*"AboutVC" as! AboutVC).withFather(self)})
+        ]
+    ]
+    override var content: [[(title: String, fun: () -> Void)]] { setting_content }
+    override var cellName: String { "AboutMenuCell" }
+    override var _tableView: UITableView! { tableView }
+    
+}
+
 class TokenVC: UIViewController {
     
     @IBOutlet weak var textView: UITextView!
@@ -124,6 +141,7 @@ class TokenVC: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        self.navigationController?.navigationBar.prefersLargeTitles = true
         let d = G.networkStat.content
         textView.text = "Failed: \(Int(d[4]))\n Average: \(d[0] / d[1])ms\n Min: \(d[2])ms\n Max: \(d[3])ms"
         

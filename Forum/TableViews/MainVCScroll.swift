@@ -21,9 +21,12 @@ extension MainVC: UIScrollViewDelegate {
     }
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        
+        #if !targetEnvironment(macCatalyst)
         scrollView.panGestureRecognizer.translation(in: scrollView).y < 0
             ?> self.changeBar(hide: true)
             ?< self.changeBar(hide: false)
+        #endif
         
         if scene == .floors {
             let ntitle = scrollView.contentOffset.y > 30

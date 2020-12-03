@@ -20,6 +20,12 @@ extension UIRefreshControl {
     }
 }
 
+extension UIViewController {
+    @objc func esc() {
+        self.dismiss(animated: true, completion: nil)
+    }
+}
+
 class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, DoubleTappable {
     
     enum Scene: String {
@@ -93,7 +99,11 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         $0.setTitle("正在加载...", for: .idle)
     }
     
-    var floor: String = "0"
+    var floor: String = "0" {
+        didSet {
+            self.replyToLabel.text = "To #\(self.floor) \((self.d as! Floor.Manager).displayNameFor(Int(self.floor)!)):"
+        }
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -128,6 +138,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             $0.isScrollEnabled = false
         }
         
+        addKeyCommand(.init(input: UIKeyCommand.inputEscape, modifierFlags: [], action: #selector(esc)))
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillShow(_:)), name: UIResponder.keyboardWillShowNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardWillHide(_:)), name: UIResponder.keyboardWillHideNotification, object: nil)
         NotificationCenter.default.addObserver(self, selector: #selector(self.keyboardDidHide(_:)), name: UIResponder.keyboardDidHideNotification, object: nil)
@@ -136,6 +147,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         textViewDidChange(textView)
         replyToLabel.text = "To #0"
         refresh()
+//        hasTappedAgain()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -189,7 +201,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         floor = f
         textView.becomeFirstResponder()
         textView.text = ""
-        replyToLabel.text = "To #\(floor) \((d as! Floor.Manager).displayNameFor(Int(floor)!)):"
     }
     
     // MARK: - IBActions
@@ -200,12 +211,15 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             self.view.endEditing(false)
             self.showProgress()..{ bar in
                 DispatchQueue.global().async {
+//                    print("start to reply...", threadID, self.)
                     if Network.newReply(for: threadID, floor: self.floor, content: content) {
                         self.setAndHideAlert(bar, "评论成功", style: .success) {
                             self.textView.text = ""
-                            self.d.count > 1
-                                ?> self.loadmore()
-                                ?< self.refresh()
+                            (self.d as! Floor.Manager)..{
+                                $0.count > 1 && !$0.reverse
+                                    ?> self.loadmore()
+                                    ?< self.refresh()
+                            }
                         }
                     } else { self.setAndHideAlert(bar, "评论失败", style: .failure) }
                 }
