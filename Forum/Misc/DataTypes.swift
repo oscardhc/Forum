@@ -44,7 +44,7 @@ class DataManager<T: DATA>: BaseManager {
 struct Thread: DATA {
     
     enum Category: String, CaseIterable {
-        case all = "主干道", sport = "体育", music = "音乐", science = "科学", it = "数码", entertainment = "娱乐", emotion = "情感", social = "社会", others = "其他"
+        case all = "主干道", sport = "校园", music = "音乐", science = "科学", it = "数码", entertainment = "娱乐", emotion = "情感", social = "社会", others = "其他"
     }
     
     var id = "", title = "", content = ""

@@ -111,7 +111,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         orderBtn.isHidden = true
         orderBtn.addTarget(self, action: #selector(orderBtnClicked(_:)), for: .touchUpInside)
     }
-
+    
     override func setSelected(_ selected: Bool, animated: Bool) {
         super.setSelected(selected, animated: animated)
 
@@ -120,7 +120,14 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     }
     
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
-        true
+        print(URL, "\(interaction.rawValue)")
+        if (URL.absoluteString.hasPrefix("http://wukefenggao.cn/viewThread/") || URL.absoluteString.hasPrefix("wukefenggao.cn/viewThread/")) && interaction == .invokeDefaultAction {
+            let u = UIKit.URL(string: "wkfg://" + URL.absoluteString.replacingOccurrences(of: "http://wukefenggao.cn/viewThread/", with: "").replacingOccurrences(of: "wukefenggao.cn/viewThread/", with: ""))!
+            UIApplication.shared.open(u)
+            return false
+        } else {
+            return true
+        }
     }
     
     var liked = false {

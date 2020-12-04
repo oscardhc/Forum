@@ -200,7 +200,8 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
     func tryToReplyTo(floor f: String) {
         floor = f
         textView.becomeFirstResponder()
-        textView.text = ""
+        self.textView.text = ""
+        self.textViewDidChange(self.textView)
     }
     
     // MARK: - IBActions
@@ -215,6 +216,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
                     if Network.newReply(for: threadID, floor: self.floor, content: content) {
                         self.setAndHideAlert(bar, "评论成功", style: .success) {
                             self.textView.text = ""
+                            self.textViewDidChange(self.textView)
                             (self.d as! Floor.Manager)..{
                                 $0.count > 1 && !$0.reverse
                                     ?> self.loadmore()

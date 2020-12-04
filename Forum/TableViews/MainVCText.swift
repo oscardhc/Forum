@@ -46,14 +46,14 @@ extension MainVC: UITextViewDelegate {
     
     func adjustTextView() {
         if scene == .floors {
-            if textView.text.count > 0 {
+//            if textView.text.count > 0 {
                 let height = max(min(textView.contentSize.height, 100), 36)
                 textViewHeight.constant = height
-                bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 16
+                bottomViewHeight.constant = textViewHeight.constant + 16 + 10 + 16 + (self.textView.isFirstResponder ? 0 : 20)
                 UIView.animate(withDuration: 0.3) {
                     self.view.layoutIfNeeded()
                 }
-            }
+//            }
             updateCountingLabel(label: replyCountLabel, text: textView.text, lineLimit: 20, charLimit: 817)
         }
     }
