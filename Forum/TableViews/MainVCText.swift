@@ -21,7 +21,10 @@ extension MainVC: UITextViewDelegate {
             }
             completion: { (t) in
                 if let dd = self.d as? Floor.Manager {
-                    self.tableView.scrollToRow(at: IndexPath(row: (dd.data.firstIndex(where: {$0.id == self.floor}) ?? -1) + 1, section: 0), at: .none, animated: true)
+                    let row = (dd.data.firstIndex(where: {$0.id == self.floor}) ?? -1) + 1
+                    if row > 0 {
+                        self.tableView.scrollToRow(at: IndexPath(row: row, section: 0), at: .none, animated: true)
+                    }
                 }
             }
         }

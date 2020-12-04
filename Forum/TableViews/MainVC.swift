@@ -264,13 +264,36 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
     }
     
     @IBAction func secondBarBtnClicked(_ sender: UIBarItem) {
-        if scene == .floors {
+        if scene == .floors, let dd = d as? Floor.Manager {
             let al = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+            if let cell = (tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? MainCell), !cell.liked {
+                al.addAction(.init(title: dd.thread.hasLiked == -1 ? "取消点踩" : "点踩", style: .default, handler: { (a) in
+                    let bar = self.showProgress()
+                    if (dd.thread.hasLiked == -1
+                            ?> Network.cancelDisLikeThread(for: dd.thread.id)
+                            ?< Network.disLikeThread(for: dd.thread.id)) {
+                        self.setAndHideAlert(bar, "点踩成功", style: .success, duration: 0.5) {
+                            al.dismiss(animated: true, completion: nil)
+                            self.clearAll()
+                        }
+                    } else {
+                        self.setAndHideAlert(bar, "点踩失败", style: .failure, duration: 0.5) {
+                            al.dismiss(animated: true, completion: nil)
+                            self.clearAll()
+                        }
+                    }
+                }))
+            }
             al.addAction(.init(title: "屏蔽", style: .default, handler: { (a) in
                 self.blockThread("屏蔽成功")
             }))
             al.addAction(.init(title: "举报", style: .destructive, handler: { (a) in
-                self.blockThread("举报成功")
+                DispatchQueue.global().async {
+                    _ = Network.reportThread(for: dd.thread.id)
+                    DispatchQueue.main.async {
+                        self.blockThread("举报成功")
+                    }
+                }
             }))
             al.addAction(.init(title: "取消", style: .cancel, handler: { (a) in
                 

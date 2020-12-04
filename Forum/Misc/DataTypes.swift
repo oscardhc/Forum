@@ -50,7 +50,7 @@ struct Thread: DATA {
     var id = "", title = "", content = ""
     var type: Category = .all
     var nLiked = 0, nRead = 0, nCommented = 0
-    var hasLiked = false, hasFavoured = false, isTop = false, isFromFloorList = false
+    var hasLiked = 1, hasFavoured = false, isTop = false, isFromFloorList = false
     var postTime = Date(), lastUpdateTime = Date()
     var name: NameG, color: ColorG
     
@@ -59,13 +59,15 @@ struct Thread: DATA {
     init(json: Any, isfromFloorList li: Bool = false) {
         let thread  = json as! [String: Any]
         
+        print(thread)
+        
         nCommented = thread["Comment"] as! Int
         id = thread["ThreadID"] as! String
         nRead = thread["Read"] as! Int
         content = thread["Summary"] as! String
-        nLiked = thread["Like"] as! Int
+        nLiked = (thread["Like"] as! Int) - (thread["Dislike"] as! Int)
         title = thread["Title"] as! String
-        hasLiked = (thread["WhetherLike"] as? Int ?? 0) == 1
+        hasLiked = (thread["WhetherLike"] as? Int) ?? 1
         hasFavoured = (thread["WhetherFavour"] as? Int ?? 0) == 1
         isTop = (thread["WhetherTop"] as? Int) == 1
         isFromFloorList = li
@@ -92,7 +94,7 @@ struct Thread: DATA {
         f.content = content
         f.nLiked = nLiked
         f.time = postTime
-        f.hasLiked = hasLiked
+        f.hasLiked = hasLiked == 1
         return f
     }
     

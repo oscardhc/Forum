@@ -299,6 +299,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         
         
         likedBtn.adjustsImageWhenDisabled = true
+        likedBtn.isEnabled = !isFirstFloor || thread.hasLiked != -1
         likedBtn.isHidden = isFirstFloor && !t.isFromFloorList
         orderBtn.isHidden = !isFirstFloor
         footerHeight.constant = isFirstFloor ? 35 : 0

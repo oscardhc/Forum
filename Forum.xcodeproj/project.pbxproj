@@ -620,7 +620,7 @@
 				CODE_SIGN_ENTITLEMENTS = Forum/Forum.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 221;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = AEF5CS25ZL;
 				INFOPLIST_FILE = Forum/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -628,7 +628,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.oscardhc.forum;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
@@ -646,7 +646,7 @@
 				CODE_SIGN_ENTITLEMENTS = Forum/Forum.entitlements;
 				"CODE_SIGN_IDENTITY[sdk=macosx*]" = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
-				CURRENT_PROJECT_VERSION = 221;
+				CURRENT_PROJECT_VERSION = 4;
 				DEVELOPMENT_TEAM = AEF5CS25ZL;
 				INFOPLIST_FILE = Forum/Info.plist;
 				IPHONEOS_DEPLOYMENT_TARGET = 13.0;
@@ -654,7 +654,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.1;
+				MARKETING_VERSION = 1.0.2;
 				PRODUCT_BUNDLE_IDENTIFIER = com.oscardhc.forum;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
