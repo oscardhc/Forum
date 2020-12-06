@@ -23,31 +23,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     var parentVC: MainVC!
     var name: String = "_"
     
-    var folded: Bool = false {
-        didSet {
-            idLabel.subviews.forEach({$0.removeFromSuperview()})
-            if folded {
-                blockBottomDist.constant = 4
-                mainView.clipsToBounds = true
-                contentView.clipsToBounds = true
-                if let t = thread.tag?.rawValue {
-                    let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
-                    idLabel += UILabel(frame: .init(x: 60, y: 5, width: w, height: 20))..{
-                        $0.text = t
-                        $0.fontSize = 15
-                        $0.textAlignment = .center
-                        $0.layer.cornerRadius = 5
-                        $0.layer.backgroundColor = UIColor.cyan.cgColor
-                    }
-                }
-            } else {
-                blockBottomDist.constant = 150
-                mainView.clipsToBounds = false
-                contentView.clipsToBounds = false
-            }
-        }
-    }
-    
     @IBOutlet weak var mainView: UIView!
     @IBOutlet weak var idLabel: UILabel!
     @IBOutlet weak var idLabelHeight: NSLayoutConstraint!
@@ -90,7 +65,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     var content = (title: "", content: "") {
         didSet {
             for v in higherTitleLabel.subviews + titleLabel.subviews {v.removeFromSuperview()}
-            if let t = thread.tag?.rawValue {
+            if let t = thread.tag?.rawValue, scene == .thread || isFirstFloor {
                 let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
                 higherTitleLeadingDist.constant = w + 16
                 titleLeadingDist.constant = w + 16
@@ -131,6 +106,31 @@ class MainCell: UITableViewCell, UITextViewDelegate {
                 lessThanDIst.constant = 100
             }
             
+        }
+    }
+    
+    var folded: Bool = false {
+        didSet {
+            idLabel.subviews.forEach({$0.removeFromSuperview()})
+            if folded {
+                blockBottomDist.constant = 4
+                mainView.clipsToBounds = true
+                contentView.clipsToBounds = true
+                if let t = thread.tag?.rawValue, scene == .thread || isFirstFloor {
+                    let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
+                    idLabel += UILabel(frame: .init(x: 60, y: 5, width: w, height: 20))..{
+                        $0.text = t
+                        $0.fontSize = 15
+                        $0.textAlignment = .center
+                        $0.layer.cornerRadius = 5
+                        $0.layer.backgroundColor = UIColor.cyan.cgColor
+                    }
+                }
+            } else {
+                blockBottomDist.constant = 500
+                mainView.clipsToBounds = false
+                contentView.clipsToBounds = false
+            }
         }
     }
     
@@ -283,7 +283,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
             lbl.isHidden = true
             cornerLabel.text = Util.dateToDeltaString(t.lastUpdateTime)
         }
-
         
         if thread.isTop {
             headLabel.text = String("公告")
@@ -306,7 +305,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         commentBtn.isEnabled = false
         readBtn.isEnabled = false
         
-        print(">", thread.id, thread.folded)
         folded = thread.folded
         
         return self
@@ -377,6 +375,8 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         likedBtn.isHidden = isFirstFloor && !t.isFromFloorList
         orderBtn.isHidden = !isFirstFloor
         footerHeight.constant = isFirstFloor ? 35 : 0
+        
+        folded = !isFirstFloor && f.nLiked <= 0
         
         return self
     }

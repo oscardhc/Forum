@@ -387,6 +387,9 @@ extension UIViewController {
     func showAlert(_ message: String, style: AlertStyle, duration: TimeInterval = 0.8, completion: @escaping () -> Void = {}) {
         setAndHideAlert(MBProgressHUD.showAdded(to: self.view, animated: true), message, style: style, duration: duration, completion: completion)
     }
+    func networkFailure(completion: @escaping () -> Void = {}) {
+        showAlert("网络错误", style: .failure, completion: completion)
+    }
     func showProgress() -> MBProgressHUD {
         MBProgressHUD.showAdded(to: self.view, animated: true)..{
             $0.mode = .indeterminate

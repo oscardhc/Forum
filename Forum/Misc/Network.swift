@@ -181,11 +181,14 @@ class Network {
     static func cancelDislikeThread(for threadID: String) -> Bool {
         getData(op_code: "9_2", pa_1: threadID, done: {_ in true}) ?? false
     }
-    
-//    static func dis
-    
     static func reportThread(for threadID: String) -> Bool {
         getData(op_code: "e", pa_1: threadID, done: {_ in true}) ?? false
+    }
+    
+    static func setTag(for threadID: String, with tag: Tag) -> Bool {
+//        getData(op_code: "", done: <#T##(([String : Any]) -> T)##(([String : Any]) -> T)##([String : Any]) -> T#>)
+        sleep(1)
+        return false
     }
     
     static func newThread(title: String, inBlock: Thread.Category, content: String, anonymousType: NameTheme, seed: Int) -> Bool {

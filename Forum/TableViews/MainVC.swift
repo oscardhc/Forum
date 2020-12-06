@@ -251,18 +251,21 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         
         func commit(_ a: UIAlertAction) {
             DispatchQueue.global().async {
-                report => _ = Network.reportThread(for: id)
+                var success = true
+                report => success = Network.reportThread(for: id)
                 DispatchQueue.main.async {
-                    let li = G.blockedList.content
-                    !li.contains(id) => G.blockedList.content = li + [id]
-                    self.showAlert(msg, style: .success) {
-                        if isViewing {
-                            (self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as! MainVC).refresh()
-                            self.navigationController?.popViewController(animated: true)
-                        } else {
-                            self.refresh()
+                    if success {
+                        let li = G.blockedList.content
+                        !li.contains(id) => G.blockedList.content = li + [id]
+                        self.showAlert(msg, style: .success) {
+                            if isViewing {
+                                (self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as! MainVC).refresh()
+                                self.navigationController?.popViewController(animated: true)
+                            } else {
+                                self.refresh()
+                            }
                         }
-                    }
+                    } else { self.networkFailure() }
                 }
             }
         }
@@ -273,26 +276,42 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
                 $0.addAction(.init(title: "确认", style: .destructive, handler: commit))
                 $0.addAction(.init(title: "取消", style: .cancel))
             })
-        
+    }
+    
+    func setTag(_ id: String) {
+        func commit(tag: Tag) {
+            DispatchQueue.global().async {
+                let success = Network.setTag(for: id, with: tag)
+                DispatchQueue.main.async {
+                    success
+                        ?> self.showAlert("设置成功", style: .success)
+                        ?< self.networkFailure()
+                }
+            }
+        }
+        self << (UIAlertController(title: "设置标签", message: "在被多人设置后，帖子将会被打上该种标签，以便不同用户过滤阅读", preferredStyle: .alert)..{ tagSelect in
+            for cs in Tag.allCases {
+                tagSelect.addAction(.init(title: String(describing: cs), style: .default, handler: { _ in
+                    commit(tag: cs)
+                }))
+            }
+            tagSelect.addAction(.init(title: "取消", style: .cancel, handler: nil))
+        })
     }
     
     @objc func firstBtnClicked(_ sender: Any) {
         if scene == .floors, let dd = d as? Floor.Manager {
             let al = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            al.addAction(.init(title: "屏蔽", style: .default, handler: { (a) in
+            al.addAction(.init(title: "设置标签", style: .default, handler: { _ in
+                self.setTag(dd.thread.id)
+            }))
+            al.addAction(.init(title: "屏蔽", style: .default, handler: { _ in
                 self.blockThread("屏蔽成功", dd.thread.id, report: false)
             }))
-            al.addAction(.init(title: "举报", style: .destructive, handler: { (a) in
-                DispatchQueue.global().async {
-                    _ = Network.reportThread(for: dd.thread.id)
-                    DispatchQueue.main.async {
-                        self.blockThread("举报成功", dd.thread.id, report: true)
-                    }
-                }
+            al.addAction(.init(title: "举报", style: .destructive, handler: { _ in
+                self.blockThread("举报成功", dd.thread.id, report: true)
             }))
-            al.addAction(.init(title: "取消", style: .cancel, handler: { (a) in
-                
-            }))
+            al.addAction(.init(title: "取消", style: .cancel, handler: nil))
             if let popoverPresentationController = al.popoverPresentationController {
                 popoverPresentationController.sourceView = self.view
                 let fr = self.navigationController!.navigationBar.frame
@@ -436,13 +455,13 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             let dd = self.d as! Floor.Manager
             return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) {_ in
                 UIMenu(title: "", children: [
-                    UIAction(title: dd.thread.hasLiked == .disL ? "取消踩" : "踩", image: UIImage(systemName: "hand.thumbsdown.fill"), identifier: nil, attributes:  cell.liked != .like ? [] : [.disabled], handler: { (a) in
+                    UIAction(title: dd.thread.hasLiked == .disL ? "取消踩" : "踩", image: UIImage(systemName: "hand.thumbsdown.fill"), identifier: nil, attributes:  cell.liked != .like ? [] : [.disabled], handler: { _ in
                         cell.like(0)
                     }),
-                    UIAction(title: indexPath.row == 0 ? "屏蔽帖子" : "屏蔽\(cell.name)", image: UIImage(systemName: "eye.slash"), identifier: nil, handler: { (a) in
+                    UIAction(title: indexPath.row == 0 ? "屏蔽帖子" : "屏蔽\(cell.name)", image: UIImage(systemName: "eye.slash"), identifier: nil, handler: { _ in
                         self.blockThread("屏蔽成功", cell.thread.id, report: false, isViewing: true)
                     }),
-                    UIAction(title: indexPath.row == 0 ? "屏蔽并举报帖子" : "屏蔽并举报\(cell.name)", image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, handler: { (a) in
+                    UIAction(title: indexPath.row == 0 ? "屏蔽并举报帖子" : "屏蔽并举报\(cell.name)", image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, handler: { _ in
                         self.blockThread("举报成功", cell.thread.id, report: true, isViewing: true)
                     })
                 ])

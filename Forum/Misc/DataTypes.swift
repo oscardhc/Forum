@@ -129,7 +129,6 @@ struct Thread: DATA {
                 filtered = data.compactMap() {
                     if li.contains($0.id) { return nil }
                     if $0.tag == nil { return $0.setedFolded(false) }
-//                    print(pr, $0.id, String(describing: $0.tag!), pr[String(describing: $0.tag!)] ?? 0)
                     switch pr[String(describing: $0.tag!)] ?? 0 {
                     case 2: return nil
                     case 1: return $0.setedFolded($0.folded)
@@ -219,6 +218,8 @@ struct Floor: DATA {
         var thread: Thread
         var reverse = false
         
+//        var filtered: [Floor]
+        
         init(_ t: Thread) {
             thread = t
             super.init()
@@ -240,6 +241,14 @@ struct Floor: DATA {
         
         func displayNameFor(_ i: Int) -> String {
             thread.name[Int((i == 0 ? thread.generateFirstFloor() : data.first(where: {$0.id == "\(i)"}) ?? thread.generateFirstFloor()).name)!]
+        }
+        
+        override func didSelectedRow(_ vc: UIViewController, index: Int, commit: Bool = true) -> UIViewController? {
+            if data[index].folded {
+                let i = data.firstIndex(where: {$0.id == filtered[index].id})!
+                data[i].folded = false
+                (vc as! MainVC).tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+            }
         }
         
     }
