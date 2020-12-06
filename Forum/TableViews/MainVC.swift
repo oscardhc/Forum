@@ -161,31 +161,17 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         if scene == .floors {
             self.tabBarController?.tabBar.isHidden = true
             self.bottomViewHeight.constant = self.textViewHeight.constant + 16 + 10 + 20
+            !firstLoading => updateFavour()
         } else {
             self.tabBarController?.tabBar.isHidden = false
             self.bottomViewHeight.constant = 0
         }
         if scene == .main {
-//            barFirstBtn.image = UIImage(systemName: "magnifyingglass")
             newThreadBtn.frame.origin = CGPoint(x: newThreadBtn.frame.minX, y: UIScreen.main.bounds.height - tabBarController!.tabBar.frame.height - 80)
             navigationController?.navigationBar.layer.shadowOpacity = 0
         } else {
-//            barFirstBtn.image = UIImage()
             newThreadBtn.isHidden = true
             navigationController?.navigationBar.applyShadow()
-        }
-        if scene == .floors {
-//            barThirdBtn.image = UIImage(systemName: "star")
-//            barSecondBtn.image = UIImage(systemName: "square.and.arrow.up")
-//            barFirstBtn.image = UIImage(systemName: "ellipsis")
-//            barThirdBtn.isEnabled = false
-            !firstLoading => updateFavour()
-//            barFirstBtn.isEnabled = true
-        } else {
-//            barThirdBtn.isEnabled = false
-//            barThirdBtn.image = UIImage()
-//            barSecondBtn.isEnabled = false
-//            barSecondBtn.image = UIImage()
         }
         
         if scene == .main {
@@ -204,6 +190,18 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             G.openThreadID = nil
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 Thread.Manager.openCertainThread(self, id: id)
+            }
+        }
+        
+        if let dd = d as? Thread.Manager {
+            let pp = G.viewStyle.content
+            for cs in Tag.allCases.map({String(describing: $0)}) {
+                if (dd.pr[cs] ?? 0) != (pp[cs] ?? 0) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.hasTappedAgain()
+                    }
+                    break
+                }
             }
         }
     }
@@ -425,7 +423,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         !tableView.refreshControl!.isRefreshing && !tableView.mj_footer!.isRefreshing => {
-            (navigationItem.largeTitleDisplayMode == .always) => navigationItem.title = ""
+            (navigationItem.largeTitleDisplayMode == .always && !(tableView.cellForRow(at: indexPath) as! MainCell).folded) => navigationItem.title = ""
             _ = d.didSelectedRow(self, index: indexPath.row)
         }
     }
@@ -494,7 +492,6 @@ extension MainVC: UIContextMenuInteractionDelegate {
                 }
             }
         }
-
     }
     
     

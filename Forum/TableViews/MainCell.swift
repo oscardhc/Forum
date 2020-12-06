@@ -25,6 +25,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     
     var folded: Bool = false {
         didSet {
+            idLabel.subviews.forEach({$0.removeFromSuperview()})
             if folded {
                 blockBottomDist.constant = 4
                 mainView.clipsToBounds = true
@@ -43,7 +44,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
                 blockBottomDist.constant = 150
                 mainView.clipsToBounds = false
                 contentView.clipsToBounds = false
-                idLabel.subviews.forEach({$0.removeFromSuperview()})
             }
         }
     }
@@ -89,6 +89,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     
     var content = (title: "", content: "") {
         didSet {
+            for v in higherTitleLabel.subviews + titleLabel.subviews {v.removeFromSuperview()}
             if let t = thread.tag?.rawValue {
                 let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
                 higherTitleLeadingDist.constant = w + 16
@@ -108,7 +109,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
                     $0.layer.backgroundColor = UIColor.cyan.cgColor
                 }
             } else {
-                for v in higherTitleLabel.subviews + titleLabel.subviews {v.removeFromSuperview()}
                 higherTitleLeadingDist.constant = 8
                 titleLeadingDist.constant = 8
             }

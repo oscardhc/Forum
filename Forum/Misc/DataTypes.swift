@@ -119,16 +119,17 @@ struct Thread: DATA {
         var block = Thread.Category.all
         var searchFor: String? = nil
         
+        var pr = G.viewStyle.content
         var filtered = [Thread]()
         
         override var data: [Thread] {
             didSet {
                 let li = G.blockedList.content
-                var pr = G.viewStyle.content
+                pr = G.viewStyle.content
                 filtered = data.compactMap() {
                     if li.contains($0.id) { return nil }
                     if $0.tag == nil { return $0.setedFolded(false) }
-                    print(pr, $0.id, String(describing: $0.tag!), pr[String(describing: $0.tag!)] ?? 0)
+//                    print(pr, $0.id, String(describing: $0.tag!), pr[String(describing: $0.tag!)] ?? 0)
                     switch pr[String(describing: $0.tag!)] ?? 0 {
                     case 2: return nil
                     case 1: return $0.setedFolded($0.folded)
