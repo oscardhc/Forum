@@ -40,11 +40,12 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
     @IBOutlet weak var bottomSpace: NSLayoutConstraint!
     @IBOutlet weak var bottomViewHeight: NSLayoutConstraint!
     @IBOutlet weak var textViewHeight: NSLayoutConstraint!
-    @IBOutlet weak var topCornerBtn: UIBarButtonItem!
     @IBOutlet weak var replyCountLabel: StateLabel!
     @IBOutlet weak var replyToLabel: UILabel!
     @IBOutlet weak var newThreadBtn: UIButton!
-    @IBOutlet weak var barSecondBtn: UIBarButtonItem!
+//    @IBOutlet weak var barFirstBtn: UIBarButtonItem!
+//    @IBOutlet weak var barSecondBtn: UIBarButtonItem!
+//    @IBOutlet weak var barThirdBtn: UIBarButtonItem!
     @IBOutlet weak var topDist: NSLayoutConstraint!
     
     var inSearchMode = false
@@ -76,6 +77,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             ? 0
             : (UIApplication.shared.windows[0].safeAreaInsets.top == 20 ? 64 : 88)
     }
+    var isRefreshing = false
     
     lazy var refreshControl = UIRefreshControl()..{
         $0.addTarget(self, action: #selector(refresh), for: .valueChanged)
@@ -96,7 +98,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         $0.setRefreshingTarget(self, refreshingAction: #selector(loadmore))
         $0.heightPreset = .small
         $0.backgroundColor = .none
-        $0.setTitle("正在加载...", for: .idle)
+        $0.setTitle(scene == .floors ? "" : "正在加载...", for: .idle)
     }
     
     var floor: String = "0" {
@@ -147,7 +149,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         textViewDidChange(textView)
         replyToLabel.text = "To #0"
         refresh()
-//        hasTappedAgain()
     }
     
     override func viewWillAppear(_ animated: Bool) {
@@ -165,28 +166,43 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             self.bottomViewHeight.constant = 0
         }
         if scene == .main {
-            barSecondBtn.image = UIImage(systemName: "magnifyingglass")
+//            barFirstBtn.image = UIImage(systemName: "magnifyingglass")
             newThreadBtn.frame.origin = CGPoint(x: newThreadBtn.frame.minX, y: UIScreen.main.bounds.height - tabBarController!.tabBar.frame.height - 80)
             navigationController?.navigationBar.layer.shadowOpacity = 0
         } else {
-            barSecondBtn.image = UIImage()
+//            barFirstBtn.image = UIImage()
             newThreadBtn.isHidden = true
             navigationController?.navigationBar.applyShadow()
         }
         if scene == .floors {
-            topCornerBtn.image = UIImage(systemName: "star")
-            barSecondBtn.image = UIImage(systemName: "ellipsis")
-            topCornerBtn.isEnabled = false
+//            barThirdBtn.image = UIImage(systemName: "star")
+//            barSecondBtn.image = UIImage(systemName: "square.and.arrow.up")
+//            barFirstBtn.image = UIImage(systemName: "ellipsis")
+//            barThirdBtn.isEnabled = false
             !firstLoading => updateFavour()
-            barSecondBtn.isEnabled = true
+//            barFirstBtn.isEnabled = true
         } else {
-            topCornerBtn.isEnabled = false
-            topCornerBtn.image = UIImage()
+//            barThirdBtn.isEnabled = false
+//            barThirdBtn.image = UIImage()
+//            barSecondBtn.isEnabled = false
+//            barSecondBtn.image = UIImage()
+        }
+        
+        if scene == .main {
+            navigationItem.rightBarButtonItems = [
+                .imgItem(UIImage(systemName: "magnifyingglass", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), action: #selector(firstBtnClicked(_:)), to: self)
+            ]
+        } else if scene == .floors {
+            navigationItem.rightBarButtonItems = [
+                .imgItem(UIImage(systemName: "ellipsis.circle", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), action: #selector(firstBtnClicked(_:)), to: self),
+                .imgItem(UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), action: #selector(secondBtnClicked(_:)), to: self),
+                .imgItem(UIImage(systemName: "star", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), action: #selector(thirdBtnClicked(_:)), to: self)..{$0.isEnabled = false}
+            ]
         }
         
         if let id = G.openThreadID {
             G.openThreadID = nil
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                 Thread.Manager.openCertainThread(self, id: id)
             }
         }
@@ -233,65 +249,46 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
     }
     
-    @IBAction func barBtnClicked(_ sender: Any) {
-        scene == .floors => {
-            topCornerBtn.isEnabled = false
-            (d as! Floor.Manager)..{ dd in
-                DispatchQueue.global().async {
-                    let success = dd.thread.hasFavoured
-                        ? Network.cancelFavourThread(for: dd.thread.id)
-                        : Network.favourThread(for: dd.thread.id)
-                    DispatchQueue.main.async {
-                        self.topCornerBtn.isEnabled = true
-                        if success {
-                            dd.thread.hasFavoured = !dd.thread.hasFavoured
-                            self.updateFavour()
-                        } else { self.showAlert("收藏失败", style: .failure) }
+    func blockThread(_ msg: String, _ id: String, report: Bool, isViewing: Bool = true) {
+        
+        func commit(_ a: UIAlertAction) {
+            DispatchQueue.global().async {
+                report => _ = Network.reportThread(for: id)
+                DispatchQueue.main.async {
+                    let li = G.blockedList.content
+                    !li.contains(id) => G.blockedList.content = li + [id]
+                    self.showAlert(msg, style: .success) {
+                        if isViewing {
+                            (self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as! MainVC).refresh()
+                            self.navigationController?.popViewController(animated: true)
+                        } else {
+                            self.refresh()
+                        }
                     }
                 }
             }
         }
+        self << (UIAlertController(
+            title: report ? "你确定要举报吗？" : "你确定要屏蔽吗？",
+            message: report ? "帖子在被举报一定次数后会被系统隐藏" : "您可以在本地选择让这个帖子不再出现",
+            preferredStyle: .alert)..{
+                $0.addAction(.init(title: "确认", style: .destructive, handler: commit))
+                $0.addAction(.init(title: "取消", style: .cancel))
+            })
+        
     }
     
-    func blockThread(_ msg: String) {
-        let id = (self.d as! Floor.Manager).thread.id
-        let li = G.blockedList.content
-        !li.contains(id) => G.blockedList.content = li + [id]
-        self.showAlert(msg, style: .success) {
-            (self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as! MainVC).refresh()
-            self.navigationController?.popViewController(animated: true)
-        }
-    }
-    
-    @IBAction func secondBarBtnClicked(_ sender: UIBarItem) {
+    @objc func firstBtnClicked(_ sender: Any) {
         if scene == .floors, let dd = d as? Floor.Manager {
             let al = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            if let cell = (tableView.cellForRow(at: IndexPath(row: 0, section: 0)) as? MainCell), !cell.liked {
-                al.addAction(.init(title: dd.thread.hasLiked == -1 ? "取消点踩" : "点踩", style: .default, handler: { (a) in
-                    let bar = self.showProgress()
-                    if (dd.thread.hasLiked == -1
-                            ?> Network.cancelDisLikeThread(for: dd.thread.id)
-                            ?< Network.disLikeThread(for: dd.thread.id)) {
-                        self.setAndHideAlert(bar, "点踩成功", style: .success, duration: 0.5) {
-                            al.dismiss(animated: true, completion: nil)
-                            self.clearAll()
-                        }
-                    } else {
-                        self.setAndHideAlert(bar, "点踩失败", style: .failure, duration: 0.5) {
-                            al.dismiss(animated: true, completion: nil)
-                            self.clearAll()
-                        }
-                    }
-                }))
-            }
             al.addAction(.init(title: "屏蔽", style: .default, handler: { (a) in
-                self.blockThread("屏蔽成功")
+                self.blockThread("屏蔽成功", dd.thread.id, report: false)
             }))
             al.addAction(.init(title: "举报", style: .destructive, handler: { (a) in
                 DispatchQueue.global().async {
                     _ = Network.reportThread(for: dd.thread.id)
                     DispatchQueue.main.async {
-                        self.blockThread("举报成功")
+                        self.blockThread("举报成功", dd.thread.id, report: true)
                     }
                 }
             }))
@@ -308,6 +305,34 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         } else {
             self.navigationItem.titleView = search
             search.searchBar.becomeFirstResponder()
+        }
+    }
+    
+    @objc func secondBtnClicked(_ sender: Any) {
+        scene == .floors => {
+            self << (UIActivityViewController(activityItems: [URL(string: "http://wukefenggao.cn/viewThread/\((d as! Floor.Manager).thread.id)")!], applicationActivities: nil)..{
+                $0.popoverPresentationController?.sourceView = self.view
+            })
+        }
+    }
+    
+    @objc func thirdBtnClicked(_ sender: UIBarButtonItem) {
+        scene == .floors => {
+            sender.isEnabled = false
+            (d as! Floor.Manager)..{ dd in
+                DispatchQueue.global().async {
+                    let success = dd.thread.hasFavoured
+                        ? Network.cancelFavourThread(for: dd.thread.id)
+                        : Network.favourThread(for: dd.thread.id)
+                    DispatchQueue.main.async {
+                        sender.isEnabled = true
+                        if success {
+                            dd.thread.hasFavoured = !dd.thread.hasFavoured
+                            self.updateFavour()
+                        } else { self.showAlert("收藏失败", style: .failure) }
+                    }
+                }
+            }
         }
     }
     
@@ -378,17 +403,20 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             }
         }
     }
-
+    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         d.count
     }
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        d.initializeCell(tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell, index: indexPath.row).withVC(self)
+//        indexPath.row % 3 == 0 ?
+//            tableView.dequeueReusableCell(withIdentifier: "FoldCell", for: indexPath)
+//        :
+            d.initializeCell(tableView.dequeueReusableCell(withIdentifier: "MainCell", for: indexPath) as! MainCell, index: indexPath.row).withVC(self)
     }
     
     func tableView(_ tableView: UITableView, estimatedHeightForRowAt indexPath: IndexPath) -> CGFloat {
-        300
+        210
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -397,20 +425,46 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
     
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         !tableView.refreshControl!.isRefreshing && !tableView.mj_footer!.isRefreshing => {
-            navigationItem.largeTitleDisplayMode == .always => navigationItem.title = ""
-            d.didSelectedRow(self, index: indexPath.row)
+            (navigationItem.largeTitleDisplayMode == .always) => navigationItem.title = ""
+            _ = d.didSelectedRow(self, index: indexPath.row)
         }
     }
     
     // MARK: - Context Menu
     
     func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        scene == .floors ? nil
-            : UIContextMenuConfiguration(identifier: nil, previewProvider: {
+        guard let cell = tableView.cellForRow(at: indexPath) as? MainCell else { return nil }
+        if scene == .floors {
+            let dd = self.d as! Floor.Manager
+            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) {_ in
+                UIMenu(title: "", children: [
+                    UIAction(title: dd.thread.hasLiked == .disL ? "取消踩" : "踩", image: UIImage(systemName: "hand.thumbsdown.fill"), identifier: nil, attributes:  cell.liked != .like ? [] : [.disabled], handler: { (a) in
+                        cell.like(0)
+                    }),
+                    UIAction(title: indexPath.row == 0 ? "屏蔽帖子" : "屏蔽\(cell.name)", image: UIImage(systemName: "eye.slash"), identifier: nil, handler: { (a) in
+                        self.blockThread("屏蔽成功", cell.thread.id, report: false, isViewing: true)
+                    }),
+                    UIAction(title: indexPath.row == 0 ? "屏蔽并举报帖子" : "屏蔽并举报\(cell.name)", image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, handler: { (a) in
+                        self.blockThread("举报成功", cell.thread.id, report: true, isViewing: true)
+                    })
+                ])
+            }
+        } else {
+            return UIContextMenuConfiguration(identifier: nil) {
                 (self.d.didSelectedRow(self, index: indexPath.row, commit: false) as! MainVC)..{
                     $0.inPreview = true
                 }
-            } , actionProvider: nil)
+            } actionProvider: {_ in
+                UIMenu(title: "", children: [
+                    UIAction(title: "屏蔽", image: UIImage(systemName: "eye.slash"), identifier: nil, handler: { (a) in
+                        self.blockThread("屏蔽成功", cell.thread.id, report: false, isViewing: false)
+                    }),
+                    UIAction(title: "屏蔽并举报", image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, handler: { (a) in
+                        self.blockThread("举报成功", cell.thread.id, report: true, isViewing: false)
+                    })
+                ])
+            }
+        }
     }
     
     func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
@@ -427,4 +481,21 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         }
     }
 
+}
+
+extension MainVC: UIContextMenuInteractionDelegate {
+    
+    func contextMenuInteraction(_ interaction: UIContextMenuInteraction, configurationForMenuAtLocation location: CGPoint) -> UIContextMenuConfiguration? {
+        return UIContextMenuConfiguration(identifier: nil) { () -> UIViewController? in
+            UIViewController()..{ vc in
+                vc.view += UIView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))..{
+                    $0.backgroundColor = .red
+                    vc.preferredContentSize = $0.frame.size
+                }
+            }
+        }
+
+    }
+    
+    
 }

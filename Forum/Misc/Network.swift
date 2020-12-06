@@ -156,6 +156,16 @@ class Network {
         getData(op_code: "8_2", pa_1: threadID, pa_4: floor, done: {_ in true}) ?? false
     }
     
+    static func dislikeFloor(for threadID: String, floor: String) -> Bool {
+        sleep(1)
+        return false
+    }
+    
+    static func canceldislikeFloor(for threadID: String, floor: String) -> Bool {
+        sleep(1)
+        return false
+    }
+    
     static func likeThread(for threadID: String) -> Bool {
         getData(op_code: "8_3", pa_1: threadID, done: {_ in true}) ?? false
     }
@@ -164,13 +174,15 @@ class Network {
         getData(op_code: "8_4", pa_1: threadID, done: {_ in true}) ?? false
     }
     
-    static func disLikeThread(for threadID: String) -> Bool {
+    static func dislikeThread(for threadID: String) -> Bool {
         getData(op_code: "9", pa_1: threadID, done: {_ in true}) ?? false
     }
     
-    static func cancelDisLikeThread(for threadID: String) -> Bool {
+    static func cancelDislikeThread(for threadID: String) -> Bool {
         getData(op_code: "9_2", pa_1: threadID, done: {_ in true}) ?? false
     }
+    
+//    static func dis
     
     static func reportThread(for threadID: String) -> Bool {
         getData(op_code: "e", pa_1: threadID, done: {_ in true}) ?? false

@@ -31,6 +31,7 @@
 		55AA46802516739B00AAF708 /* ForumUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA467F2516739B00AAF708 /* ForumUITests.swift */; };
 		55AA469C2516750100AAF708 /* MainVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA469B2516750100AAF708 /* MainVC.swift */; };
 		55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55AA46A5251799B000AAF708 /* DataTypes.swift */; };
+		55B4DD7A257BC2FE0062E567 /* SettingCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55B4DD79257BC2FE0062E567 /* SettingCell.swift */; };
 		55D748F7253EC35E00F44EF8 /* NewThreadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D748F6253EC35E00F44EF8 /* NewThreadVC.swift */; };
 		55DB189A256259C800FA8041 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DB1899256259C800FA8041 /* TabBarController.swift */; };
 /* End PBXBuildFile section */
@@ -84,6 +85,7 @@
 		55AA46812516739B00AAF708 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		55AA469B2516750100AAF708 /* MainVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVC.swift; sourceTree = "<group>"; };
 		55AA46A5251799B000AAF708 /* DataTypes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataTypes.swift; sourceTree = "<group>"; };
+		55B4DD79257BC2FE0062E567 /* SettingCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SettingCell.swift; sourceTree = "<group>"; };
 		55D748F6253EC35E00F44EF8 /* NewThreadVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewThreadVC.swift; sourceTree = "<group>"; };
 		55DB1899256259C800FA8041 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
 		90429E9417EA95DFFB87AB0F /* Pods-Forum.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Forum.debug.xcconfig"; path = "Target Support Files/Pods-Forum/Pods-Forum.debug.xcconfig"; sourceTree = "<group>"; };
@@ -130,6 +132,7 @@
 			children = (
 				55DB1899256259C800FA8041 /* TabBarController.swift */,
 				55AA469B2516750100AAF708 /* MainVC.swift */,
+				55B4DD79257BC2FE0062E567 /* SettingCell.swift */,
 				558B5339257505E600C6E775 /* MainVCScroll.swift */,
 				558B532A257502C700C6E775 /* MainVCRefresh.swift */,
 				558B5334257503F000C6E775 /* MainVCText.swift */,
@@ -428,6 +431,7 @@
 				55557CF025237F12002F17AC /* Network.swift in Sources */,
 				55DB189A256259C800FA8041 /* TabBarController.swift in Sources */,
 				55AA46A6251799B000AAF708 /* DataTypes.swift in Sources */,
+				55B4DD7A257BC2FE0062E567 /* SettingCell.swift in Sources */,
 				558B53302575033F00C6E775 /* MainVCSearch.swift in Sources */,
 				55AA465B2516739A00AAF708 /* AppDelegate.swift in Sources */,
 				558B533A257505E600C6E775 /* MainVCScroll.swift in Sources */,
@@ -628,7 +632,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.oscardhc.forum;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;
@@ -654,7 +658,7 @@
 					"$(inherited)",
 					"@executable_path/Frameworks",
 				);
-				MARKETING_VERSION = 1.0.2;
+				MARKETING_VERSION = 1.0.4;
 				PRODUCT_BUNDLE_IDENTIFIER = com.oscardhc.forum;
 				PRODUCT_NAME = "$(TARGET_NAME)";
 				SUPPORTS_MACCATALYST = YES;

@@ -33,8 +33,10 @@ extension MainVC {
     
     func updateFavour() {
         if scene == .floors {
-            topCornerBtn.image = UIImage(systemName: (d as! Floor.Manager).thread.hasFavoured ? "star.fill" : "star")
-            topCornerBtn.isEnabled = true
+            navigationItem.rightBarButtonItems![2].setImageTo(UIImage(systemName: (d as! Floor.Manager).thread.hasFavoured ? "star.fill" : "star"))
+            navigationItem.rightBarButtonItems![2].isEnabled = true
+//            barThirdBtn.image = UIImage(systemName: (d as! Floor.Manager).thread.hasFavoured ? "star.fill" : "star")
+//            barThirdBtn.isEnabled = true
         }
     }
     
@@ -44,9 +46,11 @@ extension MainVC {
         self.tableView.mj_footer?.resetNoMoreData()
         footer.setTitle("正在加载...", for: .idle)
         tableView.beginUpdates()
+        print("++++++++++++++ begin")
         if prev > self.d.count {
             tableView.deleteRows(at: (self.d.count..<prev).map{IndexPath(row: $0, section: 0)}, with: .fade)
         }
+        print("-------------- end")
         tableView.endUpdates()
         if thenRefresh {
             refresh()
@@ -54,8 +58,17 @@ extension MainVC {
     }
     
     @objc func refresh() {
-        print("refresh... topdist = ", topDist.constant)
+//        print("refresh... topdist = ", topDist.constant)
+        if isRefreshing {
+            self.tableView.refreshControl?.endRefreshing()
+            return
+        }
+        isRefreshing = true
         let prev = self.d.count
+        
+        scene == .floors && prev <= (self.scene == .floors ? 1 : 0) => self.tableView.beginUpdates()
+//        print("++++++++++++++ begin")
+        
         DispatchQueue.global().async {
             usleep(self.firstLoading ? 100000 : 200000)
             if !self.inSearchMode, let dm = self.d as? Thread.Manager, dm.searchFor != nil {
@@ -76,9 +89,9 @@ extension MainVC {
                 }
                 self.tableView.refreshControl?.endRefreshing()
                 
-                prev <= (self.scene == .floors ? 1 : 0) => self.tableView.beginUpdates()
-
-                DispatchQueue.main.asyncAfter(deadline: .now() + (self.firstLoading ? 0 : 0.25)) {
+                self.scene != .floors && prev <= (self.scene == .floors ? 1 : 0) => self.tableView.beginUpdates()
+                
+                DispatchQueue.main.asyncAfter(deadline: .now() + (self.firstLoading ? 0.0 : 0.25)) {
                     
                     self.footer.setTitle("点击或上拉以加载更多", for: .idle)
                     self.tableView.isScrollEnabled = true
@@ -95,8 +108,9 @@ extension MainVC {
                     } else {
                         self.tableView.insertRows(at: (prev..<self.d.count).map{IndexPath(row: $0, section: 0)}, with: .fade)
                         if self.scene == .floors {
-                            self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: .fade)
+                            self.tableView.reloadRows(at: [IndexPath(row: 0, section: 0)], with: self.d.count == 1 ? .automatic : .none)
                         }
+//                        print("-------------- end insert", prev, self.d.count)
                         self.tableView.endUpdates()
                     }
                     self.firstLoading = false
@@ -108,18 +122,22 @@ extension MainVC {
                         self.footer.setTitle(count == -1 ? "加载失败" : "已经全部加载完毕", for: .noMoreData)
                     }
                     
+                    self.isRefreshing = false
+                    
                 }
             }
         }
     }
     
     @objc func loadmore() {
-        self.tableView.isScrollEnabled = false
+//        self.tableView.isScrollEnabled = false
         DispatchQueue.global().async {
             usleep(100000)
             let prev = self.d.count
             let count = self.d.getContent()
             DispatchQueue.main.async {
+                self.tableView.isScrollEnabled = false
+//                self.tableView.bounces = false
                 self.tableView.mj_footer?.endRefreshing()
                 
                 if self.d.count > prev {
@@ -132,6 +150,7 @@ extension MainVC {
                 }
                 
                 self.tableView.isScrollEnabled = true
+//                self.tableView.bounces = true
             }
         }
     }

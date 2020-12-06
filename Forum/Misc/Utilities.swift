@@ -272,6 +272,21 @@ func dealWithURLContext(_ urlContext: UIOpenURLContext) -> String? {
     }
 }
 
+extension UIBarButtonItem {
+    
+    static func imgItem(_ image: UIImage?, action: @autoclosure () -> Selector, to vc: UIViewController) -> UIBarButtonItem {
+        UIBarButtonItem(customView: UIButton(frame: CGRect(x: 0, y: 0, width: image!.width, height: image!.height))..{
+            $0.setBackgroundImage(image, for: .normal)
+            $0.addTarget(vc, action: action(), for: .touchUpInside)
+        })
+    }
+    
+    func setImageTo(_ image: UIImage?) {
+        (customView as! UIButton).setBackgroundImage(image, for: .normal)
+    }
+    
+}
+
 // MARK: - View Style
 
 extension UIView {

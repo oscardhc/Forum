@@ -46,6 +46,7 @@ class G {
     }
     static let numberPerFetch = 8
     static let blockedList = StoredObject<[String]>("ForumBlockedList", { .init() })
+    static let viewStyle = StoredObject<[String: Int]>("ForumViewStyle", { ["\(Tag.unconfortable)" :1] }) // 0: ok, 1: fold, 2: hide
     
     static var hasLoggedIn: Bool {token.content != ""}
     

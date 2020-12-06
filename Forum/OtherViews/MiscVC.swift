@@ -98,6 +98,9 @@ class SettingVC: BaseTableVC {
     @IBOutlet weak var tableView: UITableView!
     
     lazy var setting_content: [[(title: String, fun: () -> Void)]] = [
+        Tag.allCases.map {
+            ($0.rawValue, {})
+        },
         [
             ("网络统计", {self >> *"TokenVC"})
         ],
@@ -111,6 +114,19 @@ class SettingVC: BaseTableVC {
             })
         ]
     ]
+    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        let cell = tableView.dequeueReusableCell(withIdentifier: cellName, for: indexPath) as! SettingCell
+        cell.textLabel?.text = content[indexPath.section][indexPath.row].title
+        let pr = G.viewStyle.content
+        if indexPath.section == 0 {
+            cell.forTag = Tag.allCases[indexPath.row]
+            cell.selectionStyle = .none
+            cell.segment.selectedSegmentIndex = pr[String(describing: cell.forTag!)] ?? 1
+        } else {
+            cell.segment.isHidden = true
+        }
+        return cell
+    }
     override var content: [[(title: String, fun: () -> Void)]] { setting_content }
     override var cellName: String { "SettingCell" }
     override var _tableView: UITableView! { tableView }
@@ -204,5 +220,3 @@ class TermVC: UIViewController {
     }
     
 }
-
-//class AboutVC

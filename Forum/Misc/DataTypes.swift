@@ -17,7 +17,7 @@ class BaseManager {
     func initializeCell(_ cell: MainCell, index: Int) -> MainCell { cell }
     func clear() -> Self { return self }
     func getContent() -> Int { -1 }
-    @discardableResult func didSelectedRow(_ vc: UIViewController, index: Int, commit: Bool = true) -> UIViewController? { return nil }
+    func didSelectedRow(_ vc: UIViewController, index: Int, commit: Bool = true) -> UIViewController? { return nil }
 }
 
 class DataManager<T: DATA>: BaseManager {
@@ -41,16 +41,27 @@ class DataManager<T: DATA>: BaseManager {
     
 }
 
+enum LikeState: String {
+    case none = "hand.thumbsup", like = "hand.thumbsup.fill", disL = "hand.thumbsdown.fill"
+    static func with(_ i: Int) -> LikeState {
+        [.disL, .none, .like][i + 1]
+    }
+}
+
+enum Tag: String, CaseIterable {
+    case unconfortable = "令人不适", sexRelated = "性相关", policsRelated = "政治相关", unconfirmed = "未经证实", abuse = "引战"
+}
+
 struct Thread: DATA {
     
     enum Category: String, CaseIterable {
         case all = "主干道", sport = "校园", music = "音乐", science = "科学", it = "数码", entertainment = "娱乐", emotion = "情感", social = "社会", others = "其他"
     }
     
-    var id = "", title = "", content = ""
+    var id = "", title = "", content = "", tag: Tag?, folded = true
     var type: Category = .all
     var nLiked = 0, nRead = 0, nCommented = 0
-    var hasLiked = 1, hasFavoured = false, isTop = false, isFromFloorList = false
+    var hasLiked = LikeState.like, hasFavoured = false, isTop = false, isFromFloorList = false
     var postTime = Date(), lastUpdateTime = Date()
     var name: NameG, color: ColorG
     
@@ -59,18 +70,18 @@ struct Thread: DATA {
     init(json: Any, isfromFloorList li: Bool = false) {
         let thread  = json as! [String: Any]
         
-        print(thread)
-        
         nCommented = thread["Comment"] as! Int
         id = thread["ThreadID"] as! String
         nRead = thread["Read"] as! Int
         content = thread["Summary"] as! String
         nLiked = (thread["Like"] as! Int) - (thread["Dislike"] as! Int)
         title = thread["Title"] as! String
-        hasLiked = (thread["WhetherLike"] as? Int) ?? 1
+        hasLiked = {$0 == nil ? .like : LikeState.with($0!)}(thread["WhetherLike"] as? Int)
         hasFavoured = (thread["WhetherFavour"] as? Int ?? 0) == 1
         isTop = (thread["WhetherTop"] as? Int) == 1
         isFromFloorList = li
+        
+        tag = Int(id)! % 3 != 0 ? (nLiked % 3 == 2 ? .sexRelated : .unconfortable) : nil
         
         name = NameG(
             theme: NameTheme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
@@ -87,6 +98,10 @@ struct Thread: DATA {
         id = s ?? ""
     }
     
+    func setedFolded(_ b: Bool) -> Self {
+        var res = self; res.folded = b; return res;
+    }
+    
     func generateFirstFloor() -> Floor {
         var f = Floor()
         f.name = "0"
@@ -94,7 +109,7 @@ struct Thread: DATA {
         f.content = content
         f.nLiked = nLiked
         f.time = postTime
-        f.hasLiked = hasLiked == 1
+        f.hasLiked = hasLiked
         return f
     }
     
@@ -109,8 +124,16 @@ struct Thread: DATA {
         override var data: [Thread] {
             didSet {
                 let li = G.blockedList.content
-                filtered = data.filter() {
-                    !li.contains($0.id)
+                var pr = G.viewStyle.content
+                filtered = data.compactMap() {
+                    if li.contains($0.id) { return nil }
+                    if $0.tag == nil { return $0.setedFolded(false) }
+                    print(pr, $0.id, String(describing: $0.tag!), pr[String(describing: $0.tag!)] ?? 0)
+                    switch pr[String(describing: $0.tag!)] ?? 0 {
+                    case 2: return nil
+                    case 1: return $0.setedFolded($0.folded)
+                    default: return $0.setedFolded(false)
+                    }
                 }
             }
         }
@@ -138,13 +161,19 @@ struct Thread: DATA {
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-//            cell.setAs(thread: filtered[index], topTrend: (sortType == .trending && index < 3) ? index : nil)
             cell.setAs(thread: index < self.count ? filtered[index] : Thread(), topTrend: (sortType == .trending && index < 3) ? index : nil)
         }
         
         override func didSelectedRow(_ vc: UIViewController, index: Int, commit: Bool = true) -> UIViewController? {
-            MainVC.new(.floors, filtered[index])..{
-                commit => vc >> $0
+            if filtered[index].folded && commit {
+                let i = data.firstIndex(where: {$0.id == filtered[index].id})!
+                data[i].folded = false
+                (vc as! MainVC).tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
+                return nil
+            } else {
+                return MainVC.new(.floors, filtered[index])..{
+                    commit => vc >> $0
+                }
             }
         }
         
@@ -164,7 +193,7 @@ struct Floor: DATA {
     var id = ""
     var name = "1", content = ""
     var nLiked = 0
-    var hasLiked = false
+    var hasLiked = LikeState.none
     var time = Date()
     
     var replyToName: String?
@@ -180,7 +209,7 @@ struct Floor: DATA {
         replyToName = floor["Replytoname"] as? String
         replyToFloor = floor["Replytofloor"] as? Int
         time = Util.stringToDate(floor["RTime"] as! String)
-        hasLiked = (floor["WhetherLike"] as! Int) == 1
+        hasLiked = LikeState.with(floor["WhetherLike"] as! Int)
         nLiked = floor["Like"] as! Int
     }
     
@@ -221,7 +250,7 @@ struct Message: DATA {
     class Manager: DataManager<Message> {
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAs(message: data[index % self.count])
+            cell.setAs(message: index < self.count ? data[index] : Message(Thread()))
         }
         
         override func networking() -> ([Message], String)? {
@@ -239,6 +268,10 @@ struct Message: DATA {
     var thread: Thread
     var ty = 0, judge = 0
     var id: String { thread.id }
+    
+    init(_ t: Thread) {
+        self.thread = t
+    }
     
     init(json: Any) {
         let msg = json as! [String: Any]

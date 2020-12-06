@@ -21,6 +21,32 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     var message: Message!
     var isFirstFloor = false
     var parentVC: MainVC!
+    var name: String = "_"
+    
+    var folded: Bool = false {
+        didSet {
+            if folded {
+                blockBottomDist.constant = 4
+                mainView.clipsToBounds = true
+                contentView.clipsToBounds = true
+                if let t = thread.tag?.rawValue {
+                    let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
+                    idLabel += UILabel(frame: .init(x: 60, y: 5, width: w, height: 20))..{
+                        $0.text = t
+                        $0.fontSize = 15
+                        $0.textAlignment = .center
+                        $0.layer.cornerRadius = 5
+                        $0.layer.backgroundColor = UIColor.cyan.cgColor
+                    }
+                }
+            } else {
+                blockBottomDist.constant = 150
+                mainView.clipsToBounds = false
+                contentView.clipsToBounds = false
+                idLabel.subviews.forEach({$0.removeFromSuperview()})
+            }
+        }
+    }
     
     @IBOutlet weak var mainView: UIView!
     @IBOutlet weak var idLabel: UILabel!
@@ -48,6 +74,9 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     @IBOutlet weak var higherTitleDist: NSLayoutConstraint!
     @IBOutlet weak var allTopDIst: NSLayoutConstraint!
     @IBOutlet weak var lessThanDIst: NSLayoutConstraint!
+    @IBOutlet weak var higherTitleLeadingDist: NSLayoutConstraint!
+    @IBOutlet weak var titleLeadingDist: NSLayoutConstraint!
+    @IBOutlet weak var blockBottomDist: NSLayoutConstraint!
     
     let lbl = UILabel(frame: .init(x: 5, y: 5, width: 20, height: 20))..{
         $0.fontSize = 15
@@ -60,8 +89,32 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     
     var content = (title: "", content: "") {
         didSet {
+            if let t = thread.tag?.rawValue {
+                let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
+                higherTitleLeadingDist.constant = w + 16
+                titleLeadingDist.constant = w + 16
+                higherTitleLabel += UILabel(frame: .init(x: -w-8, y: 0, width: w, height: 21))..{
+                    $0.text = t
+                    $0.fontSize = 15
+                    $0.textAlignment = .center
+                    $0.layer.cornerRadius = 5
+                    $0.layer.backgroundColor = UIColor.cyan.cgColor
+                }
+                titleLabel += UILabel(frame: .init(x: -w-8, y: 0, width: w, height: 17))..{
+                    $0.text = t
+                    $0.fontSize = 15
+                    $0.textAlignment = .center
+                    $0.layer.cornerRadius = 5
+                    $0.layer.backgroundColor = UIColor.cyan.cgColor
+                }
+            } else {
+                for v in higherTitleLabel.subviews + titleLabel.subviews {v.removeFromSuperview()}
+                higherTitleLeadingDist.constant = 8
+                titleLeadingDist.constant = 8
+            }
             titleLabel.text = content.title
             higherTitleLabel.text = content.title
+            
             mainTextView.text = content.content
             
             if scene != .thread {
@@ -93,6 +146,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         timeLabel.textColor = .gray
         timeLabel.text = ""
         replyToName.setTitle("", for: .normal)
+        replyToName.isEnabled = false
         contentView.superview?.clipsToBounds = false
         
         mainTextView.translatesAutoresizingMaskIntoConstraints = false
@@ -130,10 +184,10 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         }
     }
     
-    var liked = false {
+    var liked: LikeState = .none {
         didSet {
             likedBtn.setImage(
-                UIImage(systemName: liked ? "hand.thumbsup.fill" : "hand.thumbsup",
+                UIImage(systemName: liked.rawValue,
                         withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
                 for: .normal
             )
@@ -144,26 +198,41 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         self.likedBtn.isEnabled = false
         DispatchQueue.global().async {
             {() -> Bool in
-                if self.liked {
+                switch self.liked {
+                case .none:
+                    if sender is Int {
+                        return self.floor.id == "0"
+                            ? Network.dislikeThread(for: self.thread.id)
+                            : Network.dislikeFloor(for: self.thread.id, floor: self.floor.id)
+                    } else {
+                        return self.floor.id == "0"
+                            ? Network.likeThread(for: self.thread.id)
+                            : Network.likeFloor(for: self.thread.id, floor: self.floor.id)
+                    }
+                case .like:
                     return self.floor.id == "0"
                         ? Network.cancelLikeThread(for: self.thread.id)
                         : Network.cancelLikeFloor(for: self.thread.id, floor: self.floor.id)
-                } else {
+                case .disL:
                     return self.floor.id == "0"
-                        ? Network.likeThread(for: self.thread.id)
-                        : Network.likeFloor(for: self.thread.id, floor: self.floor.id)
+                        ? Network.cancelDislikeThread(for: self.thread.id)
+                        : Network.canceldislikeFloor(for: self.thread.id, floor: self.floor.id)
                 }
             }()..{ success in
                 DispatchQueue.main.async {
                     self.likedBtn.isEnabled = true
                     if success {
-                        if self.liked {
-                            self.floor.nLiked -= 1
-                        } else {
-                            self.floor.nLiked += 1
+                        switch self.liked {
+                        case .none:
+                            if sender is Int {
+                                self.liked = .disL; self.floor.nLiked -= 1
+                            } else {
+                                self.liked = .like; self.floor.nLiked += 1
+                            }
+                        case .like: self.liked = .none; self.floor.nLiked -= 1
+                        case .disL: self.liked = .none; self.floor.nLiked += 1
                         }
                         self.likedBtn.setTitle("\(self.floor.nLiked)", for: .normal)
-                        self.liked = !self.liked
                     } else { self.parentVC.showAlert("网络错误", style: .failure) }
                 }
             }
@@ -237,6 +306,9 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         commentBtn.isEnabled = false
         readBtn.isEnabled = false
         
+        print(">", thread.id, thread.folded)
+        folded = thread.folded
+        
         return self
     }
     
@@ -260,24 +332,27 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         scene = .floor
         orderReversed = reversed
         updateOrder()
+        name = t.name[Int(f.name)!]
         
-        idLabel.text = t.name[Int(f.name)!] +
+        idLabel.text = name +
             (((f.replyToFloor ?? 0) == 0)
                 ? ""
                 : " 回复 "
             )
         if (f.replyToFloor ?? 0) != 0 {
+            replyToName.isEnabled = true
             replyToNameDist.constant = (idLabel.text! as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 13)]).width + 8
             replyToName.setTitle("#\(f.replyToFloor!) \(t.name[Int(f.replyToName!)!])", for: .normal)
             replyToName.setTitleColor(t.color[Int(f.replyToName!)!], for: .normal)
             replyToName.addTarget(self, action: #selector(moveTo(_:)), for: .touchUpInside)
         } else {
+            replyToName.isEnabled = false
             replyToName.setTitle("", for: .normal)
             replyToName.removeTarget(self, action: #selector(moveTo(_:)), for: .touchUpInside)
         }
         timeLabel.text = Util.dateToDeltaString(f.time)
         
-        headLabel.text = String(t.name[Int(f.name)!].components(separatedBy: " ").last!.first!)
+        headLabel.text = String(name.components(separatedBy: " ").last!.first!)
         headLabel.layer.backgroundColor = t.color[Int(f.name)!].cgColor
         headLabel.layer.cornerRadius = 15
         headLabel.textColor = .white
@@ -299,29 +374,12 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         
         
         likedBtn.adjustsImageWhenDisabled = true
-        likedBtn.isEnabled = !isFirstFloor || thread.hasLiked != -1
         likedBtn.isHidden = isFirstFloor && !t.isFromFloorList
         orderBtn.isHidden = !isFirstFloor
         footerHeight.constant = isFirstFloor ? 35 : 0
         
         return self
     }
-    
-//    lazy var dropdown = DropDown(anchorView: orderBtn)..{
-//        $0.dataSource = ["最早回复", "最新回复"]
-//        $0.backgroundColor = .systemBackground
-//        $0.cellHeight = 50
-//        $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
-//        $0.selectionAction = { (index: Int, item: String) in
-//            self.orderBtn.setTitle(item, for: .normal)
-//            self.orderBtn.setImage(
-//                UIImage(systemName: index == 1 ? "arrowtriangle.down.circle" : "arrowtriangle.up.circle",
-//                        withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
-//                for: .normal
-//            )
-//            self.parentVC.setReplyOrder(reverse: index == 1)
-//        }
-//    }
     
     var orderReversed = false
     func updateOrder() {

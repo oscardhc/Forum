@@ -512,13 +512,34 @@
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="insetGrouped" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="18" sectionFooterHeight="18" translatesAutoresizingMaskIntoConstraints="NO" id="slz-QT-vzU">
                                 <rect key="frame" x="0.0" y="0.0" width="414" height="736"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SettingCell" id="1bf-Ll-wDj">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="SettingCell" id="1bf-Ll-wDj" customClass="SettingCell" customModule="Forum" customModuleProvider="target">
                                         <rect key="frame" x="20" y="55.333332061767578" width="374" height="43.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="1bf-Ll-wDj" id="jCf-92-9wl">
                                             <rect key="frame" x="0.0" y="0.0" width="374" height="43.666667938232422"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <subviews>
+                                                <segmentedControl opaque="NO" contentMode="scaleToFill" contentHorizontalAlignment="left" contentVerticalAlignment="top" segmentControlStyle="plain" selectedSegmentIndex="0" translatesAutoresizingMaskIntoConstraints="NO" id="8Uv-xe-ob1">
+                                                    <rect key="frame" x="221" y="8" width="137" height="29"/>
+                                                    <constraints>
+                                                        <constraint firstAttribute="height" constant="28" id="DPy-ic-A99"/>
+                                                        <constraint firstAttribute="width" constant="137" id="okB-eU-aFt"/>
+                                                    </constraints>
+                                                    <segments>
+                                                        <segment title="显示"/>
+                                                        <segment title="折叠"/>
+                                                        <segment title="隐藏"/>
+                                                    </segments>
+                                                </segmentedControl>
+                                            </subviews>
+                                            <constraints>
+                                                <constraint firstItem="8Uv-xe-ob1" firstAttribute="centerY" secondItem="jCf-92-9wl" secondAttribute="centerY" id="N8F-qY-onu"/>
+                                                <constraint firstAttribute="trailing" secondItem="8Uv-xe-ob1" secondAttribute="trailing" constant="16" id="srz-sO-kHy"/>
+                                            </constraints>
                                         </tableViewCellContentView>
+                                        <connections>
+                                            <outlet property="segment" destination="8Uv-xe-ob1" id="qI6-vZ-aXE"/>
+                                        </connections>
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
@@ -538,7 +559,7 @@
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="eLo-mL-56f" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="4072.8000000000002" y="423.39901477832512"/>
+            <point key="canvasLocation" x="4072.4637681159425" y="423.09782608695656"/>
         </scene>
         <!--关于-->
         <scene sceneID="NyL-vS-1HX">
@@ -648,12 +669,13 @@
                                 <rect key="frame" x="0.0" y="88" width="414" height="393"/>
                                 <color key="backgroundColor" systemColor="systemGroupedBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="HeadCell" rowHeight="103" id="reJ-fI-4i4" customClass="HeaderCell" customModule="Forum" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="none" indentationWidth="10" reuseIdentifier="FoldCell" rowHeight="103" id="reJ-fI-4i4">
                                         <rect key="frame" x="0.0" y="28" width="414" height="103"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="reJ-fI-4i4" id="tix-I3-5Jg">
                                             <rect key="frame" x="0.0" y="0.0" width="414" height="103"/>
                                             <autoresizingMask key="autoresizingMask"/>
+                                            <color key="backgroundColor" systemColor="systemGroupedBackgroundColor"/>
                                         </tableViewCellContentView>
                                     </tableViewCell>
                                 </prototypes>
@@ -740,25 +762,8 @@
                             <constraint firstItem="Wa6-wE-ev8" firstAttribute="centerX" secondItem="nri-P3-JWk" secondAttribute="centerX" id="zvP-yt-qYK"/>
                         </constraints>
                     </view>
-                    <navigationItem key="navigationItem" id="9cw-c9-bas">
-                        <rightBarButtonItems>
-                            <barButtonItem title="Item" image="ellipsis" catalog="system" id="Lc3-LY-er3">
-                                <inset key="imageInsets" minX="-8" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <inset key="largeContentSizeImageInsets" minX="0.0" minY="0.0" maxX="-1" maxY="0.0"/>
-                                <connections>
-                                    <action selector="secondBarBtnClicked:" destination="BH7-QK-pMN" id="IvD-g1-9ji"/>
-                                </connections>
-                            </barButtonItem>
-                            <barButtonItem image="star" catalog="system" id="rAJ-EU-CCN">
-                                <inset key="imageInsets" minX="30" minY="0.0" maxX="0.0" maxY="0.0"/>
-                                <connections>
-                                    <action selector="barBtnClicked:" destination="BH7-QK-pMN" id="eUW-RD-khN"/>
-                                </connections>
-                            </barButtonItem>
-                        </rightBarButtonItems>
-                    </navigationItem>
+                    <navigationItem key="navigationItem" id="9cw-c9-bas"/>
                     <connections>
-                        <outlet property="barSecondBtn" destination="Lc3-LY-er3" id="0hF-59-U05"/>
                         <outlet property="bottomSpace" destination="Nq5-Nn-XjH" id="0ba-pS-kjs"/>
                         <outlet property="bottomViewHeight" destination="zTw-Jh-o87" id="k52-px-2Cp"/>
                         <outlet property="newThreadBtn" destination="QOa-Cx-esn" id="3CU-Wf-zRd"/>
@@ -767,13 +772,12 @@
                         <outlet property="tableView" destination="Wa6-wE-ev8" id="w1E-FL-uLb"/>
                         <outlet property="textView" destination="TL7-aM-57h" id="5pL-dA-gmp"/>
                         <outlet property="textViewHeight" destination="Dfh-iK-9OU" id="f52-G0-VeK"/>
-                        <outlet property="topCornerBtn" destination="rAJ-EU-CCN" id="v8I-wg-2LD"/>
                         <outlet property="topDist" destination="Wp9-Cd-wtO" id="OMd-aA-coS"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="yZD-ct-32V" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
-            <point key="canvasLocation" x="1631.2" y="-333.99014778325125"/>
+            <point key="canvasLocation" x="1630.4347826086957" y="-334.23913043478262"/>
         </scene>
         <!--About-->
         <scene sceneID="3Bv-r6-dYR">
@@ -927,11 +931,9 @@ Unless, no unless.</string>
         </scene>
     </scenes>
     <resources>
-        <image name="ellipsis" catalog="system" width="128" height="37"/>
         <image name="icon4" width="1024" height="1024"/>
         <image name="paperplane" catalog="system" width="128" height="118"/>
         <image name="plus.circle.fill" catalog="system" width="128" height="121"/>
-        <image name="star" catalog="system" width="128" height="116"/>
         <systemColor name="labelColor">
             <color white="0.0" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
         </systemColor>
