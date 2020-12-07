@@ -9,7 +9,7 @@ import UIKit
 
 extension MainVC {
     func hasTappedAgain() {
-        if tableView.refreshControl!.isRefreshing || tryDoubleTapping || firstLoading {
+        if tableView.refreshControl!.isRefreshing || tryDoubleTapping || firstLoading || isDoubleTapping {
             return
         }
         let y = self.tableView.refreshControl!.frame.maxY + self.tableView.adjustedContentInset.top
@@ -23,6 +23,7 @@ extension MainVC {
                 self.tableView.refreshControl?.beginRefreshing()
                 DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                     self.refresh()
+//                    self.clearAll()
                 }
             }
         } else {

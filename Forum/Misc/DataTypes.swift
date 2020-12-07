@@ -49,18 +49,28 @@ enum LikeState: String {
 }
 
 enum Tag: String, CaseIterable {
-    case unconfortable = "令人不适", sexRelated = "性相关", policsRelated = "政治相关", unconfirmed = "未经证实", abuse = "引战"
+    case sex = "性相关", politics = "政治相关", uncomfort = "令人不适", unproved = "未经证实", war = "引战"
 }
 
 struct Thread: DATA {
     
     enum Category: String, CaseIterable {
-        case all = "主干道", sport = "校园", music = "音乐", science = "科学", it = "数码", entertainment = "娱乐", emotion = "情感", social = "社会", others = "其他"
+        case all = "主干道",
+             sport = "校园",
+             entertainment = "娱乐",
+             emotion = "情感",
+             science = "科学",
+             it = "数码",
+             social = "社会",
+             music = "音乐",
+             movie = "影视",
+             art = "文史哲",
+             life = "人生经验"
     }
     
-    var id = "", title = "", content = "", tag: Tag?, folded = true
+    var id = "", title = "", content = "", tag: Tag?, folded = true, myTag: Tag?, reported = false
     var type: Category = .all
-    var nLiked = 0, nRead = 0, nCommented = 0
+    var nLiked = 0, nDislike = 0, nRead = 0, nCommented = 0
     var hasLiked = LikeState.like, hasFavoured = false, isTop = false, isFromFloorList = false
     var postTime = Date(), lastUpdateTime = Date()
     var name: NameG, color: ColorG
@@ -68,20 +78,26 @@ struct Thread: DATA {
     static var cnt = 1
     
     init(json: Any, isfromFloorList li: Bool = false) {
-        let thread  = json as! [String: Any]
+        let thread = json as! [String: Any]
         
         nCommented = thread["Comment"] as! Int
         id = thread["ThreadID"] as! String
         nRead = thread["Read"] as! Int
         content = thread["Summary"] as! String
-        nLiked = (thread["Like"] as! Int) - (thread["Dislike"] as! Int)
+        nLiked = thread["Like"] as! Int
+        nDislike = thread["Dislike"] as! Int
         title = thread["Title"] as! String
         hasLiked = {$0 == nil ? .like : LikeState.with($0!)}(thread["WhetherLike"] as? Int)
         hasFavoured = (thread["WhetherFavour"] as? Int ?? 0) == 1
         isTop = (thread["WhetherTop"] as? Int) == 1
         isFromFloorList = li
         
-        tag = Int(id)! % 3 != 0 ? (nLiked % 3 == 2 ? .sexRelated : .unconfortable) : nil
+        
+        print(thread.keys, id)
+        
+        tag = Tag.allCases.first(where: {String(describing: $0) == (thread["Tag"] as? String ?? "NULL")})
+        myTag = Tag.allCases.first(where: {String(describing: $0) == thread["MyTag"] as? String ?? ""})
+        reported = (thread["WhetherReport"] as? Int ?? 0) == 1
         
         name = NameG(
             theme: NameTheme.init(rawValue: thread["AnonymousType"] as! String) ?? .aliceAndBob,
@@ -108,6 +124,7 @@ struct Thread: DATA {
         f.id = "0"
         f.content = content
         f.nLiked = nLiked
+        f.nDisliked = nDislike
         f.time = postTime
         f.hasLiked = hasLiked
         return f
@@ -124,16 +141,24 @@ struct Thread: DATA {
         
         override var data: [Thread] {
             didSet {
-                let li = G.blockedList.content
-                pr = G.viewStyle.content
-                filtered = data.compactMap() {
-                    if li.contains($0.id) { return nil }
-                    if $0.tag == nil { return $0.setedFolded(false) }
-                    switch pr[String(describing: $0.tag!)] ?? 0 {
-                    case 2: return nil
-                    case 1: return $0.setedFolded($0.folded)
-                    default: return $0.setedFolded(false)
-                    }
+                filter()
+            }
+        }
+        
+        func filter() {
+            let li = G.blockedList.content
+            let setting = G.threadStyle.content
+            pr = G.viewStyle.content
+            filtered = data.compactMap() {
+                if sortType == .my || sortType == .favoured { return $0.setedFolded(false) }
+
+                let dis = $0.nLiked - $0.nDislike < -5
+                if li.contains($0.id) || (setting == 2 && dis) { return nil }
+                if $0.tag == nil { return $0.setedFolded($0.folded && setting == 1 && dis) }
+                switch pr[String(describing: $0.tag!)] ?? 1 {
+                case 2: return nil
+                case 1: return $0.setedFolded($0.folded)
+                default: return $0.setedFolded($0.folded && setting == 1 && dis)
                 }
             }
         }
@@ -161,7 +186,7 @@ struct Thread: DATA {
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
-            cell.setAs(thread: index < self.count ? filtered[index] : Thread(), topTrend: (sortType == .trending && index < 3) ? index : nil)
+            cell.setAs(thread: index < self.count ? filtered[index] : Thread())
         }
         
         override func didSelectedRow(_ vc: UIViewController, index: Int, commit: Bool = true) -> UIViewController? {
@@ -192,7 +217,7 @@ struct Floor: DATA {
     
     var id = ""
     var name = "1", content = ""
-    var nLiked = 0
+    var nLiked = 0, nDisliked = 0, folded = true, reported = false
     var hasLiked = LikeState.none
     var time = Date()
     
@@ -211,6 +236,12 @@ struct Floor: DATA {
         time = Util.stringToDate(floor["RTime"] as! String)
         hasLiked = LikeState.with(floor["WhetherLike"] as! Int)
         nLiked = floor["Like"] as! Int
+        nDisliked = floor["Dislike"] as! Int
+        reported = (floor["WhetherReport"] as? Int ?? 0) == 1
+    }
+    
+    func setedFolded(_ b: Bool) -> Self {
+        var res = self; res.folded = b; return res;
     }
     
     class Manager: DataManager<Floor> {
@@ -218,14 +249,34 @@ struct Floor: DATA {
         var thread: Thread
         var reverse = false
         
-//        var filtered: [Floor]
+        var filtered = [Floor]()
+        override var data: [Floor] {
+            didSet {
+                filter()
+            }
+        }
+        
+        func filter() {
+            let setting = G.floorStyle.content
+            filtered = data.compactMap {
+                if $0.nLiked - $0.nDisliked >= -5 {
+                    return $0.setedFolded(false)
+                }
+                print(">>>", setting)
+                switch setting {
+                case 2: return nil
+                case 1: return $0.setedFolded($0.folded)
+                default: return $0.setedFolded(false)
+                }
+            }
+        }
         
         init(_ t: Thread) {
             thread = t
             super.init()
         }
         
-        override var count: Int {data.count + 1}
+        override var count: Int {filtered.count + 1}
         
         override func networking() -> ([Floor], String)? {
             Network.getFloors(for: thread.id, lastSeenID: last, reverse: reverse)..{
@@ -236,19 +287,20 @@ struct Floor: DATA {
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
             index == 0
                 ? cell.setAs(floor: thread.generateFirstFloor(), forThread: thread, firstFloor: true, reversed: reverse)
-                : cell.setAs(floor: index <= data.count ? data[index - 1] : Floor(fake: true), forThread: thread, firstFloor: false)
+                : cell.setAs(floor: index <= filtered.count ? filtered[index - 1] : Floor(fake: true), forThread: thread, firstFloor: false)
         }
         
         func displayNameFor(_ i: Int) -> String {
-            thread.name[Int((i == 0 ? thread.generateFirstFloor() : data.first(where: {$0.id == "\(i)"}) ?? thread.generateFirstFloor()).name)!]
+            thread.name[Int((i == 0 ? thread.generateFirstFloor() : filtered.first(where: {$0.id == "\(i)"}) ?? thread.generateFirstFloor()).name)!]
         }
         
         override func didSelectedRow(_ vc: UIViewController, index: Int, commit: Bool = true) -> UIViewController? {
-            if data[index].folded {
-                let i = data.firstIndex(where: {$0.id == filtered[index].id})!
+            if index > 0, filtered[index - 1].folded {
+                let i = data.firstIndex(where: {$0.id == filtered[index - 1].id})!
                 data[i].folded = false
                 (vc as! MainVC).tableView.reloadRows(at: [IndexPath(row: index, section: 0)], with: .automatic)
             }
+            return nil
         }
         
     }

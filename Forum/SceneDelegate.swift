@@ -22,9 +22,14 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
             G.openThreadID = dealWithURLContext(urlContext)
         }
         
-        if let success = Network.verifyToken() {
-            if !success {
+        if let (success, blockString) = Network.verifyToken() {
+            print(">", success)
+            if success != "1" {
                 window?.rootViewController = *"TermVC"
+                if success == "-1" {
+                    print(">>", blockString)
+                    G.blockContent = blockString
+                }
             } else {
                 window?.rootViewController = *"InitTabVC"
             }

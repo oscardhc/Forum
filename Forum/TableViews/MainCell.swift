@@ -53,39 +53,18 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     @IBOutlet weak var titleLeadingDist: NSLayoutConstraint!
     @IBOutlet weak var blockBottomDist: NSLayoutConstraint!
     
-    let lbl = UILabel(frame: .init(x: 5, y: 5, width: 20, height: 20))..{
-        $0.fontSize = 15
-        $0.textColor = .white
-        $0.textAlignment = .center
-        $0.layer.cornerRadius = 10
-        $0.layer.backgroundColor = UIColor.orange.cgColor
-        $0.isHidden = true
-    }
-    
     var content = (title: "", content: "") {
         didSet {
-            for v in higherTitleLabel.subviews + titleLabel.subviews {v.removeFromSuperview()}
+            for v in higherTitleLabel.subviews {v.removeFromSuperview()}
+            print(thread.tag, scene, isFirstFloor)
             if let t = thread.tag?.rawValue, scene == .thread || isFirstFloor {
                 let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
                 higherTitleLeadingDist.constant = w + 16
-                titleLeadingDist.constant = w + 16
-                higherTitleLabel += UILabel(frame: .init(x: -w-8, y: 0, width: w, height: 21))..{
-                    $0.text = t
-                    $0.fontSize = 15
-                    $0.textAlignment = .center
-                    $0.layer.cornerRadius = 5
-                    $0.layer.backgroundColor = UIColor.cyan.cgColor
-                }
-                titleLabel += UILabel(frame: .init(x: -w-8, y: 0, width: w, height: 17))..{
-                    $0.text = t
-                    $0.fontSize = 15
-                    $0.textAlignment = .center
-                    $0.layer.cornerRadius = 5
-                    $0.layer.backgroundColor = UIColor.cyan.cgColor
-                }
+                higherTitleLabel += UILabel(frame: .init(x: -w-8, y: 0, width: w, height: 21)).setAsTagLabel(t)
+                higherTitleLabel.clipsToBounds = false
+                higherTitleLabel.layer.masksToBounds = false
             } else {
                 higherTitleLeadingDist.constant = 8
-                titleLeadingDist.constant = 8
             }
             titleLabel.text = content.title
             higherTitleLabel.text = content.title
@@ -111,25 +90,20 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     
     var folded: Bool = false {
         didSet {
-            idLabel.subviews.forEach({$0.removeFromSuperview()})
+            print("set folded", folded)
+            (idLabel.subviews + cornerLabel.subviews).forEach({$0.removeFromSuperview()})
+            if folded || (scene == .thread && thread.tag != nil) {
+                let t = (scene == .thread ? thread.tag?.rawValue : nil) ?? "被踩过多"
+                let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
+                (floor != nil ? cornerLabel : idLabel) += UILabel(frame: .init(x: floor != nil ? -10 : 65, y: 5, width: w, height: 20)).setAsTagLabel(t)
+                mainView.bringSubviewToFront(floor != nil ? cornerLabel : idLabel)
+            }
             if folded {
-                blockBottomDist.constant = 4
-                mainView.clipsToBounds = true
-                contentView.clipsToBounds = true
-                if let t = thread.tag?.rawValue, scene == .thread || isFirstFloor {
-                    let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
-                    idLabel += UILabel(frame: .init(x: 60, y: 5, width: w, height: 20))..{
-                        $0.text = t
-                        $0.fontSize = 15
-                        $0.textAlignment = .center
-                        $0.layer.cornerRadius = 5
-                        $0.layer.backgroundColor = UIColor.cyan.cgColor
-                    }
-                }
+                blockBottomDist.constant = 6
+                replyToName.isEnabled = false
             } else {
-                blockBottomDist.constant = 500
-                mainView.clipsToBounds = false
-                contentView.clipsToBounds = false
+                blockBottomDist.constant = 2000
+                replyToName.isEnabled = true
             }
         }
     }
@@ -147,6 +121,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         timeLabel.text = ""
         replyToName.setTitle("", for: .normal)
         replyToName.isEnabled = false
+        contentView.clipsToBounds = false
         contentView.superview?.clipsToBounds = false
         
         mainTextView.translatesAutoresizingMaskIntoConstraints = false
@@ -160,7 +135,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         mainTextView.delegate = self
         mainTextView.backgroundColor = .tertiarySystemBackground
         
-        cornerLabel.addSubview(lbl)
         footerHeight.constant = 0
         orderBtn.isHidden = true
         orderBtn.addTarget(self, action: #selector(orderBtnClicked(_:)), for: .touchUpInside)
@@ -225,14 +199,14 @@ class MainCell: UITableViewCell, UITextViewDelegate {
                         switch self.liked {
                         case .none:
                             if sender is Int {
-                                self.liked = .disL; self.floor.nLiked -= 1
+                                self.liked = .disL; self.floor.nDisliked += 1
                             } else {
                                 self.liked = .like; self.floor.nLiked += 1
                             }
                         case .like: self.liked = .none; self.floor.nLiked -= 1
                         case .disL: self.liked = .none; self.floor.nLiked += 1
                         }
-                        self.likedBtn.setTitle("\(self.floor.nLiked)", for: .normal)
+                        self.likedBtn.setTitle("\(self.floor.nLiked - self.floor.nDisliked)", for: .normal)
                     } else { self.parentVC.showAlert("网络错误", style: .failure) }
                 }
             }
@@ -250,7 +224,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     
     // MARK: - Thread
     
-    func setAs(thread t: Thread, topTrend: Int? = nil) -> Self {
+    func setAs(thread t: Thread, allowFold: Bool = true) -> Self {
         thread = t
         scene = .thread
         
@@ -269,20 +243,12 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         mainTextView.textContainer.lineBreakMode = .byTruncatingTail
         content = (t.title, disp)
         
-        likedBtn.setTitle("\(t.nLiked)", for: .normal)
+        likedBtn.setTitle("\(t.nLiked - t.nDislike)", for: .normal)
         readBtn.setTitle("\(t.nRead)", for: .normal)
         commentBtn.setTitle("\(t.nCommented)", for: .normal)
         
-        if let i = topTrend {
-            cornerWidth.constant = 30
-            lbl.text = "\(i + 1)"
-            lbl.isHidden = false
-            cornerLabel.text = ""
-        } else {
-            cornerWidth.constant = 60
-            lbl.isHidden = true
-            cornerLabel.text = Util.dateToDeltaString(t.lastUpdateTime)
-        }
+        cornerWidth.constant = 60
+        cornerLabel.text = Util.dateToDeltaString(t.lastUpdateTime)
         
         if thread.isTop {
             headLabel.text = String("公告")
@@ -305,7 +271,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         commentBtn.isEnabled = false
         readBtn.isEnabled = false
         
-        folded = thread.folded
+        folded = thread.folded && allowFold
         
         return self
     }
@@ -357,7 +323,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         headLabel.font = .systemFont(ofSize: 20, weight: .medium)
         
         content = (isFirstFloor ? t.title : "", f.content)
-        likedBtn.setTitle("\(f.nLiked)", for: .normal)
+        likedBtn.setTitle("\(f.nLiked - f.nDisliked)", for: .normal)
         cornerLabel.text = "#\(floor.id)"
         cornerLabel.fontSize = 14
         
@@ -374,9 +340,10 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         likedBtn.adjustsImageWhenDisabled = true
         likedBtn.isHidden = isFirstFloor && !t.isFromFloorList
         orderBtn.isHidden = !isFirstFloor
+        orderBtn.isEnabled = true
         footerHeight.constant = isFirstFloor ? 35 : 0
         
-        folded = !isFirstFloor && f.nLiked <= 0
+        folded = floor.folded && !isFirstFloor
         
         return self
     }
@@ -395,7 +362,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         orderReversed = !orderReversed
         updateOrder()
         self.orderBtn.isEnabled = false
-        DispatchQueue.main.asyncAfter(deadline: .now() + 1.0, execute: {self.orderBtn.isEnabled = true})
         self.parentVC.setReplyOrder(reverse: orderReversed)
     }
     
@@ -403,7 +369,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     
     func setAs(message m: Message) -> Self {
         message = m
-        _ = setAs(thread: m.thread)
+        _ = setAs(thread: m.thread, allowFold: false)
         cornerLabel.text = m.judge == 0 ? "未读" : "已读"
         cornerLabel.textColor = m.judge == 0 ? .systemBlue : .label
         content.content = m.ty == 0 ? "有人回复了你！" : "有\(m.ty)人赞了你！"
@@ -412,8 +378,8 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     
     override func layoutSubviews() {
         super.layoutSubviews()
-        mainView.applyCardStyle()
-        
+        contentView.superview?.layer.masksToBounds = false
+        mainView.applyCardStyle(clip: folded)
     }
     
 }

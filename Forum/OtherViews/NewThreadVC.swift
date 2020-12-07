@@ -17,6 +17,7 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
     @IBOutlet weak var blockBtn: UIButton!
     @IBOutlet weak var typeBtn: UIButton!
     @IBOutlet weak var checkBtn: CheckerButton!
+    @IBOutlet weak var tagBtn: UIButton!
     
     var blocks: [[UIButton]]!
     var getResult: (() -> (Int, Int))!
@@ -44,6 +45,13 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         $0.dataSource = NameTheme.allCases.map {
             $0.displayText
         }
+        $0.backgroundColor = .systemBackground
+        $0.cellHeight = 40
+        $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
+    }
+    
+    lazy var tagDropDown = DropDown()..{
+        $0.dataSource = ["无需标签"] + Tag.allCases.map {$0.rawValue}
         $0.backgroundColor = .systemBackground
         $0.cellHeight = 40
         $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
@@ -87,6 +95,15 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         }
         typeDropDown.selectRow(0)
         
+        tagBtn.addTarget(self, action: #selector(chooseBlock(_:)), for: .touchUpInside)
+        tagBtn.setTitle("请选择标签", for: .normal)
+        tagBtn.setDropDownStyle(fontSize: 16)
+        
+        tagDropDown.anchorView = tagBtn
+        tagDropDown.selectionAction = { (index: Int, item: String) in
+            self.tagBtn.setTitle(item, for: .normal)
+        }
+        
         checkBtn.setCheckBoxStyle(fontSize: 14)
         checkBtn.setTitle("人名随机排序", for: .normal)
         
@@ -96,6 +113,8 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
     @objc func chooseBlock(_ sender: UIButton) {
         if sender === blockBtn {
             blockDropDown.show()
+        } else if sender === tagBtn {
+            tagDropDown.show()
         } else {
             typeDropDown.show()
         }
@@ -122,20 +141,22 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         if let postTitle = titleTextField.text, postTitle != "", let postContent = contentTextField.text, postContent != "" {
             if titleCountLabel.ok && contentCountLabel.ok {
                 if let block = Thread.Category(rawValue: blockDropDown.selectedItem ?? "") {
-                    (showProgress(), self.typeDropDown.selectedItem!)..{ bar, theme in
-                        DispatchQueue.global().async {
-                            if Network.newThread(
-                                title: postTitle, inBlock: block, content: postContent,
-                                anonymousType: NameTheme.allCases.first(where: {$0.displayText == theme})! ,
-                                seed: self.checkBtn.checked ? Int.random(in: 1..<1000000) : 0
-                            ) {
-                                self.setAndHideAlert(bar, "发帖成功", style: .success) {
-                                    self.fatherVC.refresh()
-                                    self.dismiss(animated: true)
-                                }
-                            } else { self.setAndHideAlert(bar, "发帖失败", style: .failure) }
+                    if let selTag = tagDropDown.selectedItem {
+                        (showProgress(), self.typeDropDown.selectedItem!)..{ bar, theme in
+                            DispatchQueue.global().async {
+                                if Network.newThread(
+                                    title: postTitle, inBlock: block, content: postContent,
+                                    anonymousType: NameTheme.allCases.first(where: {$0.displayText == theme})! ,
+                                    seed: self.checkBtn.checked ? Int.random(in: 1..<1000000) : 0, tag: Tag(rawValue: selTag)
+                                ) {
+                                    self.setAndHideAlert(bar, "发帖成功", style: .success) {
+                                        self.fatherVC.refresh()
+                                        self.dismiss(animated: true)
+                                    }
+                                } else { self.setAndHideAlert(bar, "发帖失败", style: .failure) }
+                            }
                         }
-                    }
+                    } else { showAlert("请选择标签", style: .warning) }
                 } else { showAlert("请选择一个分区", style: .warning) }
             } else { showAlert("请输入合适长度的内容", style: .warning) }
         } else { showAlert("请输入合适长度的内容", style: .warning) }

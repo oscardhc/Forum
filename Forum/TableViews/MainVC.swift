@@ -83,7 +83,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         $0.addTarget(self, action: #selector(refresh), for: .valueChanged)
     }
     lazy var dropDown = DropDown()..{
-        $0.dataSource = Thread.Category.allCases.dropLast().map {
+        $0.dataSource = Thread.Category.allCases.map {
             $0.rawValue
         }
         $0.backgroundColor = .systemBackground
@@ -247,84 +247,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
     }
     
-    func blockThread(_ msg: String, _ id: String, report: Bool, isViewing: Bool = true) {
-        
-        func commit(_ a: UIAlertAction) {
-            DispatchQueue.global().async {
-                var success = true
-                report => success = Network.reportThread(for: id)
-                DispatchQueue.main.async {
-                    if success {
-                        let li = G.blockedList.content
-                        !li.contains(id) => G.blockedList.content = li + [id]
-                        self.showAlert(msg, style: .success) {
-                            if isViewing {
-                                (self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as! MainVC).refresh()
-                                self.navigationController?.popViewController(animated: true)
-                            } else {
-                                self.refresh()
-                            }
-                        }
-                    } else { self.networkFailure() }
-                }
-            }
-        }
-        self << (UIAlertController(
-            title: report ? "你确定要举报吗？" : "你确定要屏蔽吗？",
-            message: report ? "帖子在被举报一定次数后会被系统隐藏" : "您可以在本地选择让这个帖子不再出现",
-            preferredStyle: .alert)..{
-                $0.addAction(.init(title: "确认", style: .destructive, handler: commit))
-                $0.addAction(.init(title: "取消", style: .cancel))
-            })
-    }
-    
-    func setTag(_ id: String) {
-        func commit(tag: Tag) {
-            DispatchQueue.global().async {
-                let success = Network.setTag(for: id, with: tag)
-                DispatchQueue.main.async {
-                    success
-                        ?> self.showAlert("设置成功", style: .success)
-                        ?< self.networkFailure()
-                }
-            }
-        }
-        self << (UIAlertController(title: "设置标签", message: "在被多人设置后，帖子将会被打上该种标签，以便不同用户过滤阅读", preferredStyle: .alert)..{ tagSelect in
-            for cs in Tag.allCases {
-                tagSelect.addAction(.init(title: String(describing: cs), style: .default, handler: { _ in
-                    commit(tag: cs)
-                }))
-            }
-            tagSelect.addAction(.init(title: "取消", style: .cancel, handler: nil))
-        })
-    }
-    
-    @objc func firstBtnClicked(_ sender: Any) {
-        if scene == .floors, let dd = d as? Floor.Manager {
-            let al = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
-            al.addAction(.init(title: "设置标签", style: .default, handler: { _ in
-                self.setTag(dd.thread.id)
-            }))
-            al.addAction(.init(title: "屏蔽", style: .default, handler: { _ in
-                self.blockThread("屏蔽成功", dd.thread.id, report: false)
-            }))
-            al.addAction(.init(title: "举报", style: .destructive, handler: { _ in
-                self.blockThread("举报成功", dd.thread.id, report: true)
-            }))
-            al.addAction(.init(title: "取消", style: .cancel, handler: nil))
-            if let popoverPresentationController = al.popoverPresentationController {
-                popoverPresentationController.sourceView = self.view
-                let fr = self.navigationController!.navigationBar.frame
-                popoverPresentationController.sourceRect = .init(x: fr.maxX - 1.0, y: fr.minY, width: 1.0, height: fr.height)
-                popoverPresentationController.permittedArrowDirections = .init(rawValue: 0)
-            }
-            self << al
-        } else {
-            self.navigationItem.titleView = search
-            search.searchBar.becomeFirstResponder()
-        }
-    }
-    
     @objc func secondBtnClicked(_ sender: Any) {
         scene == .floors => {
             self << (UIActivityViewController(activityItems: [URL(string: "http://wukefenggao.cn/viewThread/\((d as! Floor.Manager).thread.id)")!], applicationActivities: nil)..{
@@ -446,58 +368,6 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             _ = d.didSelectedRow(self, index: indexPath.row)
         }
     }
-    
-    // MARK: - Context Menu
-    
-    func tableView(_ tableView: UITableView, contextMenuConfigurationForRowAt indexPath: IndexPath, point: CGPoint) -> UIContextMenuConfiguration? {
-        guard let cell = tableView.cellForRow(at: indexPath) as? MainCell else { return nil }
-        if scene == .floors {
-            let dd = self.d as! Floor.Manager
-            return UIContextMenuConfiguration(identifier: nil, previewProvider: nil) {_ in
-                UIMenu(title: "", children: [
-                    UIAction(title: dd.thread.hasLiked == .disL ? "取消踩" : "踩", image: UIImage(systemName: "hand.thumbsdown.fill"), identifier: nil, attributes:  cell.liked != .like ? [] : [.disabled], handler: { _ in
-                        cell.like(0)
-                    }),
-                    UIAction(title: indexPath.row == 0 ? "屏蔽帖子" : "屏蔽\(cell.name)", image: UIImage(systemName: "eye.slash"), identifier: nil, handler: { _ in
-                        self.blockThread("屏蔽成功", cell.thread.id, report: false, isViewing: true)
-                    }),
-                    UIAction(title: indexPath.row == 0 ? "屏蔽并举报帖子" : "屏蔽并举报\(cell.name)", image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, handler: { _ in
-                        self.blockThread("举报成功", cell.thread.id, report: true, isViewing: true)
-                    })
-                ])
-            }
-        } else {
-            return UIContextMenuConfiguration(identifier: nil) {
-                (self.d.didSelectedRow(self, index: indexPath.row, commit: false) as! MainVC)..{
-                    $0.inPreview = true
-                }
-            } actionProvider: {_ in
-                UIMenu(title: "", children: [
-                    UIAction(title: "屏蔽", image: UIImage(systemName: "eye.slash"), identifier: nil, handler: { (a) in
-                        self.blockThread("屏蔽成功", cell.thread.id, report: false, isViewing: false)
-                    }),
-                    UIAction(title: "屏蔽并举报", image: UIImage(systemName: "exclamationmark.triangle.fill"), identifier: nil, handler: { (a) in
-                        self.blockThread("举报成功", cell.thread.id, report: true, isViewing: false)
-                    })
-                ])
-            }
-        }
-    }
-    
-    func tableView(_ tableView: UITableView, willPerformPreviewActionForMenuWith configuration: UIContextMenuConfiguration, animator: UIContextMenuInteractionCommitAnimating) {
-        if let dest = animator.previewViewController {
-            animator.addAnimations {
-                self.show(dest, sender: self)
-                with ((dest as! MainVC)) {
-                    $0.inPreview = false
-                    $0.topDist.constant = $0._topDist
-                    $0.updateFavour()
-                    $0.tableView.refreshControl = $0.refreshControl
-                }
-            }
-        }
-    }
-
 }
 
 extension MainVC: UIContextMenuInteractionDelegate {

@@ -51,6 +51,8 @@ class BaseTableVC: UIViewController, UITableViewDataSource, UITableViewDelegate,
         _tableView.dataSource = self
         _tableView.tableFooterView = UIView(frame: CGRect.zero)
         _tableView.contentInsetAdjustmentBehavior = .never
+        navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
     }
     
     func deselect() {
@@ -98,13 +100,14 @@ class SettingVC: BaseTableVC {
     @IBOutlet weak var tableView: UITableView!
     
     lazy var setting_content: [[(title: String, fun: () -> Void)]] = [
-        Tag.allCases.map {
+        [("被踩较多的帖子", {})] + Tag.allCases.map {
             ($0.rawValue, {})
         },
         [
-            ("网络统计", {self >> *"TokenVC"})
+            ("被踩较多的回复", {})
         ],
         [
+            ("网络统计", {self >> *"TokenVC"}),
             ("关于", {self >> *"AboutMenuVC"}),
             ("退出登录", {
                 G.token.content = ""
@@ -119,13 +122,31 @@ class SettingVC: BaseTableVC {
         cell.textLabel?.text = content[indexPath.section][indexPath.row].title
         let pr = G.viewStyle.content
         if indexPath.section == 0 {
-            cell.forTag = Tag.allCases[indexPath.row]
+            if indexPath.row > 0 {
+                cell.forTag = Tag.allCases[indexPath.row - 1]
+                cell.segment.selectedSegmentIndex = pr[String(describing: cell.forTag!)] ?? 1
+            } else {
+                cell.segment.selectedSegmentIndex = G.threadStyle.content
+            }
             cell.selectionStyle = .none
-            cell.segment.selectedSegmentIndex = pr[String(describing: cell.forTag!)] ?? 1
+        } else if indexPath.section == 1 {
+            cell.selectionStyle = .none
+            cell.segment.selectedSegmentIndex = G.floorStyle.content
+            cell.forThread = false
         } else {
             cell.segment.isHidden = true
         }
         return cell
+    }
+    
+    func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
+        if section == 0 {
+            return "帖子显示选项"
+        } else if section == 1 {
+            return "楼层显示选项"
+        } else {
+            return nil
+        }
     }
     override var content: [[(title: String, fun: () -> Void)]] { setting_content }
     override var cellName: String { "SettingCell" }
@@ -158,6 +179,8 @@ class TokenVC: UIViewController {
         super.viewDidLoad()
         
         self.navigationController?.navigationBar.prefersLargeTitles = true
+        navigationItem.largeTitleDisplayMode = .always
+        
         let d = G.networkStat.content
         textView.text = "Failed: \(Int(d[4]))\n Average: \(d[0] / d[1])ms\n Min: \(d[2])ms\n Max: \(d[3])ms"
         
@@ -196,10 +219,23 @@ class TermVC: UIViewController {
         checker.titleEdgeInsets = UIEdgeInsets(top: 0, left: 10, bottom: 0, right: 0)
         checker.imageEdgeInsets = UIEdgeInsets(top: 0, left: 5, bottom: 0, right: 0)
         if toHalt {
-            self.showAlert("无网络连接", style: .failure) {
+            self.showAlert("无网络连接，即将退出程序", style: .failure, duration: 2.0) {
                 Util.halt()
             }
         }
+    }
+    
+    override func viewDidAppear(_ animated: Bool) {
+        super.viewDidAppear(animated)
+        
+        if let s = G.blockContent {
+            self << (UIAlertController(title: "很抱歉，你已被封禁", message: s, preferredStyle: .alert)..{
+                $0.addAction(.init(title: "退出", style: .cancel, handler: { _ in
+                    Util.halt()
+                }))
+            })
+        }
+        
     }
     
     func noNetwork() -> Self {
