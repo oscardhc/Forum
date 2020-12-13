@@ -8,6 +8,14 @@
 import UIKit
 
 extension MainVC {
+    
+//    func tableView(_ tableView: UITableView, willDisplay cell: UITableViewCell, forRowAt indexPath: IndexPath) {
+//        if indexPath.row >= d.count - 3 && !footer.isRefreshing && d.count > 10 {
+//            print("start loadmore!", indexPath.row, d.count)
+//            footer.beginRefreshing()
+//        }
+//    }
+    
     func hasTappedAgain() {
         if tableView.refreshControl!.isRefreshing || tryDoubleTapping || firstLoading || isDoubleTapping {
             return
@@ -20,10 +28,11 @@ extension MainVC {
             self.tableView.setContentOffset(CGPoint(x: 0, y: self.tableView.contentOffset.y + 1), animated: true)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
                 self.tableView.setContentOffset(CGPoint(x: 0, y: -y), animated: true)
-                self.tableView.refreshControl?.beginRefreshing()
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
-                    self.refresh()
-//                    self.clearAll()
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.05) {
+                    self.tableView.refreshControl?.beginRefreshing()
+//                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        self.refresh()
+//                    }
                 }
             }
         } else {
@@ -36,8 +45,7 @@ extension MainVC {
         if scene == .floors {
             navigationItem.rightBarButtonItems![2].setImageTo(UIImage(systemName: (d as! Floor.Manager).thread.hasFavoured ? "star.fill" : "star"))
             navigationItem.rightBarButtonItems![2].isEnabled = true
-//            barThirdBtn.image = UIImage(systemName: (d as! Floor.Manager).thread.hasFavoured ? "star.fill" : "star")
-//            barThirdBtn.isEnabled = true
+            print(">>> update favour", navigationItem.rightBarButtonItems![2].isEnabled)
         }
     }
     

@@ -16,10 +16,10 @@ extension MainVC {
                 report => success = Network.reportThread(for: id)
                 DispatchQueue.main.async {
                     if success {
-                        let li = G.blockedList.content
-                        !li.contains(id) => G.blockedList.content = li + [id]
                         self.showAlert(msg, style: .success) {
                             if !report {
+                                let li = G.blockedList.content
+                                !li.contains(id) => G.blockedList.content = li + [id]
                                 if isViewing {
                                     if let mvc = self.navigationController!.viewControllers[self.navigationController!.viewControllers.count - 2] as? MainVC, let dd = mvc.d as? Thread.Manager, let idx = dd.filtered.firstIndex(where: {$0.id == id}) {
                                         mvc.tableView.beginUpdates()
@@ -160,11 +160,13 @@ extension MainVC {
         if let dest = animator.previewViewController {
             animator.addAnimations {
                 self.show(dest, sender: self)
-                with ((dest as! MainVC)) {
-                    $0.inPreview = false
-                    $0.topDist.constant = $0._topDist
-                    $0.updateFavour()
-                    $0.tableView.refreshControl = $0.refreshControl
+                (dest as! MainVC)..{ vc in
+                    vc.inPreview = false
+                    vc.topDist.constant = vc._topDist
+                    vc.tableView.refreshControl = vc.refreshControl
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.1) {
+                        vc.updateFavour()
+                    }
                 }
             }
         }

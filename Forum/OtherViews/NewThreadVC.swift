@@ -21,6 +21,7 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
     
     var blocks: [[UIButton]]!
     var getResult: (() -> (Int, Int))!
+    var preFill: (title: String?, content: String?)?
     
     private var fatherVC: MainVC!
     func withFather(_ vc: MainVC) -> Self {
@@ -57,6 +58,10 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         $0.textColor = self.traitCollection.userInterfaceStyle == .dark ? .lightText : .darkText
     }
 
+    func setTitleContent(_ pre : (title: String?, content: String?)) -> Self {
+        preFill = pre
+        return self
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -108,6 +113,13 @@ class NewThreadVC: UIViewController, UITextFieldDelegate, UITextViewDelegate {
         checkBtn.setTitle("人名随机排序", for: .normal)
         
         addKeyCommand(.init(input: UIKeyCommand.inputEscape, modifierFlags: [], action: #selector(esc)))
+        
+        if let t = preFill?.title {
+            titleTextField.text = t
+        }
+        if let c = preFill?.content {
+            contentTextField.text = c
+        }
     }
     
     @objc func chooseBlock(_ sender: UIButton) {

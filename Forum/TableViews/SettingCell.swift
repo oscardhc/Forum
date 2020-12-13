@@ -33,8 +33,8 @@ class SettingCell: UITableViewCell {
     @objc func segDidChange(_ sender: Any) {
         if let t = forTag {
             var pr = G.viewStyle.content, npr = [String: Int]()
-            for cs in Tag.allCases.map{String(describing: $0)} {
-                npr[cs] = pr[cs] ?? 1
+            for cs in Tag.allCases.map({String(describing: $0)}) {
+                npr[cs] = pr[cs] ?? 0
             }
             npr[String(describing: t)] = segment.selectedSegmentIndex
             G.viewStyle.content = npr

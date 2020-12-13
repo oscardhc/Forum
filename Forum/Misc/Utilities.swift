@@ -50,6 +50,24 @@ class Util {
     
 }
 
+extension UIImage {
+    
+    @available(iOS, obsoleted: 13.0)
+    convenience init?(systemName name: String, compatibleWith traitCollection: UITraitCollection?) {
+        self.init()
+    }
+    
+}
+
+extension UIColor {
+    
+    @available(iOS, obsoleted: 13.0)
+    class var systemBackground: UIColor {
+        .white
+    }
+    
+}
+
 class DarkSupportTextField: TextField {
     override func prepare() {
         super.prepare()
@@ -195,9 +213,10 @@ enum ColorTheme: ProvideList {
 
 class NameG: Generator<NameTheme> {
     override subscript(i: Int) -> String {
-        i >= vals.count
+        (i >= vals.count
             ? "\(vals[i % vals.count]).\(i / vals.count + 1)"
-            : vals[i]
+            : vals[i])
+//        + (i == 0 ? "(洞主)" : "")
     }
 }
 
@@ -253,15 +272,54 @@ extension UIViewController {
     }
 }
 
-func dealWithURLContext(_ urlContext: UIOpenURLContext) -> String? {
+extension String {
+
+    func fromBase64() -> String? {
+        guard let data = Data(base64Encoded: self) else {
+            return nil
+        }
+
+        return String(data: data, encoding: .utf8)
+    }
+
+    func toBase64() -> String {
+        return Data(self.utf8).base64EncodedString()
+    }
+
+}
+
+func dealWithURLContext(_ urlContext: UIOpenURLContext) {
     let url = urlContext.url.absoluteString.replacingOccurrences(of: "wkfg://", with: "")
     print("url = \(url)")
     
     if let i = Int(url), i >= 1, i < 1000000 {
-        return url
+        G.openThreadID = url
     } else {
+        G.openThreadID = nil
+        if url.hasPrefix("newThread") {
+            G.openNewThread = (nil, url.replacingOccurrences(of: "newThread/", with: "").fromBase64() ?? "url")
+        }
+    }
+    
+}
+
+func isUpdateAvailable() -> (Bool, String, String)? {
+    guard let info = Bundle.main.infoDictionary,
+          let currentVersion = info["CFBundleShortVersionString"] as? String,
+          let identifier = info["CFBundleIdentifier"] as? String,
+          let url = URL(string: "http://itunes.apple.com/lookup?bundleId=\(identifier)") else {
         return nil
     }
+    do {
+        let data = try Data(contentsOf: url)
+        guard let json = try JSONSerialization.jsonObject(with: data, options: [.allowFragments]) as? [String: Any] else {
+            return nil
+        }
+        if let result = (json["results"] as? [Any])?.first as? [String: Any], let version = result["version"] as? String {
+            return (version != currentVersion, version, currentVersion)
+        }
+    } catch {}
+    return nil
 }
 
 extension UIBarButtonItem {

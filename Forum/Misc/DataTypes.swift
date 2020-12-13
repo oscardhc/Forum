@@ -52,6 +52,12 @@ enum Tag: String, CaseIterable {
     case sex = "性相关", politics = "政治相关", uncomfort = "令人不适", unproved = "未经证实", war = "引战"
 }
 
+enum Order: String, CaseIterable {
+    case earliest = "最早回复", newest = "最新回复", only = "只看洞主", hot = "热度排序"
+    static let network = [Order.earliest: "0", .newest: "1", .only: "-1", .hot: "2"]
+    var netStr: String {Self.network[self]!}
+}
+
 struct Thread: DATA {
     
     enum Category: String, CaseIterable {
@@ -93,7 +99,7 @@ struct Thread: DATA {
         isFromFloorList = li
         
         
-        print(thread.keys, id)
+        print(thread.keys)
         
         tag = Tag.allCases.first(where: {String(describing: $0) == (thread["Tag"] as? String ?? "NULL")})
         myTag = Tag.allCases.first(where: {String(describing: $0) == thread["MyTag"] as? String ?? ""})
@@ -152,7 +158,7 @@ struct Thread: DATA {
             filtered = data.compactMap() {
                 if sortType == .my || sortType == .favoured { return $0.setedFolded(false) }
 
-                let dis = $0.nLiked - $0.nDislike < -5
+                let dis = $0.nLiked - $0.nDislike <= -5
                 if li.contains($0.id) || (setting == 2 && dis) { return nil }
                 if $0.tag == nil { return $0.setedFolded($0.folded && setting == 1 && dis) }
                 switch pr[String(describing: $0.tag!)] ?? 1 {
@@ -204,8 +210,7 @@ struct Thread: DATA {
         
         static func openCertainThread(_ vc: UIViewController, id: String) {
             MainVC.new(.floors, Thread(id))..{
-                $0.inPreview = true
-                vc << $0
+                vc >> $0
             }
         }
         
@@ -243,11 +248,14 @@ struct Floor: DATA {
     func setedFolded(_ b: Bool) -> Self {
         var res = self; res.folded = b; return res;
     }
+    mutating func setLikeStatus(nLiked nl: Int, nDisliked nd: Int, hasLiked hl: LikeState) {
+        (nLiked, nDisliked, hasLiked) = (nl, nd, hl)
+    }
     
     class Manager: DataManager<Floor> {
         
         var thread: Thread
-        var reverse = false
+        var order = Order.earliest
         
         var filtered = [Floor]()
         override var data: [Floor] {
@@ -259,7 +267,7 @@ struct Floor: DATA {
         func filter() {
             let setting = G.floorStyle.content
             filtered = data.compactMap {
-                if $0.nLiked - $0.nDisliked >= -5 {
+                if $0.nLiked - $0.nDisliked > -5 {
                     return $0.setedFolded(false)
                 }
                 print(">>>", setting)
@@ -279,14 +287,14 @@ struct Floor: DATA {
         override var count: Int {filtered.count + 1}
         
         override func networking() -> ([Floor], String)? {
-            Network.getFloors(for: thread.id, lastSeenID: last, reverse: reverse)..{
+            Network.getFloors(for: thread.id, lastSeenID: last, order: order.netStr)..{
                 if let t = $0.1 { thread = t }
             }..\.0
         }
         
         override func initializeCell(_ cell: MainCell, index: Int) -> MainCell {
             index == 0
-                ? cell.setAs(floor: thread.generateFirstFloor(), forThread: thread, firstFloor: true, reversed: reverse)
+                ? cell.setAs(floor: thread.generateFirstFloor(), forThread: thread, firstFloor: true, order: order)
                 : cell.setAs(floor: index <= filtered.count ? filtered[index - 1] : Floor(fake: true), forThread: thread, firstFloor: false)
         }
         

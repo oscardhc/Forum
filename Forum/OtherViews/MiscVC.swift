@@ -124,7 +124,7 @@ class SettingVC: BaseTableVC {
         if indexPath.section == 0 {
             if indexPath.row > 0 {
                 cell.forTag = Tag.allCases[indexPath.row - 1]
-                cell.segment.selectedSegmentIndex = pr[String(describing: cell.forTag!)] ?? 1
+                cell.segment.selectedSegmentIndex = pr[String(describing: cell.forTag!)] ?? 0
             } else {
                 cell.segment.selectedSegmentIndex = G.threadStyle.content
             }

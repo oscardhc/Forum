@@ -184,12 +184,19 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
                 .imgItem(UIImage(systemName: "square.and.arrow.up", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), action: #selector(secondBtnClicked(_:)), to: self),
                 .imgItem(UIImage(systemName: "star", withConfiguration: UIImage.SymbolConfiguration(scale: .large)), action: #selector(thirdBtnClicked(_:)), to: self)..{$0.isEnabled = false}
             ]
+            print("view will appear!", navigationItem.rightBarButtonItems![2].isEnabled)
         }
         
         if let id = G.openThreadID {
             G.openThreadID = nil
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
                 Thread.Manager.openCertainThread(self, id: id)
+            }
+        }
+        if let nt = G.openNewThread {
+            G.openNewThread = nil
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.2) {
+                self << (*"NewThreadVC" as! NewThreadVC).setTitleContent(nt)
             }
         }
         
@@ -197,13 +204,29 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             let pp = G.viewStyle.content
             for cs in Tag.allCases.map({String(describing: $0)}) {
                 if (dd.pr[cs] ?? 0) != (pp[cs] ?? 0) {
-                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.3) {
                         self.hasTappedAgain()
                     }
                     break
                 }
             }
         }
+        
+//        DispatchQueue.global().async {
+//            while true {
+//                sleep(1)
+//                if let up = G.updateAvailable {
+//                    DispatchQueue.main.async {
+//                        self << (UIAlertController(title: "有更新可用", message: "您当前版本为: \(up.1)\n最新版本为: \(up.0)", preferredStyle: .alert)..{
+//                            $0.addAction(.init(title: "取消", style: .cancel, handler: { _ in
+//                                G.dismissedUpdate = dis
+//                            }))
+//                        })
+//                        G.updateAvailable = nil
+//                    }
+//                }
+//            }
+//        }
     }
     
     override func viewWillDisappear(_ animated: Bool) {
@@ -232,7 +255,7 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
                             self.textView.text = ""
                             self.textViewDidChange(self.textView)
                             (self.d as! Floor.Manager)..{
-                                $0.count > 1 && !$0.reverse
+                                $0.count > 1 && $0.order == .earliest
                                     ?> self.loadmore()
                                     ?< self.refresh()
                             }
@@ -247,10 +270,11 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
         self << (*"NewThreadVC" as! NewThreadVC).withFather(self)
     }
     
-    @objc func secondBtnClicked(_ sender: Any) {
+    @objc func secondBtnClicked(_ sender: UIButton) {
+        print(type(of: sender))
         scene == .floors => {
             self << (UIActivityViewController(activityItems: [URL(string: "http://wukefenggao.cn/viewThread/\((d as! Floor.Manager).thread.id)")!], applicationActivities: nil)..{
-                $0.popoverPresentationController?.sourceView = self.view
+                $0.popoverPresentationController?.sourceView = sender
             })
         }
     }
@@ -334,10 +358,10 @@ class MainVC: UIViewController, UITableViewDelegate, UITableViewDataSource, Doub
             }
     }
     
-    func setReplyOrder(reverse: Bool) {
+    func setReplyOrder(_ order: Order) {
         (d as! Floor.Manager)..{
-            if $0.reverse != reverse {
-                $0.reverse = reverse
+            if $0.order.netStr != order.netStr {
+                $0.order = order
                 clearAll()
             }
         }

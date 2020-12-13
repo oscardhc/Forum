@@ -35,6 +35,9 @@
 		55BC1E18257D31E5005D4861 /* MainVCMenu.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55BC1E17257D31E5005D4861 /* MainVCMenu.swift */; };
 		55D748F7253EC35E00F44EF8 /* NewThreadVC.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55D748F6253EC35E00F44EF8 /* NewThreadVC.swift */; };
 		55DB189A256259C800FA8041 /* TabBarController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55DB1899256259C800FA8041 /* TabBarController.swift */; };
+		55F507BB25852DB8005FC7E3 /* ShareViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 55F507BA25852DB8005FC7E3 /* ShareViewController.swift */; };
+		55F507BE25852DB8005FC7E3 /* MainInterface.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 55F507BC25852DB8005FC7E3 /* MainInterface.storyboard */; };
+		55F507C225852DB8005FC7E3 /* ForumShare.appex in Embed App Extensions */ = {isa = PBXBuildFile; fileRef = 55F507B825852DB8005FC7E3 /* ForumShare.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -52,7 +55,28 @@
 			remoteGlobalIDString = 55AA46562516739A00AAF708;
 			remoteInfo = Forum;
 		};
+		55F507C025852DB8005FC7E3 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 55AA464F2516739A00AAF708 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 55F507B725852DB8005FC7E3;
+			remoteInfo = ForumShare;
+		};
 /* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		55F507C725852DB8005FC7E3 /* Embed App Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				55F507C225852DB8005FC7E3 /* ForumShare.appex in Embed App Extensions */,
+			);
+			name = "Embed App Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		4510799AE53C309935E5C212 /* Pods_Forum.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_Forum.framework; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -90,6 +114,11 @@
 		55BC1E17257D31E5005D4861 /* MainVCMenu.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainVCMenu.swift; sourceTree = "<group>"; };
 		55D748F6253EC35E00F44EF8 /* NewThreadVC.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NewThreadVC.swift; sourceTree = "<group>"; };
 		55DB1899256259C800FA8041 /* TabBarController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TabBarController.swift; sourceTree = "<group>"; };
+		55F507B825852DB8005FC7E3 /* ForumShare.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = ForumShare.appex; sourceTree = BUILT_PRODUCTS_DIR; };
+		55F507BA25852DB8005FC7E3 /* ShareViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ShareViewController.swift; sourceTree = "<group>"; };
+		55F507BD25852DB8005FC7E3 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/MainInterface.storyboard; sourceTree = "<group>"; };
+		55F507BF25852DB8005FC7E3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		55F507C325852DB8005FC7E3 /* ForumShare.entitlements */ = {isa = PBXFileReference; lastKnownFileType = text.plist.entitlements; path = ForumShare.entitlements; sourceTree = "<group>"; };
 		90429E9417EA95DFFB87AB0F /* Pods-Forum.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Forum.debug.xcconfig"; path = "Target Support Files/Pods-Forum/Pods-Forum.debug.xcconfig"; sourceTree = "<group>"; };
 		DEC1889DC33D6E5A3F703951 /* Pods-Forum.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Forum.release.xcconfig"; path = "Target Support Files/Pods-Forum/Pods-Forum.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -111,6 +140,13 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 		55AA46782516739B00AAF708 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		55F507B525852DB8005FC7E3 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -175,6 +211,7 @@
 				55AA46592516739A00AAF708 /* Forum */,
 				55AA46732516739B00AAF708 /* ForumTests */,
 				55AA467E2516739B00AAF708 /* ForumUITests */,
+				55F507B925852DB8005FC7E3 /* ForumShare */,
 				55AA46582516739A00AAF708 /* Products */,
 				54D7D957F7552CDB1F28B87E /* Pods */,
 				CB9CF059985FF22B9A26C8A2 /* Frameworks */,
@@ -187,6 +224,7 @@
 				55AA46572516739A00AAF708 /* Forum.app */,
 				55AA46702516739B00AAF708 /* ForumTests.xctest */,
 				55AA467B2516739B00AAF708 /* ForumUITests.xctest */,
+				55F507B825852DB8005FC7E3 /* ForumShare.appex */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -227,6 +265,17 @@
 			path = ForumUITests;
 			sourceTree = "<group>";
 		};
+		55F507B925852DB8005FC7E3 /* ForumShare */ = {
+			isa = PBXGroup;
+			children = (
+				55F507C325852DB8005FC7E3 /* ForumShare.entitlements */,
+				55F507BA25852DB8005FC7E3 /* ShareViewController.swift */,
+				55F507BC25852DB8005FC7E3 /* MainInterface.storyboard */,
+				55F507BF25852DB8005FC7E3 /* Info.plist */,
+			);
+			path = ForumShare;
+			sourceTree = "<group>";
+		};
 		CB9CF059985FF22B9A26C8A2 /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -248,10 +297,12 @@
 				55AA46552516739A00AAF708 /* Resources */,
 				55525F0AA455EA113D0DE41C /* [CP] Embed Pods Frameworks */,
 				5537269925668C620067634B /* ShellScript */,
+				55F507C725852DB8005FC7E3 /* Embed App Extensions */,
 			);
 			buildRules = (
 			);
 			dependencies = (
+				55F507C125852DB8005FC7E3 /* PBXTargetDependency */,
 			);
 			name = Forum;
 			productName = Forum;
@@ -294,13 +345,30 @@
 			productReference = 55AA467B2516739B00AAF708 /* ForumUITests.xctest */;
 			productType = "com.apple.product-type.bundle.ui-testing";
 		};
+		55F507B725852DB8005FC7E3 /* ForumShare */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 55F507C425852DB8005FC7E3 /* Build configuration list for PBXNativeTarget "ForumShare" */;
+			buildPhases = (
+				55F507B425852DB8005FC7E3 /* Sources */,
+				55F507B525852DB8005FC7E3 /* Frameworks */,
+				55F507B625852DB8005FC7E3 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = ForumShare;
+			productName = ForumShare;
+			productReference = 55F507B825852DB8005FC7E3 /* ForumShare.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
 		55AA464F2516739A00AAF708 /* Project object */ = {
 			isa = PBXProject;
 			attributes = {
-				LastSwiftUpdateCheck = 1200;
+				LastSwiftUpdateCheck = 1220;
 				LastUpgradeCheck = 1200;
 				TargetAttributes = {
 					55AA46562516739A00AAF708 = {
@@ -313,6 +381,9 @@
 					55AA467A2516739B00AAF708 = {
 						CreatedOnToolsVersion = 12.0;
 						TestTargetID = 55AA46562516739A00AAF708;
+					};
+					55F507B725852DB8005FC7E3 = {
+						CreatedOnToolsVersion = 12.2;
 					};
 				};
 			};
@@ -332,6 +403,7 @@
 				55AA46562516739A00AAF708 /* Forum */,
 				55AA466F2516739B00AAF708 /* ForumTests */,
 				55AA467A2516739B00AAF708 /* ForumUITests */,
+				55F507B725852DB8005FC7E3 /* ForumShare */,
 			);
 		};
 /* End PBXProject section */
@@ -359,6 +431,14 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		55F507B625852DB8005FC7E3 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				55F507BE25852DB8005FC7E3 /* MainInterface.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -468,6 +548,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		55F507B425852DB8005FC7E3 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				55F507BB25852DB8005FC7E3 /* ShareViewController.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
@@ -480,6 +568,11 @@
 			isa = PBXTargetDependency;
 			target = 55AA46562516739A00AAF708 /* Forum */;
 			targetProxy = 55AA467C2516739B00AAF708 /* PBXContainerItemProxy */;
+		};
+		55F507C125852DB8005FC7E3 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 55F507B725852DB8005FC7E3 /* ForumShare */;
+			targetProxy = 55F507C025852DB8005FC7E3 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
@@ -498,6 +591,14 @@
 				55AA46692516739B00AAF708 /* Base */,
 			);
 			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		55F507BC25852DB8005FC7E3 /* MainInterface.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				55F507BD25852DB8005FC7E3 /* Base */,
+			);
+			name = MainInterface.storyboard;
 			sourceTree = "<group>";
 		};
 /* End PBXVariantGroup section */
@@ -623,6 +724,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = 90429E9417EA95DFFB87AB0F /* Pods-Forum.debug.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Forum/Forum.entitlements;
@@ -649,6 +751,7 @@
 			isa = XCBuildConfiguration;
 			baseConfigurationReference = DEC1889DC33D6E5A3F703951 /* Pods-Forum.release.xcconfig */;
 			buildSettings = {
+				ALWAYS_EMBED_SWIFT_STANDARD_LIBRARIES = YES;
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_ENTITLEMENTS = Forum/Forum.entitlements;
@@ -755,6 +858,50 @@
 			};
 			name = Release;
 		};
+		55F507C525852DB8005FC7E3 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ForumShare/ForumShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = AEF5CS25ZL;
+				INFOPLIST_FILE = ForumShare/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.oscardhc.forum.ForumShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		55F507C625852DB8005FC7E3 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_ENTITLEMENTS = ForumShare/ForumShare.entitlements;
+				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = AEF5CS25ZL;
+				INFOPLIST_FILE = ForumShare/Info.plist;
+				IPHONEOS_DEPLOYMENT_TARGET = 14.2;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.oscardhc.forum.ForumShare;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SKIP_INSTALL = YES;
+				SUPPORTS_MACCATALYST = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -790,6 +937,15 @@
 			buildConfigurations = (
 				55AA468B2516739B00AAF708 /* Debug */,
 				55AA468C2516739B00AAF708 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		55F507C425852DB8005FC7E3 /* Build configuration list for PBXNativeTarget "ForumShare" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				55F507C525852DB8005FC7E3 /* Debug */,
+				55F507C625852DB8005FC7E3 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

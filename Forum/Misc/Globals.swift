@@ -54,6 +54,9 @@ class G {
     static var blockContent: String?
     
     static var openThreadID: String? = nil
+    static var openNewThread: (String?, String?)? = nil
+    static var updateAvailable: (String, String)? = nil
+    static var dismissedUpdate = StoredObject<String>("ForumDismissedUpdate", { "" })
     
 }
 

@@ -7,6 +7,7 @@
 
 import UIKit
 
+@available(iOS 13.0, *)
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
     var window: UIWindow?
@@ -19,15 +20,25 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
         guard let _ = (scene as? UIWindowScene) else { return }
         
         if let urlContext = connectionOptions.urlContexts.first {
-            G.openThreadID = dealWithURLContext(urlContext)
+            dealWithURLContext(urlContext)
         }
         
+//        DispatchQueue.global().async {
+//            if let res = isUpdateAvailable(), res.0 {
+//                G.updateAvailable = (res.1, res.2)
+//            }
+//        }
+        
+        var pr = G.viewStyle.content, npr = [String: Int]()
+        for cs in Tag.allCases.map({String(describing: $0)}) {
+            npr[cs] = pr[cs] ?? 0
+        }
+        G.viewStyle.content = npr
+        
         if let (success, blockString) = Network.verifyToken() {
-            print(">", success)
             if success != "1" {
                 window?.rootViewController = *"TermVC"
                 if success == "-1" {
-                    print(">>", blockString)
                     G.blockContent = blockString
                 }
             } else {
@@ -45,16 +56,20 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
                 if mvc is LoginVC || mvc is TermVC {
                     mvc.showAlert("请先登录", style: .failure, duration: 2)
                 } else {
-                    G.openThreadID = dealWithURLContext(urlContext)
+                    dealWithURLContext(urlContext)
                     if let id = G.openThreadID {
                         G.openThreadID = nil
                         Thread.Manager.openCertainThread(mvc, id: id)
+                    } else if let nt = G.openNewThread {
+                        G.openNewThread = nil
+                        mvc << (*"NewThreadVC" as! NewThreadVC).setTitleContent(nt)
                     } else {
                         mvc.showAlert("链接格式错误", style: .warning, duration: 1.5)
                     }
                 }
             }
         }
+        
     }
 
     func sceneDidDisconnect(_ scene: UIScene) {

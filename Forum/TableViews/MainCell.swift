@@ -56,7 +56,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     var content = (title: "", content: "") {
         didSet {
             for v in higherTitleLabel.subviews {v.removeFromSuperview()}
-            print(thread.tag, scene, isFirstFloor)
             if let t = thread.tag?.rawValue, scene == .thread || isFirstFloor {
                 let w = (t as NSString).size(withAttributes: [NSAttributedString.Key.font: UIFont.systemFont(ofSize: 15)]).width + 10
                 higherTitleLeadingDist.constant = w + 16
@@ -90,7 +89,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     
     var folded: Bool = false {
         didSet {
-            print("set folded", folded)
             (idLabel.subviews + cornerLabel.subviews).forEach({$0.removeFromSuperview()})
             if folded || (scene == .thread && thread.tag != nil) {
                 let t = (scene == .thread ? thread.tag?.rawValue : nil) ?? "被踩过多"
@@ -102,7 +100,7 @@ class MainCell: UITableViewCell, UITextViewDelegate {
                 blockBottomDist.constant = 6
                 replyToName.isEnabled = false
             } else {
-                blockBottomDist.constant = 2000
+                blockBottomDist.constant = 3000
                 replyToName.isEnabled = true
             }
         }
@@ -144,7 +142,6 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         super.setSelected(selected, animated: animated)
 
         // Configure the view for the selected state
-//        mainView.layer.backgroundColor = UIColor.systemGray6.cgColor
     }
     
     func textView(_ textView: UITextView, shouldInteractWith URL: URL, in characterRange: NSRange, interaction: UITextItemInteraction) -> Bool {
@@ -205,6 +202,9 @@ class MainCell: UITableViewCell, UITextViewDelegate {
                             }
                         case .like: self.liked = .none; self.floor.nLiked -= 1
                         case .disL: self.liked = .none; self.floor.nLiked += 1
+                        }
+                        if let dd = self.parentVC.d as? Floor.Manager, let i = dd.data.firstIndex(where: {$0.id == self.floor.id}) {
+                            dd.data[i].setLikeStatus(nLiked: self.floor.nLiked, nDisliked: self.floor.nDisliked, hasLiked: self.liked)
                         }
                         self.likedBtn.setTitle("\(self.floor.nLiked - self.floor.nDisliked)", for: .normal)
                     } else { self.parentVC.showAlert("网络错误", style: .failure) }
@@ -281,12 +281,14 @@ class MainCell: UITableViewCell, UITextViewDelegate {
     @objc func moveTo(_ sender: Any) {
         (parentVC.d as! Floor.Manager, String(floor.replyToFloor!))..{ (dd, to) in
             if floor.replyToFloor! > 0,  let idx = dd.data.firstIndex(where: {$0.id == to}) {
-                parentVC.tableView.scrollToRow(at: .init(row: idx + 1, section: 0), at: dd.reverse ? .bottom : .top, animated: true)
+                parentVC.tableView.scrollToRow(at: .init(row: idx + 1, section: 0), at: dd.order == .earliest ? .top : .none, animated: true)
+            } else {
+                parentVC.showAlert("该楼层暂未加载或不存在", style: .warning)
             }
         }
     }
     
-    func setAs(floor f: Floor, forThread t: Thread, firstFloor: Bool = false, reversed: Bool = false) -> Self {
+    func setAs(floor f: Floor, forThread t: Thread, firstFloor: Bool = false, order o: Order = .earliest) -> Self {
         if f.fake {
             return self
         }
@@ -294,8 +296,9 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         floor = f
         isFirstFloor = firstFloor
         scene = .floor
-        orderReversed = reversed
-        updateOrder()
+        order = o
+        self.orderBtn.setTitle(order.rawValue, for: .normal)
+        
         name = t.name[Int(f.name)!]
         
         idLabel.text = name +
@@ -348,21 +351,18 @@ class MainCell: UITableViewCell, UITextViewDelegate {
         return self
     }
     
-    var orderReversed = false
-    func updateOrder() {
-        self.orderBtn.setTitle(orderReversed ? "最新回复" : "最早回复", for: .normal)
-        self.orderBtn.setImage(
-            UIImage(systemName: orderReversed ? "arrowtriangle.down.circle" : "arrowtriangle.up.circle",
-                    withConfiguration: UIImage.SymbolConfiguration(scale: .small)),
-            for: .normal
-        )
-    }
-    @objc func orderBtnClicked(_ sender: Any) {
-//        dropdown.show()
-        orderReversed = !orderReversed
-        updateOrder()
-        self.orderBtn.isEnabled = false
-        self.parentVC.setReplyOrder(reverse: orderReversed)
+    var order: Order = .earliest
+    
+    
+    @objc func orderBtnClicked(_ sender: UIButton) {
+        DropDown(anchorView: sender, selectionAction: { (i, s) in
+            if self.order.rawValue != s {
+                self.order = Order.allCases.first{$0.rawValue == s}!
+                self.orderBtn.setTitle(self.order.rawValue, for: .normal)
+                self.orderBtn.isEnabled = false
+                self.parentVC.setReplyOrder(self.order)
+            }
+        }, dataSource: Order.allCases.map{$0.rawValue}).show()
     }
     
     // MARK: - Message

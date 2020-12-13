@@ -17,15 +17,23 @@ class Network {
         func singleConnect() -> [String: Any]? {
             do {
                 let data = try e.encode(d)
+                print(String(data: data, encoding: .utf8)!)
                 
                 let s = try Socket.create()
                 try s.connect(to: ip, port: port, timeout: 10000)
+                print("connect")
                 try s.write(from: data)
                 try s.setReadTimeout(value: 10000)
-                var dt = Data()
+                print("sent")
                 
+                usleep(10000)
+                
+                var dt = Data()
                 while try s.read(into: &dt) > 0 {
+                    print("> get")
                 }
+                
+                print("get", String(data: dt, encoding: .utf8)!)
                 
                 let rec = try JSONSerialization.jsonObject(
                     with: dt,
@@ -41,7 +49,7 @@ class Network {
         let before = Date().timeIntervalSince1970
         for i in 1...3 {
             if let res = singleConnect() {
-                print("connect success with in \(i) time(s)")
+                print("connect success with in \(i) time(s), \((Date().timeIntervalSince1970 - before) * 1000) ms")
                 G.updateStat((Date().timeIntervalSince1970 - before) * 1000)
                 return res
             }
@@ -98,8 +106,8 @@ class Network {
         }
     }
     
-    static func getFloors(for threadID: String, lastSeenID: String, reverse: Bool) -> (([Floor], String)?, Thread?) {
-        getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID, pa_3: reverse ? "1" : "0") {
+    static func getFloors(for threadID: String, lastSeenID: String, order: String) -> (([Floor], String)?, Thread?) {
+        getData(op_code: "2", pa_1: threadID, pa_2: lastSeenID, pa_3: order) {
             $0["ExistFlag"] as! String == "0" ? (nil, nil) :
             (
                 (
